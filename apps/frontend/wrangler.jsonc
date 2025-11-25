@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "downtown65-events-frontend",
+  "compatibility_date": "2025-04-04",
+  "main": "./workers/app.ts",
+  "workers_dev": true,
+  "routes": [
+    {
+      "pattern": "downtown65.site",
+      "custom_domain": true
+    }
+  ],
+  "vars": {
+    "VALUE_FROM_CLOUDFLARE": "Hello from Cloudflare"
+  }
+}

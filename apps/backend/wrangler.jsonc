@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "downtown65-events-backend",
+  "compatibility_date": "2025-04-04",
+  "main": "./src/server.ts",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "workers_dev": false,
+  "routes": [
+    {
+      "pattern": "api.downtown65.site",
+      "custom_domain": true
+    }
+  ]
+}
