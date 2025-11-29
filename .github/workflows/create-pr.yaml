@@ -15,12 +15,11 @@ env:
   WRANGLER_ENV: ${{ github.actor }}
 
 jobs:
-  build:
+  ci:
     runs-on: ubuntu-22.04
     environment: development
-    name: Setup
     steps:
-      - uses: actions/checkout@v4.2
+      - uses: actions/checkout@v4
       - name: Install pnpm
         uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
@@ -30,19 +29,22 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Lint
-        run: pnpm run ci:
-      - name: Version check
-        run:  pnpm run lint-package-versions
+        run: pnpm run ci:lint
       - name: Typecheck
         run: pnpm run typecheck
-      - name: Unit test
+      - name: Test
         run: pnpm run test
-      - name: Deploy API
-        working-directory: apps/backend
+      - name: Deploy backend to Cloudflare Workers
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+        working-directory: apps/backend
         run: |
-          npx wrangler deploy -e development
-#  npx wrangler deploy -e ${{ env.WRANGLER_ENV }}
-          
+         pnpm run deploy -e=$WRANGLER_ENV
+      - name: Deploy frontend to Cloudflare Workers
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+        working-directory: apps/frontend
+        run: |
+         pnpm run deploy -e=$WRANGLER_ENV

@@ -2,7 +2,11 @@ import { Card, Container, Flex, Image, List, Stack, Text } from '@mantine/core'
 import logoDark from './logo-dark.svg'
 import logoLight from './logo-light.svg'
 
-export function Welcome() {
+interface WelcomeProps {
+  message?: string
+}
+
+export const Welcome = ({ message }: WelcomeProps) => {
   return (
     <Flex component="main" align="center" justify="center" pt="lg" pb="sm" h="100%">
       <Flex direction="column" gap="xl" align="center">

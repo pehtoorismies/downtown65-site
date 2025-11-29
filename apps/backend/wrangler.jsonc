@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "downtown65-events-backend",
+  "name": "dt65-events-backend",
   "compatibility_date": "2025-04-04",
   "main": "./src/server.ts",
   "compatibility_flags": [
@@ -14,9 +14,11 @@
     }
   ],
   "env": {
-    "development": {
+    // Developer environments
+    "pehtoorismies": {
       "workers_dev": true
     },
+    // Production and staging environments
     "staging": {
       "routes": [
         {
