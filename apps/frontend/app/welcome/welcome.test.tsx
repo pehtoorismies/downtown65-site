@@ -6,6 +6,6 @@ import { Welcome } from './welcome'
 describe('Welcome', () => {
   it('should render successfully', () => {
     testRender(<Welcome />)
-    expect(screen.getByText(/What's kupp?/i)).toBeInTheDocument()
+    expect(screen.getByText(/What's next?/i)).toBeInTheDocument()
   })
 })

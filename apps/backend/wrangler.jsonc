@@ -6,11 +6,32 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
-  "workers_dev": false,
+  "workers_dev": true,
   "routes": [
     {
       "pattern": "api.downtown65.site",
       "custom_domain": true
     }
-  ]
+  ],
+  "env": {
+    "development": {
+      "workers_dev": true
+    },
+    "staging": {
+      "routes": [
+        {
+          "pattern": "staging-api.downtown65.site",
+          "custom_domain": true
+        }
+      ]
+    },
+    "production": {
+      "routes": [
+        {
+          "pattern": "api.downtown65.site",
+          "custom_domain": true
+        }
+      ]
+    }
+  }
 }
