@@ -1,5 +1,6 @@
 import { OpenAPIHono } from '@hono/zod-openapi'
 import { beforeEach, describe, expect, it } from 'vitest'
+import type { AppAPI } from '../app-api'
 import { registerEventRoutes } from '../routes/events'
 import { EventStore } from '../store/events'
 
@@ -35,7 +36,7 @@ describe('EventStore', () => {
 
 describe('Event routes', () => {
   let store: EventStore
-  let app: OpenAPIHono
+  let app: AppAPI
 
   beforeEach(() => {
     store = new EventStore()
