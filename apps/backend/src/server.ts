@@ -1,10 +1,13 @@
 import { OpenAPIHono } from '@hono/zod-openapi'
 import { apiReference } from '@scalar/hono-api-reference'
 import { cors } from 'hono/cors'
+import type { AppAPI } from './app-api'
 import { registerEventRoutes } from './routes/events'
 import { eventStore } from './store/events'
 
-const app = new OpenAPIHono<{ Bindings: Env }>()
+export type OpenAPIHonoType = OpenAPIHono<{ Bindings: Env }>
+
+const app: AppAPI = new OpenAPIHono<{ Bindings: Env }>()
 
 app.openAPIRegistry.registerComponent('securitySchemes', 'ApiKeyAuth', {
   type: 'apiKey',

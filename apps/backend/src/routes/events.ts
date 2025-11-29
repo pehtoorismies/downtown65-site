@@ -1,5 +1,5 @@
-import type { OpenAPIHono } from '@hono/zod-openapi'
 import { createRoute, z } from '@hono/zod-openapi'
+import type { AppAPI } from '../app-api'
 import {
   EventCreateSchema,
   EventListSchema,
@@ -12,10 +12,7 @@ const MessageSchema = z.object({
   message: z.string(),
 })
 
-export const registerEventRoutes = (
-  app: OpenAPIHono<{ Bindings: Env }>,
-  store: EventStore,
-): void => {
+export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
   app.openapi(
     createRoute({
       method: 'get',

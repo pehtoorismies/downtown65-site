@@ -9,11 +9,13 @@
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
+    "ci:lint": "pnpm -r ci:lint",
     "format": "pnpm -r format",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "lint-package-versions": "sherif"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "wrangler": "4.40.2"
+    "sherif": "1.9.0"
   }
 }
