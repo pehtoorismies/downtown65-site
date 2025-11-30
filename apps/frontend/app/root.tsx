@@ -1,4 +1,5 @@
 import {
+  AppShell,
   Box,
   Code,
   ColorSchemeScript,
@@ -11,9 +12,20 @@ import type React from 'react'
 import { Links, Meta, Outlet, Scripts, ScrollRestoration, isRouteErrorResponse } from 'react-router'
 import type { Route } from './+types/root'
 import './app.css'
+import { useDisclosure } from '@mantine/hooks'
 import { AppTheme } from '~/app-theme'
+import { LoggedInNavigation, LoggedOutNavigation, Navbar } from './components/navigation'
+import type { User } from './domain/user'
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const [navigationOpened, { toggle, close }] = useDisclosure()
+
+  const user: User = {
+    id: 'user-1',
+    nickname: 'Testaaja Testinen',
+    picture: 'https://example.com/avatar.jpg',
+  }
+
   return (
     <html lang="en" {...mantineHtmlProps}>
       <head>
@@ -24,7 +36,33 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <AppTheme>{children}</AppTheme>
+        <AppTheme>
+          <AppShell
+            header={{ height: { base: 60, md: 70, lg: 80 } }}
+            navbar={{
+              width: 300,
+              breakpoint: 'sm',
+              collapsed: { desktop: true, mobile: !navigationOpened },
+            }}
+            padding="xs"
+          >
+            <AppShell.Header>
+              {user && (
+                <LoggedInNavigation
+                  user={user}
+                  toggle={toggle}
+                  close={close}
+                  navigationOpened={navigationOpened}
+                />
+              )}
+              {!user && <LoggedOutNavigation />}
+            </AppShell.Header>
+            <AppShell.Navbar py="md" p="sm">
+              <Navbar close={close} />
+            </AppShell.Navbar>
+            <AppShell.Main>{children}</AppShell.Main>
+          </AppShell>
+        </AppTheme>
         <ScrollRestoration />
         <Scripts />
       </body>

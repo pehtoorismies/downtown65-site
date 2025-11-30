@@ -3,10 +3,13 @@
   "name": "dt65-events-backend",
   "compatibility_date": "2025-04-04",
   "main": "./src/server.ts",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
+  "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
+  "vars": {
+    "AUTH_CLIENT_ID": "JaoAht7ggce7f5R8DCBGUyjUJeMQEDtz",
+    "AUTH_DOMAIN": "dev-dt65.eu.auth0.com",
+    "AUTH_AUDIENCE": "https://graphql-dev.downtown65.com"
+  },
   "routes": [
     {
       "pattern": "api.downtown65.site",
@@ -16,7 +19,12 @@
   "env": {
     // Developer environments
     "pehtoorismies": {
-      "workers_dev": true
+      "workers_dev": true,
+      "vars": {
+        "AUTH_CLIENT_ID": "JaoAht7ggce7f5R8DCBGUyjUJeMQEDtz",
+        "AUTH_DOMAIN": "dev-dt65.eu.auth0.com",
+        "AUTH_AUDIENCE": "https://graphql-dev.downtown65.com"
+      }
     },
     // Production and staging environments
     "staging": {

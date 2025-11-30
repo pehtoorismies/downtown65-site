@@ -36,5 +36,3 @@ export class EventStore {
     this.events.clear()
   }
 }
-
-export const eventStore = new EventStore()

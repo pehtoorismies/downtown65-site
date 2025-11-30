@@ -1,13 +1,17 @@
 import { OpenAPIHono } from '@hono/zod-openapi'
 import { apiReference } from '@scalar/hono-api-reference'
 import { cors } from 'hono/cors'
+
+import { Hono } from 'hono'
 import type { AppAPI } from './app-api'
+import { registerAuthRoutes } from './routes/auth'
 import { registerEventRoutes } from './routes/events'
-import { eventStore } from './store/events'
+import { AuthStore } from './store/auth'
+import { EventStore } from './store/events'
 
 export type OpenAPIHonoType = OpenAPIHono<{ Bindings: Env }>
 
-const app: AppAPI = new OpenAPIHono<{ Bindings: Env }>()
+const app = new OpenAPIHono<{ Bindings: Env }>()
 
 app.openAPIRegistry.registerComponent('securitySchemes', 'ApiKeyAuth', {
   type: 'apiKey',
@@ -20,7 +24,8 @@ app.use('*', cors())
 
 app.get('/healthz', (c) => c.json({ status: 'oks' }))
 
-registerEventRoutes(app, eventStore)
+registerEventRoutes(app, new EventStore())
+registerAuthRoutes(app)
 
 app.doc('/openapi.json', {
   openapi: '3.1.0',

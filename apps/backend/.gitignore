@@ -4,13 +4,11 @@
 *.tsbuildinfo
 
 # React Router
-/.react-router/
 /build/
 
 # Cloudflare
 .mf
 .wrangler
-.dev.vars*
-worker-configuration.d.ts
+
 
 .dev.vars
