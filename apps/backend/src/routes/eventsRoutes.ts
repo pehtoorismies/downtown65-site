@@ -6,7 +6,7 @@ import {
   EventSchema,
   EventUpdateSchema,
 } from '../schemas/event'
-import type { EventStore } from '../store/events'
+import type { EventStore } from '../store/eventsStore'
 
 const MessageSchema = z.object({
   message: z.string(),

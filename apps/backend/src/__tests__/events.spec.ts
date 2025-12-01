@@ -1,8 +1,8 @@
 import { OpenAPIHono } from '@hono/zod-openapi'
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { AppAPI } from '../app-api'
-import { registerEventRoutes } from '../routes/events'
-import { EventStore } from '../store/events'
+import { registerEventRoutes } from '../routes/eventsRoutes'
+import { EventStore } from '../store/eventsStore'
 
 const sampleEvent = {
   title: 'Sample',

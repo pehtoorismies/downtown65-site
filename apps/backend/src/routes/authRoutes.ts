@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import type { AppAPI } from '../app-api'
-import { AuthStore } from '../store/auth'
+import { createAuthStore } from '../store/auth'
 
 // Schemas
 const loginSchema = z.object({
@@ -26,26 +26,6 @@ const refreshTokenSchema = z.object({
   refreshToken: z.string(),
 })
 export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>
-
-const environmentSchema = z.object({
-  AUTH_DOMAIN: z.string(),
-  AUTH_CLIENT_ID: z.string(),
-  AUTH_CLIENT_SECRET: z.string(),
-  AUTH_AUDIENCE: z.string(),
-  REGISTER_SECRET: z.string(),
-})
-
-const getStoreFromContext = (env: Env): AuthStore => {
-  const values = environmentSchema.parse(env)
-
-  return new AuthStore({
-    AUTH_DOMAIN: values.AUTH_DOMAIN,
-    AUTH_CLIENT_ID: values.AUTH_CLIENT_ID,
-    AUTH_CLIENT_SECRET: values.AUTH_CLIENT_SECRET,
-    AUTH_AUDIENCE: values.AUTH_AUDIENCE,
-    REGISTER_SECRET: values.REGISTER_SECRET,
-  })
-}
 
 // Register routes
 export function registerAuthRoutes(app: AppAPI) {
@@ -119,7 +99,7 @@ export function registerAuthRoutes(app: AppAPI) {
     async (c) => {
       const { email, password } = c.req.valid('json')
 
-      const store = getStoreFromContext(c.env)
+      const store = createAuthStore(c.env)
       const response = await store.login({ email, password })
 
       switch (response.type) {
@@ -212,33 +192,6 @@ export function registerAuthRoutes(app: AppAPI) {
         },
         201,
       )
-    },
-  )
-
-  // Logout
-  app.openapi(
-    {
-      method: 'post',
-      path: '/auth/logout',
-      security: [{ ApiKeyAuth: [] }],
-      responses: {
-        200: {
-          description: 'Logout successful',
-          content: {
-            'application/json': {
-              schema: z.object({
-                message: z.string(),
-              }),
-            },
-          },
-        },
-      },
-    },
-    async (c) => {
-      // TODO: Implement logout logic
-      // - Invalidate token/session
-
-      return c.json({ message: 'Logged out successfully' })
     },
   )
 

@@ -2,12 +2,10 @@ import { OpenAPIHono } from '@hono/zod-openapi'
 import { apiReference } from '@scalar/hono-api-reference'
 import { cors } from 'hono/cors'
 
-import { Hono } from 'hono'
 import type { AppAPI } from './app-api'
-import { registerAuthRoutes } from './routes/auth'
-import { registerEventRoutes } from './routes/events'
-import { AuthStore } from './store/auth'
-import { EventStore } from './store/events'
+import { registerAuthRoutes } from './routes/authRoutes'
+import { registerEventRoutes } from './routes/eventsRoutes'
+import { EventStore } from './store/eventsStore'
 
 export type OpenAPIHonoType = OpenAPIHono<{ Bindings: Env }>
 
