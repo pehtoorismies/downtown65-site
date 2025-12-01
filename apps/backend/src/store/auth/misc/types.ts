@@ -13,9 +13,9 @@ export const auth0UserSchema = z
     ...rest,
   }))
 
-export type User = z.infer<typeof auth0UserSchema>
+export type Auth0User = z.infer<typeof auth0UserSchema>
 
-export const authTokenSchema = z
+export const auth0TokensSchema = z
   .object({
     access_token: z.string(),
     id_token: z.string(),
@@ -29,7 +29,7 @@ export const authTokenSchema = z
     refreshToken: tokens.refresh_token,
   }))
 
-export type AuthTokens = z.infer<typeof authTokenSchema>
+export type Auth0Tokens = z.infer<typeof auth0TokensSchema>
 
 export type InvalidCredentialsError = {
   type: 'InvalidCredentials'

@@ -1,4 +1,4 @@
-import type { RegisterInput } from '../../routes/authRoutes'
+import type { RegisterInput } from '~/routes/authRoutes'
 import type { AuthConfig } from './misc/auth-config'
 import { getManagementClient } from './misc/client'
 

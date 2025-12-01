@@ -1,4 +1,4 @@
-import type { ForgotPasswordInput } from '../../routes/authRoutes'
+import type { ForgotPasswordInput } from '~/routes/authRoutes'
 import type { AuthConfig } from './misc/auth-config'
 import { createAuthClient } from './misc/client'
 

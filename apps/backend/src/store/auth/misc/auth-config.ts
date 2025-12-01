@@ -1,4 +1,4 @@
-import { environmentSchema } from '../../../schemas/environment'
+import { environmentSchema } from '~/schemas/environment'
 
 export const getAuthConfigFromEnv = (env: Env): AuthConfig => {
   const validated = environmentSchema.parse(env)

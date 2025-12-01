@@ -1,9 +1,9 @@
 import { AuthApiError } from 'auth0'
 import { jwtDecode } from 'jwt-decode'
-import type { LoginInput } from '../../routes/authRoutes'
+import type { LoginInput } from '~/routes/authRoutes'
 import type { AuthConfig } from './misc/auth-config'
 import { createAuthClient } from './misc/client'
-import { type AuthTokens, type User, auth0UserSchema, authTokenSchema } from './misc/types'
+import { type Auth0Tokens, type Auth0User, auth0TokensSchema, auth0UserSchema } from './misc/types'
 
 type InvalidCredentialsError = {
   type: 'InvalidCredentials'
@@ -22,8 +22,8 @@ type AccessDeniedError = {
 
 type LoginSuccess = {
   type: 'Success'
-  tokens: AuthTokens
-  user: User
+  tokens: Auth0Tokens
+  user: Auth0User
 }
 
 type LoginResponse = InvalidCredentialsError | UnknownError | AccessDeniedError | LoginSuccess
@@ -41,7 +41,7 @@ export const login =
           'read:events write:events read:me write:me read:users openid profile email offline_access',
       })
 
-      const tokens = authTokenSchema.parse(result.data)
+      const tokens = auth0TokensSchema.parse(result.data)
       const user = auth0UserSchema.parse(jwtDecode(tokens.idToken))
 
       return {
