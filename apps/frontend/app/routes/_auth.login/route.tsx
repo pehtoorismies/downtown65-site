@@ -11,8 +11,20 @@ import {
   Title,
 } from '@mantine/core'
 import { Form, Link, useActionData, useNavigation } from 'react-router'
+import type { Route } from './+types/route'
+
+export async function action({ request }: Route.ActionArgs) {
+  const formData = await request.formData()
+  const email = formData.get('email')
+  const password = formData.get('password')
+
+  return null
+}
 
 export default function Login() {
+  const navigation = useNavigation()
+  const actionData = useActionData()
+
   return (
     <>
       <Title ta="center" fw={900}>
