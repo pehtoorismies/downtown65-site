@@ -1,4 +1,6 @@
 import { createRoute, z } from '@hono/zod-openapi'
+import { jwk } from 'hono/jwk'
+import { apiKeyAuth } from '~/middleware/apiKeyAuth'
 import type { AppAPI } from '../app-api'
 import {
   EventCreateSchema,
@@ -14,11 +16,39 @@ const MessageSchema = z.object({
 })
 
 export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
+  // Protected routes - require X-API-Key authentication
+  app.use('/events/*', apiKeyAuth)
+
+  app.on(
+    ['GET', 'POST'],
+    '/events',
+    jwk({
+      jwks_uri: (c) => `https://${c.env.AUTH_DOMAIN}/.well-known/jwks.json`,
+    }),
+  )
+
+  app.on(
+    ['GET'],
+    '/events/:id',
+    jwk({
+      jwks_uri: (c) => `https://${c.env.AUTH_DOMAIN}/.well-known/jwks.json`,
+      allow_anon: true,
+    }),
+  )
+
+  app.on(
+    ['PUT', 'DELETE'],
+    '/events/:id',
+    jwk({
+      jwks_uri: (c) => `https://${c.env.AUTH_DOMAIN}/.well-known/jwks.json`,
+    }),
+  )
+
   app.openapi(
     createRoute({
       method: 'get',
       path: '/events',
-      security: [{ ApiKeyAuth: [] }],
+      security: [{ ApiKeyAuth: [], BearerToken: [] }],
       responses: {
         200: {
           description: 'List all events',
@@ -37,6 +67,8 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
       },
     }),
     (c) => {
+      const jwtPayload = c.get('jwtPayload')
+      console.log('JWT Payload:', jwtPayload)
       return c.json(store.list())
     },
   )
@@ -84,7 +116,7 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
     createRoute({
       method: 'post',
       path: '/events',
-      security: [{ ApiKeyAuth: [] }],
+      security: [{ ApiKeyAuth: [], BearerToken: [] }],
       request: {
         body: {
           description: 'Event payload',
@@ -118,9 +150,9 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
 
   app.openapi(
     createRoute({
-      method: 'patch',
+      method: 'put',
       path: '/events/{id}',
-      security: [{ ApiKeyAuth: [] }],
+      security: [{ ApiKeyAuth: [], BearerToken: [] }],
       request: {
         params: EventPathParamSchema,
         body: {
@@ -166,7 +198,7 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
     createRoute({
       method: 'delete',
       path: '/events/{id}',
-      security: [{ ApiKeyAuth: [] }],
+      security: [{ ApiKeyAuth: [], BearerToken: [] }],
       request: {
         params: EventPathParamSchema,
       },

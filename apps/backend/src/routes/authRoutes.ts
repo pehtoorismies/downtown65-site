@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { apiKeyAuth } from '~/middleware/apiKeyAuth'
 import type { AppAPI } from '../app-api'
 import { createAuthStore } from '../store/auth'
 
@@ -53,6 +54,8 @@ const ErrorSchema = z.object({
 
 // Register routes
 export function registerAuthRoutes(app: AppAPI) {
+  app.use('/auth/*', apiKeyAuth)
+
   // Login
   app.openapi(
     {

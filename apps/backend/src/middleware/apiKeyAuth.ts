@@ -2,7 +2,7 @@ import type { Context, Next } from 'hono'
 import { bearerAuth } from 'hono/bearer-auth'
 
 /**
- * Middleware to validate X-API-Key header
+ * Middleware to validate x-api-key header
  * Returns 401 Unauthorized if the API key is missing or invalid
  */
 export async function apiKeyAuth(c: Context<{ Bindings: Env }>, next: Next) {
@@ -24,5 +24,7 @@ export async function apiKeyAuth(c: Context<{ Bindings: Env }>, next: Next) {
       wwwAuthenticateHeader: 'APIKey realm="global"',
     },
   })
+  console.log('API key authentication middleware initialized')
+
   return middleware(c, next)
 }
