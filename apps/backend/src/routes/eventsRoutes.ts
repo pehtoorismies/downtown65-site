@@ -15,6 +15,8 @@ const MessageSchema = z.object({
   message: z.string(),
 })
 
+const getUri = (domain: string) => `https://${domain}/.well-known/jwks.json`
+
 export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
   // Protected routes - require X-API-Key authentication
   app.use('/events/*', apiKeyAuth)
@@ -23,7 +25,7 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
     ['GET', 'POST'],
     '/events',
     jwk({
-      jwks_uri: (c) => `https://${c.env.AUTH_DOMAIN}/.well-known/jwks.json`,
+      jwks_uri: (c) => getUri(c.env.AUTH_DOMAIN),
     }),
   )
 
@@ -31,7 +33,7 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
     ['GET'],
     '/events/:id',
     jwk({
-      jwks_uri: (c) => `https://${c.env.AUTH_DOMAIN}/.well-known/jwks.json`,
+      jwks_uri: (c) => getUri(c.env.AUTH_DOMAIN),
       allow_anon: true,
     }),
   )
@@ -40,7 +42,14 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
     ['PUT', 'DELETE'],
     '/events/:id',
     jwk({
-      jwks_uri: (c) => `https://${c.env.AUTH_DOMAIN}/.well-known/jwks.json`,
+      jwks_uri: (c) => getUri(c.env.AUTH_DOMAIN),
+    }),
+  )
+
+  app.use(
+    '/events/:id/participants/me',
+    jwk({
+      jwks_uri: (c) => getUri(c.env.AUTH_DOMAIN),
     }),
   )
 
@@ -226,6 +235,80 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
       if (!deleted) {
         return c.json({ message: `Event ${id} not found` }, 404)
       }
+      return c.body(null, 204)
+    },
+  )
+
+  app.openapi(
+    createRoute({
+      method: 'post',
+      path: '/events/{id}/participants/me',
+      description: 'Register the authenticated user as a participant to the event',
+      security: [{ ApiKeyAuth: [], BearerToken: [] }],
+      request: {
+        params: EventPathParamSchema,
+      },
+      responses: {
+        200: {
+          description: 'User is registered for the event successfully',
+        },
+        401: {
+          $ref: '#/components/responses/UnauthorizedError',
+        },
+        404: {
+          description: 'Event not found',
+          content: {
+            'application/json': { schema: MessageSchema },
+          },
+        },
+        422: {
+          $ref: '#/components/responses/ValidationError',
+        },
+      },
+    }),
+    (c) => {
+      // const { id } = c.req.valid('param')
+      // const deleted = store.delete(id)
+      // if (!deleted) {
+      //   return c.json({ message: `Event ${id} not found` }, 404)
+      // }
+      return c.body(null, 204)
+    },
+  )
+
+  app.openapi(
+    createRoute({
+      method: 'delete',
+      path: '/events/{id}/participants/me',
+      description: 'Unregister the authenticated user from the event',
+      security: [{ ApiKeyAuth: [], BearerToken: [] }],
+      request: {
+        params: EventPathParamSchema,
+      },
+      responses: {
+        200: {
+          description: 'User is unregistered from the event successfully',
+        },
+        401: {
+          $ref: '#/components/responses/UnauthorizedError',
+        },
+        404: {
+          description: 'Event not found',
+          content: {
+            'application/json': { schema: MessageSchema },
+          },
+        },
+        422: {
+          $ref: '#/components/responses/ValidationError',
+        },
+      },
+    }),
+    (c) => {
+      // const { id } = c.req.valid('param')
+      // const deleted = store.delete(id)
+      // if (!deleted) {
+      //   return c.json({ message: `Event ${id} not found` }, 404)
+      // }
       return c.body(null, 204)
     },
   )
