@@ -3,6 +3,7 @@ import type { AppAPI } from '../app-api'
 import {
   EventCreateSchema,
   EventListSchema,
+  EventPathParamSchema,
   EventSchema,
   EventUpdateSchema,
 } from '../schemas/event'
@@ -27,6 +28,9 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
             },
           },
         },
+        422: {
+          $ref: '#/components/responses/ValidationError',
+        },
       },
     }),
     (c) => {
@@ -40,7 +44,7 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
       path: '/events/{id}',
       security: [{ ApiKeyAuth: [] }],
       request: {
-        params: z.object({ id: z.string() }),
+        params: EventPathParamSchema,
       },
       responses: {
         200: {
@@ -54,6 +58,9 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
           content: {
             'application/json': { schema: MessageSchema },
           },
+        },
+        422: {
+          $ref: '#/components/responses/ValidationError',
         },
       },
     }),
@@ -88,6 +95,9 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
             'application/json': { schema: EventSchema },
           },
         },
+        422: {
+          $ref: '#/components/responses/ValidationError',
+        },
       },
     }),
     async (c) => {
@@ -103,7 +113,7 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
       path: '/events/{id}',
       security: [{ ApiKeyAuth: [] }],
       request: {
-        params: z.object({ id: z.string() }),
+        params: EventPathParamSchema,
         body: {
           required: true,
           content: {
@@ -124,6 +134,9 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
             'application/json': { schema: MessageSchema },
           },
         },
+        422: {
+          $ref: '#/components/responses/ValidationError',
+        },
       },
     }),
     async (c) => {
@@ -143,7 +156,7 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
       path: '/events/{id}',
       security: [{ ApiKeyAuth: [] }],
       request: {
-        params: z.object({ id: z.string() }),
+        params: EventPathParamSchema,
       },
       responses: {
         204: {
@@ -154,6 +167,9 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
           content: {
             'application/json': { schema: MessageSchema },
           },
+        },
+        422: {
+          $ref: '#/components/responses/ValidationError',
         },
       },
     }),

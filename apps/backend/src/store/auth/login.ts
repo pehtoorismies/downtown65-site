@@ -1,32 +1,19 @@
 import { AuthApiError } from 'auth0'
 import { jwtDecode } from 'jwt-decode'
+import { z } from 'zod'
 import type { LoginInput } from '~/routes/authRoutes'
 import type { AuthConfig } from './misc/auth-config'
+import { Auth0TokensSchema, Auth0UserSchema } from './misc/auth0'
 import { createAuthClient } from './misc/client'
-import { type Auth0Tokens, type Auth0User, auth0TokensSchema, auth0UserSchema } from './misc/types'
 
-type InvalidCredentialsError = {
-  type: 'InvalidCredentials'
-  error: string
-}
+const LoginResponse = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('InvalidCredentials'), error: z.string() }),
+  z.object({ type: z.literal('UnknownError'), error: z.string() }),
+  z.object({ type: z.literal('AccessDenied'), error: z.string() }),
+  z.object({ type: z.literal('Success'), tokens: Auth0TokensSchema, user: Auth0UserSchema }),
+])
 
-type UnknownError = {
-  type: 'UnknownError'
-  error: string
-}
-
-type AccessDeniedError = {
-  type: 'AccessDenied'
-  error: string
-}
-
-type LoginSuccess = {
-  type: 'Success'
-  tokens: Auth0Tokens
-  user: Auth0User
-}
-
-type LoginResponse = InvalidCredentialsError | UnknownError | AccessDeniedError | LoginSuccess
+type LoginResponse = z.infer<typeof LoginResponse>
 
 export const login =
   (config: AuthConfig) =>
@@ -41,8 +28,8 @@ export const login =
           'read:events write:events read:me write:me read:users openid profile email offline_access',
       })
 
-      const tokens = auth0TokensSchema.parse(result.data)
-      const user = auth0UserSchema.parse(jwtDecode(tokens.idToken))
+      const tokens = Auth0TokensSchema.parse(result.data)
+      const user = Auth0UserSchema.parse(jwtDecode(tokens.idToken))
 
       return {
         type: 'Success',

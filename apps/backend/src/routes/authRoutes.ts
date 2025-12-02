@@ -201,6 +201,9 @@ export function registerAuthRoutes(app: AppAPI) {
             },
           },
         },
+        422: {
+          $ref: '#/components/responses/ValidationError',
+        },
       },
     },
     async (c) => {
@@ -255,6 +258,9 @@ export function registerAuthRoutes(app: AppAPI) {
             },
           },
         },
+        422: {
+          $ref: '#/components/responses/ValidationError',
+        },
       },
     },
     async (c) => {
@@ -293,6 +299,9 @@ export function registerAuthRoutes(app: AppAPI) {
               }),
             },
           },
+        },
+        422: {
+          $ref: '#/components/responses/ValidationError',
         },
       },
     },

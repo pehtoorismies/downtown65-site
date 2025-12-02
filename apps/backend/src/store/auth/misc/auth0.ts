@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const auth0UserSchema = z
+export const Auth0UserSchema = z
   .object({
     sub: z.string(),
     email: z.string(),
@@ -13,9 +13,9 @@ export const auth0UserSchema = z
     ...rest,
   }))
 
-export type Auth0User = z.infer<typeof auth0UserSchema>
+export type Auth0User = z.infer<typeof Auth0UserSchema>
 
-export const auth0TokensSchema = z
+export const Auth0TokensSchema = z
   .object({
     access_token: z.string(),
     id_token: z.string(),
@@ -29,7 +29,7 @@ export const auth0TokensSchema = z
     refreshToken: tokens.refresh_token,
   }))
 
-export type Auth0Tokens = z.infer<typeof auth0TokensSchema>
+export type Auth0Tokens = z.infer<typeof Auth0TokensSchema>
 
 export type InvalidCredentialsError = {
   type: 'InvalidCredentials'

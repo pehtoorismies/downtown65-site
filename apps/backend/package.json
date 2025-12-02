@@ -24,6 +24,7 @@
     "jwt-decode": "4.0.0",
     "nanoid": "5.1.6",
     "openapi3-ts": "4.5.0",
+    "ulidx": "^2.4.1",
     "zod": "4.1.13"
   },
   "devDependencies": {
