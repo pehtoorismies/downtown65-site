@@ -4,13 +4,28 @@ import { createAuthStore } from '../store/auth'
 
 // Schemas
 const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string(),
+  email: z.email().openapi({
+    param: {
+      name: 'email',
+      in: 'path',
+    },
+    example: 'me@example.com',
+  }),
+  password: z
+    .string()
+    .min(2)
+    .openapi({
+      param: {
+        name: 'password',
+        in: 'path',
+      },
+      example: 'supersecretpassword',
+    }),
 })
 export type LoginInput = z.infer<typeof loginSchema>
 
 const registerSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(8),
   name: z.string().min(2),
   registerSecret: z.string(),
@@ -18,7 +33,7 @@ const registerSchema = z.object({
 export type RegisterInput = z.infer<typeof registerSchema>
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
 })
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>
 
@@ -26,6 +41,15 @@ const refreshTokenSchema = z.object({
   refreshToken: z.string(),
 })
 export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>
+
+const ErrorSchema = z.object({
+  code: z.number().openapi({
+    example: 400,
+  }),
+  message: z.string().openapi({
+    example: 'Bad Request',
+  }),
+})
 
 // Register routes
 export function registerAuthRoutes(app: AppAPI) {
@@ -64,6 +88,14 @@ export function registerAuthRoutes(app: AppAPI) {
             },
           },
         },
+        400: {
+          content: {
+            'application/json': {
+              schema: ErrorSchema,
+            },
+          },
+          description: 'Returns an error',
+        },
         401: {
           description: 'Invalid credentials',
           content: {
@@ -83,6 +115,9 @@ export function registerAuthRoutes(app: AppAPI) {
               }),
             },
           },
+        },
+        422: {
+          $ref: '#/components/responses/ValidationError',
         },
         500: {
           description: 'Internal server error',

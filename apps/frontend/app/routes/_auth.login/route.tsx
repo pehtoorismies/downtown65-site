@@ -11,12 +11,26 @@ import {
   Title,
 } from '@mantine/core'
 import { Form, Link, useActionData, useNavigation } from 'react-router'
+import { apiClient } from '~/api/api-client'
 import type { Route } from './+types/route'
 
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData()
   const email = formData.get('email')
   const password = formData.get('password')
+
+  const { data, error } = await apiClient.POST('/auth/login', {
+    body: {
+      email: 'My New Post',
+      password: 'This is the content of my new post.',
+    },
+  })
+  if (error) {
+    console.log(JSON.stringify(error, null, 2))
+    return null
+  }
+
+  console.log(data)
 
   return null
 }

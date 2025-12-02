@@ -1,15 +1,52 @@
 import { OpenAPIHono } from '@hono/zod-openapi'
-import { apiReference } from '@scalar/hono-api-reference'
+import { Scalar } from '@scalar/hono-api-reference'
 import { cors } from 'hono/cors'
+import type { SchemaObject } from 'openapi3-ts/oas31'
+import * as z from 'zod'
 
-import type { AppAPI } from './app-api'
 import { registerAuthRoutes } from './routes/authRoutes'
 import { registerEventRoutes } from './routes/eventsRoutes'
+import { ValidationErrorSchema, formatZodErrors } from './schemas/validation-error'
 import { EventStore } from './store/eventsStore'
 
 export type OpenAPIHonoType = OpenAPIHono<{ Bindings: Env }>
 
-const app = new OpenAPIHono<{ Bindings: Env }>()
+const app = new OpenAPIHono<{ Bindings: Env }>({
+  defaultHook: (result, c) => {
+    console.log('*********')
+    console.log('Default hook called')
+    console.log(JSON.stringify(result, null, 2))
+    console.log('*********')
+    if (!result.success) {
+      return c.json(
+        {
+          // ok: false,
+          // code: 422,
+          message: 'Validation failed',
+          errors: formatZodErrors(result.error),
+        },
+        422,
+      )
+    }
+  },
+})
+
+app.openAPIRegistry.registerComponent(
+  'schemas',
+  'ValidationError',
+  z.toJSONSchema(ValidationErrorSchema) as SchemaObject,
+)
+
+app.openAPIRegistry.registerComponent('responses', 'ValidationError', {
+  description: 'Validation error',
+  content: {
+    'application/json': {
+      schema: {
+        $ref: '#/components/schemas/ValidationError',
+      },
+    },
+  },
+})
 
 app.openAPIRegistry.registerComponent('securitySchemes', 'ApiKeyAuth', {
   type: 'apiKey',
@@ -20,12 +57,12 @@ app.openAPIRegistry.registerComponent('securitySchemes', 'ApiKeyAuth', {
 
 app.use('*', cors())
 
-app.get('/healthz', (c) => c.json({ status: 'oks' }))
+app.get('/healthz', (c) => c.json({ status: 'ok' }))
 
 registerEventRoutes(app, new EventStore())
 registerAuthRoutes(app)
 
-app.doc('/openapi.json', {
+app.doc31('/doc', {
   openapi: '3.1.0',
   info: {
     title: 'Event API',
@@ -33,14 +70,7 @@ app.doc('/openapi.json', {
   },
 })
 
-app.get(
-  '/doc',
-  apiReference({
-    spec: { url: '/openapi.json' },
-    layout: 'classic',
-    theme: 'kepler',
-  }),
-)
+app.get('/scalar', Scalar({ url: '/doc', theme: 'kepler' }))
 
 // Export for Cloudflare Workers
 export default app
