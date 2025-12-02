@@ -9,9 +9,11 @@ import * as z from 'zod'
 import { apiKeyAuth } from './middleware/apiKeyAuth'
 import { registerAuthRoutes } from './routes/authRoutes'
 import { registerEventRoutes } from './routes/eventsRoutes'
+import { registerUserRoutes } from './routes/userRoutes'
 import { UnauthorizedErrorSchema } from './schemas/unauthorized -error'
 import { ValidationErrorSchema, formatZodErrors } from './schemas/validation-error'
 import { EventStore } from './store/eventsStore'
+import { UserStore } from './store/userStore'
 
 type Vars = {
   jwtPayload: string
@@ -85,6 +87,7 @@ app.get('/healthz', (c) => c.json({ status: 'ok' }))
 
 registerEventRoutes(app, new EventStore())
 registerAuthRoutes(app)
+registerUserRoutes(app, new UserStore())
 
 app.doc31('/doc', {
   openapi: '3.1.0',
