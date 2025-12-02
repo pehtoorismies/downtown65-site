@@ -28,6 +28,9 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
             },
           },
         },
+        401: {
+          $ref: '#/components/responses/UnauthorizedError',
+        },
         422: {
           $ref: '#/components/responses/ValidationError',
         },
@@ -52,6 +55,9 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
           content: {
             'application/json': { schema: EventSchema },
           },
+        },
+        401: {
+          $ref: '#/components/responses/UnauthorizedError',
         },
         404: {
           description: 'Event not found',
@@ -95,6 +101,9 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
             'application/json': { schema: EventSchema },
           },
         },
+        401: {
+          $ref: '#/components/responses/UnauthorizedError',
+        },
         422: {
           $ref: '#/components/responses/ValidationError',
         },
@@ -127,6 +136,9 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
           content: {
             'application/json': { schema: EventSchema },
           },
+        },
+        401: {
+          $ref: '#/components/responses/UnauthorizedError',
         },
         404: {
           description: 'Event not found',
@@ -161,6 +173,9 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
       responses: {
         204: {
           description: 'Event removed',
+        },
+        401: {
+          $ref: '#/components/responses/UnauthorizedError',
         },
         404: {
           description: 'Event not found',

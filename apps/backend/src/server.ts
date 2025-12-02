@@ -4,8 +4,10 @@ import { cors } from 'hono/cors'
 import type { SchemaObject } from 'openapi3-ts/oas31'
 import * as z from 'zod'
 
+import { apiKeyAuth } from './middleware/apiKeyAuth'
 import { registerAuthRoutes } from './routes/authRoutes'
 import { registerEventRoutes } from './routes/eventsRoutes'
+import { UnauthorizedErrorSchema } from './schemas/unauthorized -error'
 import { ValidationErrorSchema, formatZodErrors } from './schemas/validation-error'
 import { EventStore } from './store/eventsStore'
 
@@ -36,13 +38,28 @@ app.openAPIRegistry.registerComponent(
   'ValidationError',
   z.toJSONSchema(ValidationErrorSchema) as SchemaObject,
 )
-
 app.openAPIRegistry.registerComponent('responses', 'ValidationError', {
   description: 'Validation error',
   content: {
     'application/json': {
       schema: {
         $ref: '#/components/schemas/ValidationError',
+      },
+    },
+  },
+})
+
+app.openAPIRegistry.registerComponent(
+  'schemas',
+  'UnauthorizedError',
+  z.toJSONSchema(UnauthorizedErrorSchema) as SchemaObject,
+)
+app.openAPIRegistry.registerComponent('responses', 'UnauthorizedError', {
+  description: 'Unauthorized Error',
+  content: {
+    'application/json': {
+      schema: {
+        $ref: '#/components/schemas/UnauthorizedError',
       },
     },
   },
@@ -58,6 +75,10 @@ app.openAPIRegistry.registerComponent('securitySchemes', 'ApiKeyAuth', {
 app.use('*', cors())
 
 app.get('/healthz', (c) => c.json({ status: 'ok' }))
+
+// Protected routes - require X-API-Key authentication
+app.use('/events/*', apiKeyAuth)
+app.use('/auth/*', apiKeyAuth)
 
 registerEventRoutes(app, new EventStore())
 registerAuthRoutes(app)

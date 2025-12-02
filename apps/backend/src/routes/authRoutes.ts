@@ -58,6 +58,7 @@ export function registerAuthRoutes(app: AppAPI) {
     {
       method: 'post',
       path: '/auth/login',
+      security: [{ ApiKeyAuth: [] }],
       request: {
         body: {
           content: {
@@ -97,14 +98,7 @@ export function registerAuthRoutes(app: AppAPI) {
           description: 'Returns an error',
         },
         401: {
-          description: 'Invalid credentials',
-          content: {
-            'application/json': {
-              schema: z.object({
-                error: z.string(),
-              }),
-            },
-          },
+          $ref: '#/components/responses/UnauthorizedError',
         },
         403: {
           description: 'Access denied',
@@ -165,6 +159,7 @@ export function registerAuthRoutes(app: AppAPI) {
     {
       method: 'post',
       path: '/auth/register',
+      security: [{ ApiKeyAuth: [] }],
       request: {
         body: {
           content: {
@@ -190,6 +185,9 @@ export function registerAuthRoutes(app: AppAPI) {
               }),
             },
           },
+        },
+        401: {
+          $ref: '#/components/responses/UnauthorizedError',
         },
         403: {
           description: 'Access denied',
@@ -238,6 +236,7 @@ export function registerAuthRoutes(app: AppAPI) {
     {
       method: 'post',
       path: '/auth/forgot-password',
+      security: [{ ApiKeyAuth: [] }],
       request: {
         body: {
           content: {
@@ -257,6 +256,9 @@ export function registerAuthRoutes(app: AppAPI) {
               }),
             },
           },
+        },
+        401: {
+          $ref: '#/components/responses/UnauthorizedError',
         },
         422: {
           $ref: '#/components/responses/ValidationError',
@@ -279,6 +281,7 @@ export function registerAuthRoutes(app: AppAPI) {
     {
       method: 'post',
       path: '/auth/refresh-token',
+      security: [{ ApiKeyAuth: [] }],
       request: {
         body: {
           content: {
@@ -299,6 +302,9 @@ export function registerAuthRoutes(app: AppAPI) {
               }),
             },
           },
+        },
+        401: {
+          $ref: '#/components/responses/UnauthorizedError',
         },
         422: {
           $ref: '#/components/responses/ValidationError',
