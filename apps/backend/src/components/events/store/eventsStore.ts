@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid'
-import type { Event, EventCreateInput, EventUpdateInput } from '../schemas/event'
+import type { Event, EventCreateInput, EventUpdateInput } from '../schema'
 
 export class EventStore {
   private events = new Map<string, Event>()

@@ -52,7 +52,7 @@ export const ParticipantListSchema = z
 export const EventBaseSchema = z.object({
   title: z.string().min(1).openapi({ example: 'Engineering Sync' }),
   subtitle: z.string().min(1).openapi({ example: 'Weekly updates' }),
-  date: z.date().openapi({ example: '2025-01-15' }),
+  date: z.iso.date().openapi({ example: '2025-01-15' }),
   time: TimeHHMM,
   type: EventTypeEnum.openapi({
     example: 'MEETING',

@@ -1,59 +1,17 @@
 import { z } from 'zod'
 import { apiKeyAuth } from '~/middleware/apiKeyAuth'
-import type { AppAPI } from '../app-api'
-import { createAuthStore } from '../store/auth'
-
-// Schemas
-const loginSchema = z.object({
-  email: z.email().openapi({
-    param: {
-      name: 'email',
-      in: 'path',
-    },
-    example: 'me@example.com',
-  }),
-  password: z
-    .string()
-    .min(2)
-    .openapi({
-      param: {
-        name: 'password',
-        in: 'path',
-      },
-      example: 'supersecretpassword',
-    }),
-})
-export type LoginInput = z.infer<typeof loginSchema>
-
-const registerSchema = z.object({
-  email: z.email(),
-  password: z.string().min(8),
-  name: z.string().min(2),
-  registerSecret: z.string(),
-})
-export type RegisterInput = z.infer<typeof registerSchema>
-
-const forgotPasswordSchema = z.object({
-  email: z.email(),
-})
-export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>
-
-const refreshTokenSchema = z.object({
-  refreshToken: z.string(),
-})
-export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>
-
-const ErrorSchema = z.object({
-  code: z.number().openapi({
-    example: 400,
-  }),
-  message: z.string().openapi({
-    example: 'Bad Request',
-  }),
-})
+import type { AppAPI } from '../../app-api'
+import {
+  ErrorSchema,
+  ForgotPasswordSchema,
+  LoginSchema,
+  RefreshTokenSchema,
+  RegisterSchema,
+} from './schema'
+import { createAuthStore } from './store'
 
 // Register routes
-export function registerAuthRoutes(app: AppAPI) {
+export function registerRoutes(app: AppAPI) {
   app.use('/auth/*', apiKeyAuth)
 
   // Login
@@ -66,7 +24,7 @@ export function registerAuthRoutes(app: AppAPI) {
         body: {
           content: {
             'application/json': {
-              schema: loginSchema,
+              schema: LoginSchema,
             },
           },
         },
@@ -167,7 +125,7 @@ export function registerAuthRoutes(app: AppAPI) {
         body: {
           content: {
             'application/json': {
-              schema: registerSchema,
+              schema: RegisterSchema,
             },
           },
         },
@@ -244,7 +202,7 @@ export function registerAuthRoutes(app: AppAPI) {
         body: {
           content: {
             'application/json': {
-              schema: forgotPasswordSchema,
+              schema: ForgotPasswordSchema,
             },
           },
         },
@@ -289,7 +247,7 @@ export function registerAuthRoutes(app: AppAPI) {
         body: {
           content: {
             'application/json': {
-              schema: refreshTokenSchema,
+              schema: RefreshTokenSchema,
             },
           },
         },

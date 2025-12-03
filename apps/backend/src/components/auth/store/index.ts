@@ -13,14 +13,3 @@ export const createAuthStore = (env: Env) => {
     forgotPassword: forgotPassword(config),
   }
 }
-
-// export type {
-//   AuthConfig,
-//   AuthTokens,
-//   User,
-//   LoginResponse,
-//   LoginSuccess,
-//   InvalidCredentialsError,
-//   AccessDeniedError,
-//   UnknownError,
-// } from './types'

@@ -1,4 +1,4 @@
-import type { RefreshTokenInput } from '~/routes/authRoutes'
+import type { RefreshTokenInput } from '../schema'
 import type { AuthConfig } from './misc/auth-config'
 import { type Auth0Tokens, Auth0TokensSchema } from './misc/auth0'
 import { createAuthClient } from './misc/client'

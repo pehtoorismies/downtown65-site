@@ -1,4 +1,4 @@
-import type { User, UserUpdateInput } from '../schemas/user'
+import type { User, UserUpdateInput } from '../schema'
 
 export class UserStore {
   private users = new Map<string, User>()

@@ -1,15 +1,15 @@
 import { createRoute, z } from '@hono/zod-openapi'
 import { jwk } from 'hono/jwk'
 import { apiKeyAuth } from '~/middleware/apiKeyAuth'
-import type { AppAPI } from '../app-api'
+import type { AppAPI } from '../../app-api'
 import {
   EventCreateSchema,
   EventListSchema,
   EventPathParamSchema,
   EventSchema,
   EventUpdateSchema,
-} from '../schemas/event'
-import type { EventStore } from '../store/eventsStore'
+} from './schema'
+import type { EventStore } from './store/eventsStore'
 
 const MessageSchema = z.object({
   message: z.string(),
@@ -17,7 +17,7 @@ const MessageSchema = z.object({
 
 const getUri = (domain: string) => `https://${domain}/.well-known/jwks.json`
 
-export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
+export const registerRoutes = (app: AppAPI, store: EventStore): void => {
   // Protected routes - require X-API-Key authentication
   app.use('/events/*', apiKeyAuth)
 
@@ -69,9 +69,6 @@ export const registerEventRoutes = (app: AppAPI, store: EventStore): void => {
         },
         401: {
           $ref: '#/components/responses/UnauthorizedError',
-        },
-        422: {
-          $ref: '#/components/responses/ValidationError',
         },
       },
     }),

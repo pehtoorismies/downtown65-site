@@ -1,9 +1,9 @@
 import { createRoute, z } from '@hono/zod-openapi'
 import { jwk } from 'hono/jwk'
 import { apiKeyAuth } from '~/middleware/apiKeyAuth'
-import type { AppAPI } from '../app-api'
-import { UserListSchema, UserSchema, UserUpdateSchema } from '../schemas/user'
-import type { UserStore } from '../store/userStore'
+import type { AppAPI } from '../../app-api'
+import { UserListSchema, UserSchema, UserUpdateSchema } from './schema'
+import type { UserStore } from './store/userStore'
 
 const MessageSchema = z.object({
   message: z.string(),
@@ -41,9 +41,6 @@ export const registerUserRoutes = (app: AppAPI, store: UserStore): void => {
         },
         401: {
           $ref: '#/components/responses/UnauthorizedError',
-        },
-        422: {
-          $ref: '#/components/responses/ValidationError',
         },
       },
     }),

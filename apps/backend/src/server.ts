@@ -1,27 +1,20 @@
 import { OpenAPIHono } from '@hono/zod-openapi'
 import { Scalar } from '@scalar/hono-api-reference'
 import { cors } from 'hono/cors'
-import { jwk } from 'hono/jwk'
-import { verifyWithJwks } from 'hono/jwt'
+
 import type { SchemaObject } from 'openapi3-ts/oas31'
 import * as z from 'zod'
 
-import { apiKeyAuth } from './middleware/apiKeyAuth'
-import { registerAuthRoutes } from './routes/authRoutes'
-import { registerEventRoutes } from './routes/eventsRoutes'
-import { registerUserRoutes } from './routes/userRoutes'
+import type { AppAPI } from './app-api'
+import { registerRoutes as authRoutes } from './components/auth/routes'
+import { registerRoutes as eventRoutes } from './components/events/routes'
+import { EventStore } from './components/events/store/eventsStore'
+import { UserStore } from './components/users/store/userStore'
+import { registerUserRoutes as usersRoutes } from './components/users/userRoutes'
 import { UnauthorizedErrorSchema } from './schemas/unauthorized -error'
 import { ValidationErrorSchema, formatZodErrors } from './schemas/validation-error'
-import { EventStore } from './store/eventsStore'
-import { UserStore } from './store/userStore'
 
-type Vars = {
-  jwtPayload: string
-}
-
-export type OpenAPIHonoType = OpenAPIHono<{ Bindings: Env; Variables: Vars }>
-
-const app = new OpenAPIHono<{ Bindings: Env }>({
+const app: AppAPI = new OpenAPIHono({
   defaultHook: (result, c) => {
     console.log('Default hook:', result)
     if (!result.success) {
@@ -41,6 +34,7 @@ app.openAPIRegistry.registerComponent(
   'ValidationError',
   z.toJSONSchema(ValidationErrorSchema) as SchemaObject,
 )
+
 app.openAPIRegistry.registerComponent('responses', 'ValidationError', {
   description: 'Validation error',
   content: {
@@ -85,9 +79,9 @@ app.use('*', cors())
 
 app.get('/healthz', (c) => c.json({ status: 'ok' }))
 
-registerEventRoutes(app, new EventStore())
-registerAuthRoutes(app)
-registerUserRoutes(app, new UserStore())
+eventRoutes(app, new EventStore())
+authRoutes(app)
+usersRoutes(app, new UserStore())
 
 app.doc31('/doc', {
   openapi: '3.1.0',

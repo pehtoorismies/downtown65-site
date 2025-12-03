@@ -1,15 +1,16 @@
 import { OpenAPIHono } from '@hono/zod-openapi'
 import { beforeEach, describe, expect, it } from 'vitest'
-import type { AppAPI } from '../app-api'
-import { registerEventRoutes } from '../routes/eventsRoutes'
+import type { AppAPI } from '../../../app-api'
+import { registerRoutes } from '../routes'
+import type { EventCreateInput } from '../schema'
 import { EventStore } from '../store/eventsStore'
 
-const sampleEvent = {
+const sampleEvent: EventCreateInput = {
   title: 'Sample',
   subtitle: 'Kick-off',
   date: '2025-11-15',
   time: '09:00',
-  type: 'meeting',
+  type: 'MEETING',
   description: 'Project intro',
   location: 'Room 1',
   participants: [
@@ -41,7 +42,7 @@ describe('Event routes', () => {
   beforeEach(() => {
     store = new EventStore()
     app = new OpenAPIHono()
-    registerEventRoutes(app, store)
+    registerRoutes(app, store)
   })
 
   it('creates and lists events via HTTP', async () => {

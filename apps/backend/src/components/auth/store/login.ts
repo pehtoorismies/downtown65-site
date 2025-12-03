@@ -1,7 +1,7 @@
 import { AuthApiError } from 'auth0'
 import { jwtDecode } from 'jwt-decode'
 import { z } from 'zod'
-import type { LoginInput } from '~/routes/authRoutes'
+import type { LoginInput } from '../schema'
 import type { AuthConfig } from './misc/auth-config'
 import { Auth0TokensSchema, Auth0UserSchema } from './misc/auth0'
 import { createAuthClient } from './misc/client'
