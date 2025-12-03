@@ -1,7 +1,7 @@
+import type { AuthConfig } from '~/common/auth0/auth-config'
+import { createAuthClient } from '~/common/auth0/client'
 import type { RefreshTokenInput } from '../schema'
-import type { AuthConfig } from './misc/auth-config'
 import { type Auth0Tokens, Auth0TokensSchema } from './misc/auth0'
-import { createAuthClient } from './misc/client'
 
 export const refreshToken =
   (config: AuthConfig) =>

@@ -1,7 +1,7 @@
 import { createRoute, z } from '@hono/zod-openapi'
 import { jwk } from 'hono/jwk'
-import { apiKeyAuth } from '~/middleware/apiKeyAuth'
-import { jwtToken } from '~/middleware/jwt'
+import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
+import { jwtToken } from '~/common/middleware/jwt'
 import type { AppAPI } from '../../app-api'
 import {
   EventCreateSchema,

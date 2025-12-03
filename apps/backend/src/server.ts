@@ -16,7 +16,6 @@ import { ValidationErrorSchema, formatZodErrors } from './schemas/validation-err
 
 const app: AppAPI = new OpenAPIHono({
   defaultHook: (result, c) => {
-    console.log('Default hook:', result)
     if (!result.success) {
       return c.json(
         {
@@ -81,7 +80,7 @@ app.get('/healthz', (c) => c.json({ status: 'ok' }))
 
 eventRoutes(app, new EventStore())
 authRoutes(app)
-usersRoutes(app, new UserStore())
+usersRoutes(app)
 
 app.doc31('/doc', {
   openapi: '3.1.0',

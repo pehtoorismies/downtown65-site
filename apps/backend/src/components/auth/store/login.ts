@@ -1,10 +1,10 @@
 import { AuthApiError } from 'auth0'
 import { jwtDecode } from 'jwt-decode'
 import { z } from 'zod'
+import type { AuthConfig } from '~/common/auth0/auth-config'
+import { createAuthClient } from '~/common/auth0/client'
 import type { LoginInput } from '../schema'
-import type { AuthConfig } from './misc/auth-config'
 import { Auth0TokensSchema, Auth0UserSchema } from './misc/auth0'
-import { createAuthClient } from './misc/client'
 
 const LoginResponse = z.discriminatedUnion('type', [
   z.object({ type: z.literal('InvalidCredentials'), error: z.string() }),

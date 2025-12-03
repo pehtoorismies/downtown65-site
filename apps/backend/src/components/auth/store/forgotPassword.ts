@@ -1,6 +1,6 @@
+import type { AuthConfig } from '~/common/auth0/auth-config'
+import { createAuthClient } from '~/common/auth0/client'
 import type { ForgotPasswordInput } from '../schema'
-import type { AuthConfig } from './misc/auth-config'
-import { createAuthClient } from './misc/client'
 
 export const forgotPassword =
   (config: AuthConfig) =>

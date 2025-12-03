@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { apiKeyAuth } from '~/middleware/apiKeyAuth'
+import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import type { AppAPI } from '../../app-api'
 import {
   ErrorSchema,

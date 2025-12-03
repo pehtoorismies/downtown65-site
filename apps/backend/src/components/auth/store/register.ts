@@ -1,6 +1,6 @@
+import type { AuthConfig } from '~/common/auth0/auth-config'
+import { getManagementClient } from '~/common/auth0/client'
 import type { RegisterInput } from '../schema'
-import type { AuthConfig } from './misc/auth-config'
-import { getManagementClient } from './misc/client'
 
 export const register =
   (config: AuthConfig) =>

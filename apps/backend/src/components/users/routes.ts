@@ -1,7 +1,7 @@
 import { createRoute, z } from '@hono/zod-openapi'
 import { jwk } from 'hono/jwk'
-import { apiKeyAuth } from '~/middleware/apiKeyAuth'
-import { jwtToken } from '~/middleware/jwt'
+import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
+import { jwtToken } from '~/common/middleware/jwt'
 import type { AppAPI } from '../../app-api'
 import { UserListSchema, UserSchema, UserUpdateSchema } from './schema'
 import type { UserStore } from './store/userStore'
@@ -130,11 +130,7 @@ export const registerUserRoutes = (app: AppAPI, store: UserStore): void => {
     }),
     async (c) => {
       const jwtPayload = c.get('jwtPayload')
-      const userId = jwtPayload?.sub
-
-      if (!userId) {
-        return c.json({ message: 'User not authenticated' }, 401)
-      }
+      const userId = jwtPayload.sub
 
       const payload = await c.req.valid('json')
       const updated = store.update(userId, payload)

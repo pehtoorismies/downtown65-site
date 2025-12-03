@@ -1,6 +1,6 @@
+import { getAuthConfigFromEnv } from '~/common/auth0/auth-config'
 import { forgotPassword } from './forgotPassword'
 import { login } from './login'
-import { getAuthConfigFromEnv } from './misc/auth-config'
 import { refreshToken } from './refreshToken'
 import { register } from './register'
 
