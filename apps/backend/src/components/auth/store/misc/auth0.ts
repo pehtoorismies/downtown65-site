@@ -37,6 +37,7 @@ export const Auth0TokensRefreshSchema = Auth0TokensBaseSchema.transform((tokens)
 }))
 
 export type Auth0Tokens = z.infer<typeof Auth0TokensSchema>
+export type Auth0TokensRefresh = z.infer<typeof Auth0TokensRefreshSchema>
 
 export type InvalidCredentialsError = {
   type: 'InvalidCredentials'

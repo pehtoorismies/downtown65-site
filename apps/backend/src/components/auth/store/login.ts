@@ -24,8 +24,9 @@ export const login =
         username: input.email,
         password: input.password,
         audience: config.AUTH_AUDIENCE,
-        scope:
-          'read:events write:events read:me write:me read:users openid profile email offline_access',
+        // scope:
+        //   'read:events write:events read:me write:me read:users openid profile email offline_access',
+        scope: 'openid profile email offline_access',
       })
 
       const tokens = Auth0TokensSchema.parse(result.data)

@@ -49,7 +49,7 @@ export const DetailedUserSchema = UserBaseSchema.extend({
   picture: obj.picture,
   createdAt: obj.created_at,
   roles: [obj.app_metadata.role],
-  prefences: {
+  preferences: {
     subscribeWeeklyEmail: obj.user_metadata.subscribeWeeklyEmail,
     subscribeEventCreationEmail: obj.user_metadata.subscribeEventCreationEmail,
   },
@@ -59,9 +59,12 @@ export const UserListSchema = z.array(UserSchema)
 
 export const UserUpdateSchema = z
   .object({
+    // email: z.email().optional().openapi({ example: 'ada@example.com' }),
     name: z.string().min(1).optional().openapi({ example: 'Ada Lovelace' }),
     nickname: z.string().min(1).optional().openapi({ example: 'ada' }),
-    picture: z.string().url().optional().openapi({ example: 'https://example.com/avatar.jpg' }),
+    picture: z.url().optional().openapi({ example: 'https://example.com/avatar.jpg' }),
+    subscribeWeeklyEmail: z.boolean().optional().openapi({ example: true }),
+    subscribeEventCreationEmail: z.boolean().optional().openapi({ example: false }),
   })
   .refine((value) => Object.keys(value).length > 0, {
     message: 'At least one field must be provided to update user.',

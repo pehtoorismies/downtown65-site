@@ -168,18 +168,18 @@ export const registerUserRoutes = (app: AppAPI): void => {
       },
     }),
     async (c) => {
-      throw new Error('Not implemented yet')
-      // const jwtPayload = c.get('jwtPayload')
-      // const userId = jwtPayload.sub
+      const payload = c.req.valid('json')
+      const { sub } = c.get('jwtPayload')
+      const store = createUsersStore(c.env)
 
-      // const payload = await c.req.valid('json')
-      // const updated = store.update(userId, payload)
+      //
+      const updated = await store.updateUser(sub, payload)
 
       // if (!updated) {
       //   return c.json({ message: 'User not found' }, 404)
       // }
 
-      // return c.json(updated, 200)
+      return c.json(updated, 200)
     },
   )
 }
