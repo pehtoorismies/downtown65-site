@@ -1,10 +1,12 @@
 import { createRoute, z } from '@hono/zod-openapi'
 import { jwk } from 'hono/jwk'
+import { getAuthConfigFromEnv } from '~/common/auth0/auth-config'
+import { getManagementClient } from '~/common/auth0/client'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import type { AppAPI } from '../../app-api'
-import { UserListSchema, UserSchema, UserUpdateSchema } from './schema'
-import type { UserStore } from './store/userStore'
+import { PaginationQuerySchema, User, UserListSchema, UserSchema, UserUpdateSchema } from './schema'
+import { createUsersStore } from './store'
 
 const MessageSchema = z.object({
   message: z.string(),
@@ -12,7 +14,7 @@ const MessageSchema = z.object({
 
 const defaultMiddleware = [apiKeyAuth, jwtToken()]
 
-export const registerUserRoutes = (app: AppAPI, store: UserStore): void => {
+export const registerUserRoutes = (app: AppAPI): void => {
   // GET /users - List all users
   app.openapi(
     createRoute({
@@ -21,6 +23,9 @@ export const registerUserRoutes = (app: AppAPI, store: UserStore): void => {
       description: 'Get all users',
       security: [{ ApiKeyAuth: [], BearerToken: [] }],
       middleware: defaultMiddleware,
+      request: {
+        query: PaginationQuerySchema,
+      },
       responses: {
         200: {
           description: 'List of all users',
@@ -35,8 +40,11 @@ export const registerUserRoutes = (app: AppAPI, store: UserStore): void => {
         },
       },
     }),
-    (c) => {
-      return c.json(store.list())
+    async (c) => {
+      const { page, limit } = c.req.valid('query')
+      const store = createUsersStore(c.env)
+      const users = await store.listUsers({ page, limit })
+      return c.json(users, 200)
     },
   )
 

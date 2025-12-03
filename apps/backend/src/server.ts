@@ -10,7 +10,6 @@ import { registerRoutes as authRoutes } from './components/auth/routes'
 import { registerRoutes as eventRoutes } from './components/events/routes'
 import { EventStore } from './components/events/store/eventsStore'
 import { registerUserRoutes as usersRoutes } from './components/users/routes'
-import { UserStore } from './components/users/store/userStore'
 import { UnauthorizedErrorSchema } from './schemas/unauthorized -error'
 import { ValidationErrorSchema, formatZodErrors } from './schemas/validation-error'
 
