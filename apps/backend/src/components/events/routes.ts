@@ -1,6 +1,7 @@
 import { createRoute, z } from '@hono/zod-openapi'
 import { jwk } from 'hono/jwk'
 import { apiKeyAuth } from '~/middleware/apiKeyAuth'
+import { jwtToken } from '~/middleware/jwt'
 import type { AppAPI } from '../../app-api'
 import {
   EventCreateSchema,
@@ -15,49 +16,15 @@ const MessageSchema = z.object({
   message: z.string(),
 })
 
-const getUri = (domain: string) => `https://${domain}/.well-known/jwks.json`
+const defaultMiddleware = [apiKeyAuth, jwtToken()]
 
 export const registerRoutes = (app: AppAPI, store: EventStore): void => {
-  // Protected routes - require X-API-Key authentication
-  app.use('/events/*', apiKeyAuth)
-
-  app.on(
-    ['GET', 'POST'],
-    '/events',
-    jwk({
-      jwks_uri: (c) => getUri(c.env.AUTH_DOMAIN),
-    }),
-  )
-
-  app.on(
-    ['GET'],
-    '/events/:id',
-    jwk({
-      jwks_uri: (c) => getUri(c.env.AUTH_DOMAIN),
-      allow_anon: true,
-    }),
-  )
-
-  app.on(
-    ['PUT', 'DELETE'],
-    '/events/:id',
-    jwk({
-      jwks_uri: (c) => getUri(c.env.AUTH_DOMAIN),
-    }),
-  )
-
-  app.use(
-    '/events/:id/participants/me',
-    jwk({
-      jwks_uri: (c) => getUri(c.env.AUTH_DOMAIN),
-    }),
-  )
-
   app.openapi(
     createRoute({
       method: 'get',
       path: '/events',
       security: [{ ApiKeyAuth: [], BearerToken: [] }],
+      middleware: defaultMiddleware,
       responses: {
         200: {
           description: 'List all events',
@@ -84,6 +51,7 @@ export const registerRoutes = (app: AppAPI, store: EventStore): void => {
       method: 'get',
       path: '/events/{id}',
       security: [{ ApiKeyAuth: [] }],
+      middleware: [apiKeyAuth, jwtToken({ allowAnon: true })],
       request: {
         params: EventPathParamSchema,
       },
@@ -123,6 +91,7 @@ export const registerRoutes = (app: AppAPI, store: EventStore): void => {
       method: 'post',
       path: '/events',
       security: [{ ApiKeyAuth: [], BearerToken: [] }],
+      middleware: defaultMiddleware,
       request: {
         body: {
           description: 'Event payload',
@@ -159,6 +128,7 @@ export const registerRoutes = (app: AppAPI, store: EventStore): void => {
       method: 'put',
       path: '/events/{id}',
       security: [{ ApiKeyAuth: [], BearerToken: [] }],
+      middleware: defaultMiddleware,
       request: {
         params: EventPathParamSchema,
         body: {
@@ -205,6 +175,7 @@ export const registerRoutes = (app: AppAPI, store: EventStore): void => {
       method: 'delete',
       path: '/events/{id}',
       security: [{ ApiKeyAuth: [], BearerToken: [] }],
+      middleware: defaultMiddleware,
       request: {
         params: EventPathParamSchema,
       },
@@ -242,6 +213,7 @@ export const registerRoutes = (app: AppAPI, store: EventStore): void => {
       path: '/events/{id}/participants/me',
       description: 'Register the authenticated user as a participant to the event',
       security: [{ ApiKeyAuth: [], BearerToken: [] }],
+      middleware: defaultMiddleware,
       request: {
         params: EventPathParamSchema,
       },
@@ -279,6 +251,7 @@ export const registerRoutes = (app: AppAPI, store: EventStore): void => {
       path: '/events/{id}/participants/me',
       description: 'Unregister the authenticated user from the event',
       security: [{ ApiKeyAuth: [], BearerToken: [] }],
+      middleware: defaultMiddleware,
       request: {
         params: EventPathParamSchema,
       },

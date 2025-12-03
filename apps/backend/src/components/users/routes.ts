@@ -1,6 +1,7 @@
 import { createRoute, z } from '@hono/zod-openapi'
 import { jwk } from 'hono/jwk'
 import { apiKeyAuth } from '~/middleware/apiKeyAuth'
+import { jwtToken } from '~/middleware/jwt'
 import type { AppAPI } from '../../app-api'
 import { UserListSchema, UserSchema, UserUpdateSchema } from './schema'
 import type { UserStore } from './store/userStore'
@@ -9,20 +10,9 @@ const MessageSchema = z.object({
   message: z.string(),
 })
 
-const getUri = (domain: string) => `https://${domain}/.well-known/jwks.json`
+const defaultMiddleware = [apiKeyAuth, jwtToken()]
 
 export const registerUserRoutes = (app: AppAPI, store: UserStore): void => {
-  // Protected routes - require X-API-Key authentication
-  app.use('/users/*', apiKeyAuth)
-
-  // All user routes require JWT authentication
-  app.use(
-    '/users/*',
-    jwk({
-      jwks_uri: (c) => getUri(c.env.AUTH_DOMAIN),
-    }),
-  )
-
   // GET /users - List all users
   app.openapi(
     createRoute({
@@ -30,6 +20,7 @@ export const registerUserRoutes = (app: AppAPI, store: UserStore): void => {
       path: '/users',
       description: 'Get all users',
       security: [{ ApiKeyAuth: [], BearerToken: [] }],
+      middleware: defaultMiddleware,
       responses: {
         200: {
           description: 'List of all users',
@@ -56,6 +47,7 @@ export const registerUserRoutes = (app: AppAPI, store: UserStore): void => {
       path: '/users/me',
       description: 'Get the authenticated user information',
       security: [{ ApiKeyAuth: [], BearerToken: [] }],
+      middleware: defaultMiddleware,
       responses: {
         200: {
           description: 'User information',
@@ -103,6 +95,7 @@ export const registerUserRoutes = (app: AppAPI, store: UserStore): void => {
       path: '/users/me',
       description: 'Update the authenticated user information',
       security: [{ ApiKeyAuth: [], BearerToken: [] }],
+      middleware: defaultMiddleware,
       request: {
         body: {
           description: 'User update payload',

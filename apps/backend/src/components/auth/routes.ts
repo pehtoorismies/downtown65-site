@@ -12,14 +12,13 @@ import { createAuthStore } from './store'
 
 // Register routes
 export function registerRoutes(app: AppAPI) {
-  app.use('/auth/*', apiKeyAuth)
-
   // Login
   app.openapi(
     {
       method: 'post',
       path: '/auth/login',
       security: [{ ApiKeyAuth: [] }],
+      middleware: [apiKeyAuth],
       request: {
         body: {
           content: {
@@ -121,6 +120,7 @@ export function registerRoutes(app: AppAPI) {
       method: 'post',
       path: '/auth/register',
       security: [{ ApiKeyAuth: [] }],
+      middleware: [apiKeyAuth],
       request: {
         body: {
           content: {
@@ -198,6 +198,7 @@ export function registerRoutes(app: AppAPI) {
       method: 'post',
       path: '/auth/forgot-password',
       security: [{ ApiKeyAuth: [] }],
+      middleware: [apiKeyAuth],
       request: {
         body: {
           content: {
@@ -243,6 +244,7 @@ export function registerRoutes(app: AppAPI) {
       method: 'post',
       path: '/auth/refresh-token',
       security: [{ ApiKeyAuth: [] }],
+      middleware: [apiKeyAuth],
       request: {
         body: {
           content: {
