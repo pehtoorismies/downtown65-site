@@ -24,7 +24,6 @@ export async function apiKeyAuth(c: Context<{ Bindings: Env }>, next: Next) {
       wwwAuthenticateHeader: 'APIKey realm="global"',
     },
   })
-  console.log('API key authentication middleware initialized')
 
   return middleware(c, next)
 }

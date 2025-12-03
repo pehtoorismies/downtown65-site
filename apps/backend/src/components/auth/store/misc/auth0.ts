@@ -15,19 +15,26 @@ export const Auth0UserSchema = z
 
 export type Auth0User = z.infer<typeof Auth0UserSchema>
 
-export const Auth0TokensSchema = z
-  .object({
-    access_token: z.string(),
-    id_token: z.string(),
-    expires_in: z.number(),
-    refresh_token: z.string(),
-  })
-  .transform((tokens) => ({
-    accessToken: tokens.access_token,
-    idToken: tokens.id_token,
-    expiresIn: tokens.expires_in,
-    refreshToken: tokens.refresh_token,
-  }))
+const Auth0TokensBaseSchema = z.object({
+  access_token: z.string(),
+  id_token: z.string(),
+  expires_in: z.number(),
+})
+
+export const Auth0TokensSchema = Auth0TokensBaseSchema.extend({
+  refresh_token: z.string(),
+}).transform((tokens) => ({
+  accessToken: tokens.access_token,
+  idToken: tokens.id_token,
+  expiresIn: tokens.expires_in,
+  refreshToken: tokens.refresh_token,
+}))
+
+export const Auth0TokensRefreshSchema = Auth0TokensBaseSchema.transform((tokens) => ({
+  accessToken: tokens.access_token,
+  idToken: tokens.id_token,
+  expiresIn: tokens.expires_in,
+}))
 
 export type Auth0Tokens = z.infer<typeof Auth0TokensSchema>
 

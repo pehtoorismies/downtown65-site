@@ -1,11 +1,15 @@
 import { createRoute, z } from '@hono/zod-openapi'
-import { jwk } from 'hono/jwk'
-import { getAuthConfigFromEnv } from '~/common/auth0/auth-config'
-import { getManagementClient } from '~/common/auth0/client'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import type { AppAPI } from '../../app-api'
-import { PaginationQuerySchema, User, UserListSchema, UserSchema, UserUpdateSchema } from './schema'
+import {
+  DetailedUserSchema,
+  PaginationQuerySchema,
+  UserListSchema,
+  UserPathParamSchema,
+  UserSchema,
+  UserUpdateSchema,
+} from './schema'
 import { createUsersStore } from './store'
 
 const MessageSchema = z.object({
@@ -53,7 +57,7 @@ export const registerUserRoutes = (app: AppAPI): void => {
     createRoute({
       method: 'get',
       path: '/users/me',
-      description: 'Get the authenticated user information',
+      description: "Get the authenticated user's information",
       security: [{ ApiKeyAuth: [], BearerToken: [] }],
       middleware: defaultMiddleware,
       responses: {
@@ -61,7 +65,39 @@ export const registerUserRoutes = (app: AppAPI): void => {
           description: 'User information',
           content: {
             'application/json': {
-              schema: UserSchema,
+              schema: DetailedUserSchema,
+            },
+          },
+        },
+        401: {
+          $ref: '#/components/responses/UnauthorizedError',
+        },
+      },
+    }),
+    async (c) => {
+      const { sub } = c.get('jwtPayload')
+      const store = createUsersStore(c.env)
+      const user = await store.getUser(sub)
+      return c.json(user, 200)
+    },
+  )
+
+  app.openapi(
+    createRoute({
+      method: 'get',
+      path: '/users/{nickname}',
+      description: "Get user's information by nickname",
+      security: [{ ApiKeyAuth: [], BearerToken: [] }],
+      middleware: defaultMiddleware,
+      request: {
+        params: UserPathParamSchema,
+      },
+      responses: {
+        200: {
+          description: 'User information',
+          content: {
+            'application/json': {
+              schema: DetailedUserSchema,
             },
           },
         },
@@ -79,15 +115,10 @@ export const registerUserRoutes = (app: AppAPI): void => {
         },
       },
     }),
-    (c) => {
-      const jwtPayload = c.get('jwtPayload')
-      const userId = jwtPayload?.sub
-
-      if (!userId) {
-        return c.json({ message: 'User not authenticated' }, 401)
-      }
-
-      const user = store.get(userId)
+    async (c) => {
+      const { nickname } = c.req.valid('param')
+      const store = createUsersStore(c.env)
+      const user = await store.getUserByNickname(nickname)
       if (!user) {
         return c.json({ message: 'User not found' }, 404)
       }
@@ -137,17 +168,18 @@ export const registerUserRoutes = (app: AppAPI): void => {
       },
     }),
     async (c) => {
-      const jwtPayload = c.get('jwtPayload')
-      const userId = jwtPayload.sub
+      throw new Error('Not implemented yet')
+      // const jwtPayload = c.get('jwtPayload')
+      // const userId = jwtPayload.sub
 
-      const payload = await c.req.valid('json')
-      const updated = store.update(userId, payload)
+      // const payload = await c.req.valid('json')
+      // const updated = store.update(userId, payload)
 
-      if (!updated) {
-        return c.json({ message: 'User not found' }, 404)
-      }
+      // if (!updated) {
+      //   return c.json({ message: 'User not found' }, 404)
+      // }
 
-      return c.json(updated, 200)
+      // return c.json(updated, 200)
     },
   )
 }
