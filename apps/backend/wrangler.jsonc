@@ -16,6 +16,7 @@
       "custom_domain": true
     }
   ],
+
   "env": {
     // Developer environments
     "pehtoorismies": {
@@ -24,7 +25,14 @@
         "AUTH_CLIENT_ID": "JaoAht7ggce7f5R8DCBGUyjUJeMQEDtz",
         "AUTH_DOMAIN": "dev-dt65.eu.auth0.com",
         "AUTH_AUDIENCE": "https://graphql-dev.downtown65.com"
-      }
+      },
+      "d1_databases": [
+        {
+          "binding": "pehtoorismies_development",
+          "database_name": "pehtoorismies-development",
+          "database_id": "1f425fbb-7dec-49f0-b158-0d0963a27ad2"
+        }
+      ]
     },
     // Production and staging environments
     "staging": {
