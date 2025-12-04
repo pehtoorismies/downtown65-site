@@ -6,9 +6,12 @@ import { updateUser } from './updateUser'
 
 export interface UserStore {
   listUsers: ReturnType<typeof listUsers>
+  getUser: ReturnType<typeof getUser>
+  getUserByNickname: ReturnType<typeof getUserByNickname>
+  updateUser: ReturnType<typeof updateUser>
 }
 
-export const createUsersStore = (env: Env) => {
+export const createUsersStore = (env: Env): UserStore => {
   const config = getAuthConfigFromEnv(env)
   return {
     listUsers: listUsers(config),

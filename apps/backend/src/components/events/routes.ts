@@ -78,11 +78,7 @@ export const registerRoutes = (app: AppAPI, store: EventStore): void => {
     }),
     (c) => {
       const { id } = c.req.valid('param')
-      const event = store.get(id)
-      if (!event) {
-        return c.json({ message: `Event ${id} not found` }, 404)
-      }
-      return c.json(event, 200)
+      return c.json({ message: `Event ${id} not found` }, 404)
     },
   )
 
