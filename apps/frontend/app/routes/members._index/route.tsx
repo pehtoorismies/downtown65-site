@@ -1,7 +1,7 @@
 import { Anchor, Breadcrumbs, Container, Pagination, Table, Text, Title } from '@mantine/core'
-
-import { Link, useLoaderData, useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { apiClient } from '~/api/api-client'
+import { createSessionManager } from '~/session/session-manager.server'
 import type { Route } from './+types/route'
 
 const defaultTo = (defaultValue: number, value: string | null): number => {
@@ -14,54 +14,34 @@ const defaultTo = (defaultValue: number, value: string | null): number => {
   return Number(value)
 }
 
-export function loader({ context, request }: Route.LoaderArgs) {
-  apiClient.GET('/users', {
-    query: {
-      page: 1,
-      limit: 50,
-    },
-    headers: {
-      'x-api-key': 'YOUR_API_KEY',
-      Authorization: 'Bearer YOUR_JWT',
-    },
-  })
+export async function loader({ context, request }: Route.LoaderArgs) {
+  const { loaderAuthenticate } = createSessionManager(request, context)
+  const { user, accessToken } = await loaderAuthenticate()
 
   const url = new URL(request.url)
   const page = defaultTo(1, url.searchParams.get('page'))
   const perPage = defaultTo(50, url.searchParams.get('per_page'))
 
-  const response = {
-    users: {
-      users: [
-        {
-          id: 'user-1',
-          nickname: 'testaaja',
-          name: 'Testaaja Testinen',
-        },
-        {
-          id: 'user-2',
-          nickname: 'kayttaja',
-          name: 'Käyttäjä Käyttäjäinen',
-        },
-      ],
-      total: 2,
-      length: 2,
-      limit: 2,
-      start: 0,
+  const { data, error } = await apiClient.GET('/users', {
+    query: {
+      page: page - 1,
+      perPage,
     },
+    headers: {
+      'x-api-key': context.cloudflare.env.API_KEY,
+      authorization: `Bearer ${accessToken}`,
+    },
+  })
+
+  if (error) {
+    return []
   }
 
-  const {
-    users: { users, total, length, limit, start },
-  } = response
+  const { users, total, length, limit, start } = data
 
   const extra = total % limit === 0 ? 0 : 1
   const numberPages = Math.floor(total / limit) + extra
   const currentPage = Math.floor(start / limit) + 1
-
-  const user = {
-    id: 'user-1',
-  }
 
   return {
     user,
@@ -75,8 +55,9 @@ export function loader({ context, request }: Route.LoaderArgs) {
   }
 }
 
-export default function Users() {
-  const { users, start, usersOnPage, userCount, numPages, currentPage, perPage } = useLoaderData()
+export default function Users({ loaderData }: Route.ComponentProps) {
+  const { users, start, usersOnPage, userCount, numPages, currentPage, perPage } = loaderData
+
   const navigate = useNavigate()
   const hasPagination = userCount > perPage
 

@@ -1,31 +1,33 @@
 import type { Session } from 'react-router'
 import { z } from 'zod'
-import { User } from '~/domain/user'
+import { UserSchema } from '~/domain/user'
 
-const REFRESH_TOKEN_KEY = 'refreshToken'
-const USER_KEY = 'user'
-const ACCESS_TOKEN_KEY = 'accessToken'
-const COOKIE_EXPIRES = 'cookieExpires'
+const CookieSessionBase = z.object({
+  accessToken: z.string(),
+  refreshToken: z.string(),
+  cookieExpires: z.string().datetime(),
+})
 
-export const CookieSessionData = z
-  .object({
-    user: User,
-    accessToken: z.string(),
-    refreshToken: z.string(),
-    cookieExpires: z.string().datetime(),
-  })
-  .brand<'CookieSessionData'>()
+export const CookieSessionDataSchema = CookieSessionBase.extend({
+  user: UserSchema,
+})
 
-export type CookieSessionData = z.infer<typeof CookieSessionData>
+const CookieSessionStoredDataSchema = CookieSessionBase.extend({
+  userJSON: z.string(),
+})
 
-export const getCookieSessionData = (session: Session): CookieSessionData | undefined => {
-  const user = session.get(USER_KEY)
-  const accessToken = session.get(ACCESS_TOKEN_KEY)
-  const refreshToken = session.get(REFRESH_TOKEN_KEY)
-  const cookieExpires = session.get(COOKIE_EXPIRES)
+type CookieSessionStoredData = z.infer<typeof CookieSessionStoredDataSchema>
+type CookieSessionData = z.infer<typeof CookieSessionDataSchema>
 
-  const sessionData = CookieSessionData.safeParse({
-    user: user == null ? undefined : JSON.parse(user),
+export const getCookieSessionData = (
+  session: Session<CookieSessionStoredData>,
+): CookieSessionData | undefined => {
+  const userJSON = session.get('userJSON')
+  const accessToken = session.get('accessToken')
+  const refreshToken = session.get('refreshToken')
+  const cookieExpires = session.get('cookieExpires')
+  const sessionData = CookieSessionDataSchema.safeParse({
+    user: userJSON == null ? undefined : JSON.parse(userJSON),
     accessToken,
     refreshToken,
     cookieExpires,
@@ -37,11 +39,11 @@ export const getCookieSessionData = (session: Session): CookieSessionData | unde
 }
 
 export const setCookieSessionData = (
-  session: Session,
+  session: Session<CookieSessionStoredData>,
   { refreshToken, user, accessToken, cookieExpires }: CookieSessionData,
 ) => {
-  session.set(REFRESH_TOKEN_KEY, refreshToken)
-  session.set(USER_KEY, JSON.stringify(user))
-  session.set(ACCESS_TOKEN_KEY, accessToken)
-  session.set(COOKIE_EXPIRES, cookieExpires)
+  session.set('refreshToken', refreshToken)
+  session.set('userJSON', JSON.stringify(user))
+  session.set('accessToken', accessToken)
+  session.set('cookieExpires', cookieExpires)
 }

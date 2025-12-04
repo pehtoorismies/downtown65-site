@@ -78,3 +78,13 @@ export type User = z.infer<typeof UserSchema>
 export type DetailedUser = z.infer<typeof DetailedUserSchema>
 export type UserList = z.infer<typeof UserListSchema>
 export type UserUpdateInput = z.infer<typeof UserUpdateSchema>
+
+export const UserListResponseSchema = z.object({
+  users: z.array(UserSchema),
+  total: z.number(),
+  start: z.number(),
+  limit: z.number(),
+  length: z.number(),
+})
+
+export type UserListResponse = z.infer<typeof UserListResponseSchema>

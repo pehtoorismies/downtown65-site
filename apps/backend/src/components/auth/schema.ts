@@ -1,7 +1,7 @@
 import z from 'zod'
 
 // Schemas
-export const LoginSchema = z.object({
+export const LoginParamSchema = z.object({
   email: z.email().openapi({
     param: {
       name: 'email',
@@ -20,25 +20,25 @@ export const LoginSchema = z.object({
       example: 'supersecretpassword',
     }),
 })
-export type LoginInput = z.infer<typeof LoginSchema>
+export type LoginInput = z.infer<typeof LoginParamSchema>
 
-export const RegisterSchema = z.object({
+export const RegisterParamSchema = z.object({
   email: z.email(),
   password: z.string().min(8),
   name: z.string().min(2),
   registerSecret: z.string(),
 })
-export type RegisterInput = z.infer<typeof RegisterSchema>
+export type RegisterInput = z.infer<typeof RegisterParamSchema>
 
-export const ForgotPasswordSchema = z.object({
+export const ForgotPasswordParamSchema = z.object({
   email: z.email(),
 })
-export type ForgotPasswordInput = z.infer<typeof ForgotPasswordSchema>
+export type ForgotPasswordInput = z.infer<typeof ForgotPasswordParamSchema>
 
-export const RefreshTokenSchema = z.object({
+export const RefreshTokenParamSchema = z.object({
   refreshToken: z.string(),
 })
-export type RefreshTokenInput = z.infer<typeof RefreshTokenSchema>
+export type RefreshTokenInput = z.infer<typeof RefreshTokenParamSchema>
 
 export const ErrorSchema = z.object({
   code: z.number().openapi({

@@ -1,3 +1,4 @@
+import { LoginSchema } from '@downtown65/schema'
 import {
   Alert,
   Anchor,
@@ -10,34 +11,54 @@ import {
   TextInput,
   Title,
 } from '@mantine/core'
+import { IconAlertCircle } from '@tabler/icons-react'
 import { Form, Link, useActionData, useNavigation } from 'react-router'
 import { apiClient } from '~/api/api-client'
+import { createSessionManager } from '~/session/session-manager.server'
 import type { Route } from './+types/route'
 
-export async function action({ request }: Route.ActionArgs) {
+export async function action({ request, context }: Route.ActionArgs) {
+  const { createUserSession } = createSessionManager(request, context)
+
   const formData = await request.formData()
   const email = formData.get('email')
   const password = formData.get('password')
 
-  const { data, error } = await apiClient.POST('/auth/login', {
-    body: {
-      email,
-      password,
-    },
-  })
-  if (error) {
-    console.log(JSON.stringify(error, null, 2))
-    return null
+  const result = LoginSchema.safeParse({ email, password })
+  if (!result.success) {
+    return {
+      errorGeneral: 'Invalid form data',
+    }
   }
 
-  console.log(data)
+  const { data, error, response } = await apiClient.POST('/auth/login', {
+    body: {
+      email: result.data.email,
+      password: result.data.password,
+    },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': 'dev-api-key-change-in-production',
+    },
+  })
 
-  return null
+  if (data) {
+    return createUserSession({
+      tokens: data,
+      redirectTo: '/events',
+      rememberMe: false,
+    })
+  }
+
+  if (error) {
+    // error type is union of all error response schemas
+    return { errorGeneral: error.message }
+  }
+  return { errorGeneral: 'Unknown error' }
 }
 
-export default function Login() {
+export default function Login({ actionData, loaderData }: Route.ComponentProps) {
   const navigation = useNavigation()
-  const actionData = useActionData()
 
   return (
     <>
@@ -52,6 +73,16 @@ export default function Login() {
       </Text>
 
       <Paper withBorder shadow="md" p={30} mt={30} radius="md">
+        {actionData?.errorGeneral && (
+          <Alert
+            icon={<IconAlertCircle size={16} />}
+            title="Virhe kirjautumisessa"
+            color="red"
+            mb="sm"
+          >
+            {actionData?.errorGeneral}
+          </Alert>
+        )}
         <Form method="post">
           <TextInput
             id="email"

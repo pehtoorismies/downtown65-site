@@ -5,6 +5,7 @@ import type { AppAPI } from '../../app-api'
 import {
   DetailedUserSchema,
   PaginationQuerySchema,
+  UserListResponseSchema,
   UserListSchema,
   UserPathParamSchema,
   UserSchema,
@@ -35,7 +36,7 @@ export const registerUserRoutes = (app: AppAPI): void => {
           description: 'List of all users',
           content: {
             'application/json': {
-              schema: UserListSchema,
+              schema: UserListResponseSchema,
             },
           },
         },
@@ -47,8 +48,8 @@ export const registerUserRoutes = (app: AppAPI): void => {
     async (c) => {
       const { page, limit } = c.req.valid('query')
       const store = createUsersStore(c.env)
-      const users = await store.listUsers({ page, limit })
-      return c.json(users, 200)
+      const response = await store.listUsers({ page, limit })
+      return c.json(response, 200)
     },
   )
 

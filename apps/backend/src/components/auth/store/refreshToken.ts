@@ -11,7 +11,7 @@ export const refreshToken =
       const result = await authClient.oauth.refreshTokenGrant({
         refresh_token: input.refreshToken,
       })
-      console.log('Refresh token response', result.data)
+
       return Auth0TokensRefreshSchema.parse(result.data)
     } catch (error) {
       console.error(error)

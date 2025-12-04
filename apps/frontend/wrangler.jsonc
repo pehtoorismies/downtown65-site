@@ -11,7 +11,8 @@
     }
   ],
   "vars": {
-    "VALUE_FROM_CLOUDFLARE": "Hello from Cloudflare"
+    "API_HOST": "define in envs below",
+    "API_KEY": "define in envs below"
   },
   "env": {
     // Developer environments

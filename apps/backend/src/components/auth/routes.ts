@@ -1,12 +1,13 @@
 import { z } from 'zod'
+import { id } from 'zod/locales'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import type { AppAPI } from '../../app-api'
 import {
   ErrorSchema,
-  ForgotPasswordSchema,
-  LoginSchema,
-  RefreshTokenSchema,
-  RegisterSchema,
+  ForgotPasswordParamSchema,
+  LoginParamSchema,
+  RefreshTokenParamSchema,
+  RegisterParamSchema,
 } from './schema'
 import { createAuthStore } from './store'
 
@@ -23,7 +24,7 @@ export function registerRoutes(app: AppAPI) {
         body: {
           content: {
             'application/json': {
-              schema: LoginSchema,
+              schema: LoginParamSchema,
             },
           },
         },
@@ -125,7 +126,7 @@ export function registerRoutes(app: AppAPI) {
         body: {
           content: {
             'application/json': {
-              schema: RegisterSchema,
+              schema: RegisterParamSchema,
             },
           },
         },
@@ -203,7 +204,7 @@ export function registerRoutes(app: AppAPI) {
         body: {
           content: {
             'application/json': {
-              schema: ForgotPasswordSchema,
+              schema: ForgotPasswordParamSchema,
             },
           },
         },
@@ -249,7 +250,7 @@ export function registerRoutes(app: AppAPI) {
         body: {
           content: {
             'application/json': {
-              schema: RefreshTokenSchema,
+              schema: RefreshTokenParamSchema,
             },
           },
         },
@@ -262,6 +263,7 @@ export function registerRoutes(app: AppAPI) {
               schema: z.object({
                 accessToken: z.string(),
                 refreshToken: z.string(),
+                idToken: z.string(),
               }),
             },
           },
