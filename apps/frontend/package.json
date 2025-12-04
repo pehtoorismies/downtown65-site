@@ -14,9 +14,10 @@
     "preview": "pnpm run build && vite preview",
     "test": "vitest",
     "typecheck": "pnpm run cf-typegen && react-router typegen && tsc -b",
-    "generate:api": "openapi-typescript http://localhost:3002/openapi.json -o ./.generated/types/app/api/+types/api.d.ts"
+    "generate:api": "openapi-typescript http://localhost:3002/doc -o ./.generated/types/app/api/+types/api.d.ts"
   },
   "dependencies": {
+    "@downtown65/schema": "workspace:*",
     "@mantine/core": "^8.3.9",
     "@mantine/hooks": "^8.3.9",
     "@react-router/fs-routes": "7.9.6",

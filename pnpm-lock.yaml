@@ -17,6 +17,9 @@ importers:
 
   apps/backend:
     dependencies:
+      '@downtown65/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
       '@hono/node-server':
         specifier: 1.19.6
         version: 1.19.6(hono@4.10.7)
@@ -78,6 +81,9 @@ importers:
 
   apps/frontend:
     dependencies:
+      '@downtown65/schema':
+        specifier: workspace:*
+        version: link:../../packages/schema
       '@mantine/core':
         specifier: ^8.3.9
         version: 8.3.9(@mantine/hooks@8.3.9(react@19.2.0))(@types/react@19.1.9)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -178,6 +184,16 @@ importers:
       wrangler:
         specifier: 4.51.0
         version: 4.51.0
+
+  packages/schema:
+    dependencies:
+      zod:
+        specifier: 4.1.13
+        version: 4.1.13
+    devDependencies:
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
 
 packages:
 

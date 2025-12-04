@@ -1,6 +1,7 @@
 import { Anchor, Breadcrumbs, Container, Pagination, Table, Text, Title } from '@mantine/core'
 
 import { Link, useLoaderData, useNavigate } from 'react-router'
+import { apiClient } from '~/api/api-client'
 import type { Route } from './+types/route'
 
 const defaultTo = (defaultValue: number, value: string | null): number => {
@@ -14,6 +15,17 @@ const defaultTo = (defaultValue: number, value: string | null): number => {
 }
 
 export function loader({ context, request }: Route.LoaderArgs) {
+  apiClient.GET('/users', {
+    query: {
+      page: 1,
+      limit: 50,
+    },
+    headers: {
+      'x-api-key': 'YOUR_API_KEY',
+      Authorization: 'Bearer YOUR_JWT',
+    },
+  })
+
   const url = new URL(request.url)
   const page = defaultTo(1, url.searchParams.get('page'))
   const perPage = defaultTo(50, url.searchParams.get('per_page'))

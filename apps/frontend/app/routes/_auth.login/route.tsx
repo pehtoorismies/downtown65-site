@@ -21,8 +21,8 @@ export async function action({ request }: Route.ActionArgs) {
 
   const { data, error } = await apiClient.POST('/auth/login', {
     body: {
-      email: 'My New Post',
-      password: 'This is the content of my new post.',
+      email,
+      password,
     },
   })
   if (error) {
