@@ -1,5 +1,5 @@
 {
-  "name": "event-monorepo",
+  "name": "downtown65-events",
   "private": true,
   "version": "0.1.0",
   "packageManager": "pnpm@9.12.0",

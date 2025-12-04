@@ -1,32 +1,68 @@
+import {
+  AppShell,
+  Box,
+  Code,
+  ColorSchemeScript,
+  Container,
+  Text,
+  Title,
+  mantineHtmlProps,
+} from '@mantine/core'
+import type React from 'react'
 import { Links, Meta, Outlet, Scripts, ScrollRestoration, isRouteErrorResponse } from 'react-router'
-
 import type { Route } from './+types/root'
 import './app.css'
-
-export const links: Route.LinksFunction = () => [
-  { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-  {
-    rel: 'preconnect',
-    href: 'https://fonts.gstatic.com',
-    crossOrigin: 'anonymous',
-  },
-  {
-    rel: 'stylesheet',
-    href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
-  },
-]
+import { useDisclosure } from '@mantine/hooks'
+import { AppTheme } from '~/app-theme'
+import { LoggedInNavigation, LoggedOutNavigation, Navbar } from './components/navigation'
+import type { User } from './domain/user'
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const [navigationOpened, { toggle, close }] = useDisclosure()
+
+  const user: User = {
+    id: 'user-1',
+    nickname: 'Testaaja Testinen',
+    picture: 'https://example.com/avatar.jpg',
+  }
+
   return (
-    <html lang="en">
+    <html lang="en" {...mantineHtmlProps}>
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        <ColorSchemeScript />
         <Meta />
         <Links />
       </head>
       <body>
-        {children}
+        <AppTheme>
+          <AppShell
+            header={{ height: { base: 60, md: 70, lg: 80 } }}
+            navbar={{
+              width: 300,
+              breakpoint: 'sm',
+              collapsed: { desktop: true, mobile: !navigationOpened },
+            }}
+            padding="xs"
+          >
+            <AppShell.Header>
+              {user && (
+                <LoggedInNavigation
+                  user={user}
+                  toggle={toggle}
+                  close={close}
+                  navigationOpened={navigationOpened}
+                />
+              )}
+              {!user && <LoggedOutNavigation />}
+            </AppShell.Header>
+            <AppShell.Navbar py="md" p="sm">
+              <Navbar close={close} />
+            </AppShell.Navbar>
+            <AppShell.Main>{children}</AppShell.Main>
+          </AppShell>
+        </AppTheme>
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -53,14 +89,14 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className="pt-16 p-4 container mx-auto">
-      <h1>{message}</h1>
-      <p>{details}</p>
+    <Container component="main" pt="xl" p="md" mx="auto">
+      <Title>{message}</Title>
+      <Text>{details}</Text>
       {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
-          <code>{stack}</code>
-        </pre>
+        <Box component="pre" w="100%" style={{ overflowX: 'auto' }} p="md">
+          <Code>{stack}</Code>
+        </Box>
       )}
-    </main>
+    </Container>
   )
 }
