@@ -41,7 +41,6 @@ export const registerRoutes = (app: AppAPI, store: EventStore): void => {
     }),
     (c) => {
       const jwtPayload = c.get('jwtPayload')
-      console.log('JWT Payload:', jwtPayload)
       return c.json(store.list())
     },
   )

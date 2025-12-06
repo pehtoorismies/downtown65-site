@@ -6,7 +6,6 @@ const jwkMock = () => {
 
   vi.mock('hono/jwk', () => ({
     jwk: (options: { allow_anon?: boolean }) => {
-      console.log('JWK mock initialized with options:', options)
       return async (c: Context, next: Next) => {
         const authHeader = c.req.header('Authorization')
 

@@ -7,13 +7,8 @@ import { bearerAuth } from 'hono/bearer-auth'
  */
 export async function apiKeyAuth(c: Context<{ Bindings: Env }>, next: Next) {
   if (!c) {
-    console.log('*******************************')
     return new Response('Internal Server Error', { status: 120 })
   }
-
-  console.log('*******************************')
-  // console.log('API Key Auth Middleware Invoked', JSON.stringify(c))
-  console.log('*******************************')
 
   const middleware = bearerAuth({
     token: c.env.API_KEY,

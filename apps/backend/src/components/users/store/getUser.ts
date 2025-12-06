@@ -1,6 +1,6 @@
 import type { AuthConfig } from '~/common/auth0/auth-config'
 import { getManagementClient } from '~/common/auth0/client'
-import { type DetailedUser, DetailedUserSchema } from '../schema'
+import { DetailedAuth0UserSchema } from './schema'
 
 const QUERY_USER_RETURNED_FIELDS = [
   'nickname',
@@ -13,14 +13,12 @@ const QUERY_USER_RETURNED_FIELDS = [
   'user_metadata',
 ].join(',')
 
-export const getUser =
-  (config: AuthConfig) =>
-  async (auth0Sub: string): Promise<DetailedUser> => {
-    const management = await getManagementClient(config)
+export const getUser = (config: AuthConfig) => async (auth0Sub: string) => {
+  const management = await getManagementClient(config)
 
-    const user = await management.users.get(auth0Sub, {
-      fields: QUERY_USER_RETURNED_FIELDS,
-    })
+  const user = await management.users.get(auth0Sub, {
+    fields: QUERY_USER_RETURNED_FIELDS,
+  })
 
-    return DetailedUserSchema.parse(user)
-  }
+  return DetailedAuth0UserSchema.parse(user)
+}

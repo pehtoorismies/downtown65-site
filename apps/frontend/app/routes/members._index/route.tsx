@@ -1,9 +1,8 @@
 import { Anchor, Breadcrumbs, Container, Pagination, Table, Text, Title } from '@mantine/core'
-import { Link, type MiddlewareFunction, redirect, useNavigate } from 'react-router'
+import { Link, redirect, useNavigate } from 'react-router'
 import { apiClient } from '~/api/api-client'
 import { AuthContext } from '~/context/context'
 import { authMiddleware } from '~/middleware/auth'
-import { createSessionManager } from '~/session/session-manager.server'
 import type { Route } from './+types/route'
 
 const defaultTo = (defaultValue: number, value: string | null): number => {
@@ -39,11 +38,13 @@ export async function loader({ request, context }: Route.LoaderArgs) {
     },
     headers: {
       'x-api-key': context.cloudflare.env.API_KEY,
-      authorization: `Bearer ${authContext.accessToken}`,
+      authorization: `Bearer ${accessToken}`,
     },
   })
 
   if (error) {
+    console.error('Error fetching users:')
+    console.error(error)
     return {
       user,
       users: [],

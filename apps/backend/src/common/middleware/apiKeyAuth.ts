@@ -6,7 +6,6 @@ import { bearerAuth } from 'hono/bearer-auth'
  * Returns 401 Unauthorized if the API key is missing or invalid
  */
 export async function apiKeyAuth(c: Context<{ Bindings: Env }>, next: Next) {
-  console.log('API key******************:', c.env.API_KEY)
   const middleware = bearerAuth({
     token: c.env.API_KEY,
     headerName: 'x-api-key',

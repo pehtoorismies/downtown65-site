@@ -1,8 +1,9 @@
+import z from 'zod'
 import type { AuthConfig } from '~/common/auth0/auth-config'
 import { getManagementClient } from '~/common/auth0/client'
-import { DetailedUserSchema, type UserUpdateInput, UserUpdateSchema } from '../schema'
+import { DetailedAuth0UserSchema, type UserUpdateParams, UserUpdateParamsSchema } from './schema'
 
-const UpdateSchema = UserUpdateSchema.transform((obj) => ({
+const UpdateSchema = UserUpdateParamsSchema.transform((obj) => ({
   name: obj.name,
   nickname: obj.nickname,
   picture: obj.picture,
@@ -13,10 +14,10 @@ const UpdateSchema = UserUpdateSchema.transform((obj) => ({
 }))
 
 export const updateUser =
-  (config: AuthConfig) => async (auth0Sub: string, params: UserUpdateInput) => {
+  (config: AuthConfig) => async (auth0Sub: string, params: UserUpdateParams) => {
     const management = await getManagementClient(config)
     const parsedParams = UpdateSchema.parse(params)
     const response = await management.users.update(auth0Sub, parsedParams)
 
-    return DetailedUserSchema.parse(response)
+    return DetailedAuth0UserSchema.parse(response)
   }

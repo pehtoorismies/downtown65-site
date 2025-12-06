@@ -22,8 +22,9 @@ export const authMiddleware =
         accessToken: result.accessToken,
       })
     }
-    const response = await next()
+
+    const response = (await next()) as Response
     response.headers.append('Set-Cookie', result.headers.get('Set-Cookie') || '')
-    // response.headers.append("X-Request-Id", requestId);
+
     return response
   }

@@ -1,11 +1,11 @@
 import { type AuthConfig, getAuthConfigFromEnv } from '~/common/auth0/auth-config'
 import { getUser } from './getUser'
 import { getUserByNickname } from './getUserByNickname'
-import { listUsers } from './listUsers'
+import { getUsers } from './getUsers'
 import { updateUser } from './updateUser'
 
 export interface UserStore {
-  listUsers: ReturnType<typeof listUsers>
+  getUsers: ReturnType<typeof getUsers>
   getUser: ReturnType<typeof getUser>
   getUserByNickname: ReturnType<typeof getUserByNickname>
   updateUser: ReturnType<typeof updateUser>
@@ -14,7 +14,7 @@ export interface UserStore {
 export const createUsersStore = (env: Env): UserStore => {
   const config = getAuthConfigFromEnv(env)
   return {
-    listUsers: listUsers(config),
+    getUsers: getUsers(config),
     getUser: getUser(config),
     getUserByNickname: getUserByNickname(config),
     updateUser: updateUser(config),

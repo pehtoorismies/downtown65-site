@@ -273,7 +273,6 @@ export function registerRoutes(app: AppAPI) {
     },
     async (c) => {
       const { refreshToken } = c.req.valid('json')
-      console.log('Refresh token request received', refreshToken)
       const store = createAuthStore(c.env)
       const refreshedTokens = await store.refreshToken({ refreshToken })
 
