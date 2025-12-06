@@ -1,6 +1,8 @@
 import { Anchor, Breadcrumbs, Container, Pagination, Table, Text, Title } from '@mantine/core'
-import { Link, useNavigate } from 'react-router'
+import { Link, type MiddlewareFunction, redirect, useNavigate } from 'react-router'
 import { apiClient } from '~/api/api-client'
+import { AuthContext } from '~/context/context'
+import { authMiddleware } from '~/middleware/auth'
 import { createSessionManager } from '~/session/session-manager.server'
 import type { Route } from './+types/route'
 
@@ -11,16 +13,24 @@ const defaultTo = (defaultValue: number, value: string | null): number => {
   if (Number.isNaN(value)) {
     return defaultValue
   }
+
   return Number(value)
 }
 
-export async function loader({ context, request }: Route.LoaderArgs) {
-  const { loaderAuthenticate } = createSessionManager(request, context)
-  const { user, accessToken } = await loaderAuthenticate()
+export const middleware = [authMiddleware()]
+
+export async function loader({ request, context }: Route.LoaderArgs) {
+  const authContext = context.get(AuthContext)
+  if (!authContext) {
+    console.error
+    return redirect('/login')
+  }
 
   const url = new URL(request.url)
   const page = defaultTo(1, url.searchParams.get('page'))
   const perPage = defaultTo(50, url.searchParams.get('per_page'))
+
+  const { user, accessToken } = authContext
 
   const { data, error } = await apiClient.GET('/users', {
     query: {
@@ -29,12 +39,21 @@ export async function loader({ context, request }: Route.LoaderArgs) {
     },
     headers: {
       'x-api-key': context.cloudflare.env.API_KEY,
-      authorization: `Bearer ${accessToken}`,
+      authorization: `Bearer ${authContext.accessToken}`,
     },
   })
 
   if (error) {
-    return []
+    return {
+      user,
+      users: [],
+      userCount: 0,
+      numPages: 0,
+      currentPage: 0,
+      perPage: 0,
+      usersOnPage: 0,
+      start: 0,
+    }
   }
 
   const { users, total, length, limit, start } = data

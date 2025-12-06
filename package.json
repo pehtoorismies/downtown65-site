@@ -2,7 +2,7 @@
   "name": "downtown65-events",
   "private": true,
   "version": "0.1.0",
-  "packageManager": "pnpm@9.12.0",
+  "packageManager": "pnpm@10.24.0",
   "scripts": {
     "dev:backend": "pnpm --filter backend dev",
     "dev:frontend": "pnpm --filter frontend dev",

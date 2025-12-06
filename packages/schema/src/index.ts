@@ -3,13 +3,8 @@ export { TimeHHMM } from './common'
 export type { TimeHHMM as TimeHHMMType } from './common'
 
 // Auth schemas
-export {
-  LoginSchema,
-  RegisterSchema,
-  ForgotPasswordSchema,
-  RefreshTokenSchema,
-} from './auth'
-export type { Login, Register, ForgotPassword, RefreshToken } from './auth'
+export { ErrorResponseSchema, LoginSchema } from './auth'
+export type { ErrorResponse, Login } from './auth'
 
 // User schemas
 export {

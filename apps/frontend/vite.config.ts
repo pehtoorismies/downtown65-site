@@ -4,5 +4,11 @@ import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
-  plugins: [cloudflare({ viteEnvironment: { name: 'ssr' } }), reactRouter(), tsconfigPaths()],
+  plugins: [
+    cloudflare({
+      viteEnvironment: { name: 'ssr' },
+    }),
+    reactRouter(),
+    tsconfigPaths(),
+  ],
 })

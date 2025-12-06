@@ -12,20 +12,19 @@ import {
   Title,
 } from '@mantine/core'
 import { IconAlertCircle } from '@tabler/icons-react'
-import { Form, Link, useActionData, useNavigation } from 'react-router'
+import { Form, Link, redirect, useNavigation } from 'react-router'
 import { apiClient } from '~/api/api-client'
 import { createSessionManager } from '~/session/session-manager.server'
 import type { Route } from './+types/route'
 
 export async function action({ request, context }: Route.ActionArgs) {
-  const { createUserSession } = createSessionManager(request, context)
-
   const formData = await request.formData()
   const email = formData.get('email')
   const password = formData.get('password')
 
   const result = LoginSchema.safeParse({ email, password })
   if (!result.success) {
+    console.error('Login form validation error:', result.error)
     return {
       errorGeneral: 'Invalid form data',
     }
@@ -38,22 +37,48 @@ export async function action({ request, context }: Route.ActionArgs) {
     },
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': 'dev-api-key-change-in-production',
+      'x-api-key': context.cloudflare.env.API_KEY,
     },
   })
 
+  if (error) {
+    console.error('Login error:', error)
+
+    switch (response.status) {
+      case 400:
+        return { errorGeneral: 'virhe 400' }
+      case 401:
+        return { errorGeneral: 'virhe 401' }
+      case 403:
+        return { errorGeneral: 'virhe 403' }
+      case 422:
+        return { errorGeneral: 'virhe 422' }
+      default:
+        // Try to get message from error object
+        return {
+          errorGeneral: 'virhe 500',
+        }
+    }
+  }
   if (data) {
-    return createUserSession({
+    const secrets = {
+      COOKIE_SESSION_SECRET: context.cloudflare.env.COOKIE_SESSION_SECRET,
+      API_KEY: context.cloudflare.env.API_KEY,
+    }
+    const { createUserSession, commitSession } = createSessionManager(secrets)
+    const userSession = await createUserSession({
+      request,
       tokens: data,
-      redirectTo: '/events',
       rememberMe: false,
+    })
+
+    const headers = new Headers()
+    headers.append('Set-Cookie', await commitSession(userSession))
+    return redirect('/events', {
+      headers,
     })
   }
 
-  if (error) {
-    // error type is union of all error response schemas
-    return { errorGeneral: error.message }
-  }
   return { errorGeneral: 'Unknown error' }
 }
 

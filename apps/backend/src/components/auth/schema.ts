@@ -39,12 +39,3 @@ export const RefreshTokenParamSchema = z.object({
   refreshToken: z.string(),
 })
 export type RefreshTokenInput = z.infer<typeof RefreshTokenParamSchema>
-
-export const ErrorSchema = z.object({
-  code: z.number().openapi({
-    example: 400,
-  }),
-  message: z.string().openapi({
-    example: 'Bad Request',
-  }),
-})

@@ -1,9 +1,8 @@
+import { ErrorResponseSchema } from '@downtown65/schema'
 import { z } from 'zod'
-import { id } from 'zod/locales'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import type { AppAPI } from '../../app-api'
 import {
-  ErrorSchema,
   ForgotPasswordParamSchema,
   LoginParamSchema,
   RefreshTokenParamSchema,
@@ -53,7 +52,7 @@ export function registerRoutes(app: AppAPI) {
         400: {
           content: {
             'application/json': {
-              schema: ErrorSchema,
+              schema: ErrorResponseSchema,
             },
           },
           description: 'Returns an error',
@@ -65,9 +64,7 @@ export function registerRoutes(app: AppAPI) {
           description: 'Access denied',
           content: {
             'application/json': {
-              schema: z.object({
-                error: z.string(),
-              }),
+              schema: ErrorResponseSchema,
             },
           },
         },
@@ -78,9 +75,7 @@ export function registerRoutes(app: AppAPI) {
           description: 'Internal server error',
           content: {
             'application/json': {
-              schema: z.object({
-                error: z.string(),
-              }),
+              schema: ErrorResponseSchema,
             },
           },
         },
@@ -94,11 +89,11 @@ export function registerRoutes(app: AppAPI) {
 
       switch (response.type) {
         case 'InvalidCredentials':
-          return c.json({ error: response.error }, 401)
+          return c.json({ message: response.error, code: 401 }, 401)
         case 'AccessDenied':
-          return c.json({ error: response.error }, 403)
+          return c.json({ message: response.error, code: 403 }, 403)
         case 'UnknownError':
-          return c.json({ error: response.error }, 500)
+          return c.json({ message: response.error, code: 500 }, 500)
         case 'Success': {
           return c.json(
             {
