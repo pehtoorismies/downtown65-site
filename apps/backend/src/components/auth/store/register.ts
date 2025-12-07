@@ -21,7 +21,7 @@ export const register =
         },
         app_metadata: { role: 'USER' },
       })
-    } catch (error) {
+    } catch {
       throw new Error('Registration failed')
     }
   }

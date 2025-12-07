@@ -2,7 +2,7 @@ import { Anchor, Breadcrumbs, Container, Pagination, Table, Text, Title } from '
 import { Link, redirect, useNavigate } from 'react-router'
 import { apiClient } from '~/api/api-client'
 import { AuthContext } from '~/context/context'
-import { authMiddleware } from '~/middleware/auth'
+import { authMiddleware } from '~/middleware/authMiddleware'
 import type { Route } from './+types/route'
 
 const defaultTo = (defaultValue: number, value: string | null): number => {
@@ -21,7 +21,6 @@ export const middleware = [authMiddleware()]
 export async function loader({ request, context }: Route.LoaderArgs) {
   const authContext = context.get(AuthContext)
   if (!authContext) {
-    console.error
     return redirect('/login')
   }
 
@@ -30,7 +29,6 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   const perPage = defaultTo(50, url.searchParams.get('per_page'))
 
   const { user, accessToken } = authContext
-
   const { data, error } = await apiClient.GET('/users', {
     query: {
       page: page - 1,

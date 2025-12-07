@@ -1,4 +1,3 @@
-import z from 'zod'
 import type { AuthConfig } from '~/common/auth0/auth-config'
 import { getManagementClient } from '~/common/auth0/client'
 import { DetailedAuth0UserSchema, type UserUpdateParams, UserUpdateParamsSchema } from './schema'

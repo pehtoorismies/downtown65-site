@@ -11,7 +11,7 @@ export const forgotPassword =
         email: input.email,
         connection: 'Username-Password-Authentication',
       })
-    } catch (error) {
+    } catch {
       throw new Error('Password reset failed')
     }
   }

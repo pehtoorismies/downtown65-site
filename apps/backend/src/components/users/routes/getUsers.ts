@@ -1,15 +1,11 @@
 import { createRoute } from '@hono/zod-openapi'
-import { Page } from 'auth0'
+
 import z from 'zod'
 import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { createUsersStore } from '../store'
-import {
-  Auth0UserListResponseSchema,
-  Auth0UserSchema,
-  PaginationQuerySchema,
-} from '../store/schema'
+import { Auth0UserListResponseSchema, PaginationQuerySchema } from '../store/schema'
 import { UserResponseSchema } from './schema'
 
 const RESTUserListSchema = Auth0UserListResponseSchema.transform((data) => ({

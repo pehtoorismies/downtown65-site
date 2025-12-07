@@ -162,7 +162,7 @@ export function registerRoutes(app: AppAPI) {
       },
     },
     async (c) => {
-      const { email, password, name, registerSecret } = c.req.valid('json')
+      const { email, name, registerSecret } = c.req.valid('json')
 
       if (registerSecret !== c.env.REGISTER_SECRET) {
         return c.json({ error: 'Access denied' }, 403)
@@ -224,7 +224,7 @@ export function registerRoutes(app: AppAPI) {
       },
     },
     async (c) => {
-      const { email } = c.req.valid('json')
+      // const { email } = c.req.valid('json')
 
       // TODO: Implement forgot password logic
       // - Generate reset token

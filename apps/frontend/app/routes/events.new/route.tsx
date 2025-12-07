@@ -1,7 +1,7 @@
 import { Container, Text, Title } from '@mantine/core'
 import type { Route } from './+types/route'
 
-export async function loader({ request }: Route.LoaderArgs) {
+export async function loader() {
   // TODO: Replace with actual API call
   const events = [
     { id: '1', title: 'Sample Event 1', date: '2025-12-01' },

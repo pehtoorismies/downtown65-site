@@ -11,7 +11,7 @@ import { registerRoutes as eventRoutes } from './components/events/routes'
 import { EventStore } from './components/events/store/eventsStore'
 import { registerUserRoutes as usersRoutes } from './components/users/routes'
 import { UnauthorizedErrorSchema } from './schemas/unauthorized -error'
-import { ValidationErrorSchema, formatZodErrors } from './schemas/validation-error'
+import { formatZodErrors, ValidationErrorSchema } from './schemas/validation-error'
 
 const app: AppAPI = new OpenAPIHono({
   defaultHook: (result, c) => {
@@ -92,7 +92,7 @@ app.doc31('/doc', {
 
 app.get(
   '/scalar',
-  Scalar((c) => ({
+  Scalar(() => ({
     url: '/doc',
     theme: 'kepler',
     authentication: {

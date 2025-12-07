@@ -1,7 +1,7 @@
 import { addDays, addMonths, isAfter, parseISO } from 'date-fns'
 import { jwtDecode } from 'jwt-decode'
-import { createCookieSessionStorage, redirect } from 'react-router'
-import type { RouterContextProvider, Session } from 'react-router'
+import type { Session } from 'react-router'
+import { createCookieSessionStorage } from 'react-router'
 import { z } from 'zod'
 import { apiClient } from '~/api/api-client'
 import { type User, UserSchema } from '~/domain/user'
@@ -60,7 +60,7 @@ type FlashData = {
   success?: string
 }
 
-const getCookieSessionStorage = (cookieSessionSecret: string) => {
+const getCookieSessionStorage = (_cookieSessionSecret: string) => {
   return createCookieSessionStorage<CookieSessionData, FlashData>({
     cookie: {
       name: '__session',

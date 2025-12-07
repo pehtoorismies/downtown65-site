@@ -5,7 +5,7 @@ import { jwtToken } from '~/common/middleware/jwt'
 import { ErrorResponseSchema } from '../../../../../../packages/schema/src/auth'
 import { createUsersStore } from '../store'
 import { UserUpdateParamsSchema } from '../store/schema'
-import { DetailedUserResponseSchema, RESTDetailedUserSchema, UserResponseSchema } from './schema'
+import { DetailedUserResponseSchema, RESTDetailedUserSchema } from './schema'
 
 const route = createRoute({
   method: 'put',

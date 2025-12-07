@@ -1,7 +1,15 @@
-import { environmentSchema } from '~/schemas/environment'
+import z from 'zod'
+
+const EnvironmentSchema = z.object({
+  AUTH_DOMAIN: z.string().min(1),
+  AUTH_CLIENT_ID: z.string().min(1),
+  AUTH_CLIENT_SECRET: z.string().min(1),
+  AUTH_AUDIENCE: z.url(),
+  REGISTER_SECRET: z.string().min(1),
+})
 
 export const getAuthConfigFromEnv = (env: Env): AuthConfig => {
-  const validated = environmentSchema.parse(env)
+  const validated = EnvironmentSchema.parse(env)
 
   return {
     AUTH_DOMAIN: validated.AUTH_DOMAIN,

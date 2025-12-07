@@ -1,7 +1,7 @@
 import { Anchor, Box, Button, Center, Group, Paper, Text, TextInput, Title } from '@mantine/core'
 
 import { IconArrowLeft } from '@tabler/icons-react'
-import { Form, Link, useActionData, useNavigation } from 'react-router'
+import { Form, Link } from 'react-router'
 
 export default function ForgotPassword() {
   return (

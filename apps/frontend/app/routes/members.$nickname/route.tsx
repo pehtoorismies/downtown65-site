@@ -11,13 +11,13 @@ import {
 } from '@mantine/core'
 
 import { IconArrowNarrowLeft } from '@tabler/icons-react'
-import { Link, isRouteErrorResponse, useLoaderData, useRouteError } from 'react-router'
+import { isRouteErrorResponse, Link, useLoaderData, useRouteError } from 'react-router'
 
 import { ProfileBox } from '../../components/ProfileBox'
 import type { Route } from './+types/route'
 import notFoundProfileImage from './not-found.jpg'
 
-export function loader({ context, request, params }: Route.LoaderArgs) {
+export function loader({ params }: Route.LoaderArgs) {
   return {
     picture: 'https://example.com/avatar.jpg',
     name: 'Nimi Sukunimi',

@@ -1,6 +1,4 @@
 import type { OpenAPIHono } from '@hono/zod-openapi'
-import type { ManagementClient } from 'auth0'
-import { User } from './components/events/schema'
 import type { UserStore } from './components/users/store'
 
 type Vars = {

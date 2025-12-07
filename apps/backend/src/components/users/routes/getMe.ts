@@ -1,14 +1,9 @@
 import { createRoute } from '@hono/zod-openapi'
-import { z } from 'zod/mini'
 import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { createUsersStore } from '../store'
-import {
-  type DetailedUserResponse,
-  DetailedUserResponseSchema,
-  RESTDetailedUserSchema,
-} from './schema'
+import { DetailedUserResponseSchema, RESTDetailedUserSchema } from './schema'
 
 const route = createRoute({
   method: 'get',

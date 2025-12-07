@@ -1,5 +1,4 @@
 import { createRoute, z } from '@hono/zod-openapi'
-import { jwk } from 'hono/jwk'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import type { AppAPI } from '../../app-api'
@@ -40,7 +39,7 @@ export const registerRoutes = (app: AppAPI, store: EventStore): void => {
       },
     }),
     (c) => {
-      const jwtPayload = c.get('jwtPayload')
+      const _jwtPayload = c.get('jwtPayload')
       return c.json(store.list())
     },
   )
@@ -156,7 +155,7 @@ export const registerRoutes = (app: AppAPI, store: EventStore): void => {
     }),
     async (c) => {
       const { id } = c.req.valid('param')
-      const payload = await c.req.valid('json')
+      const payload = c.req.valid('json')
       const updated = store.update(id, payload)
       if (!updated) {
         return c.json({ message: `Event ${id} not found` }, 404)

@@ -15,7 +15,7 @@
     "lint-package-versions": "sherif"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
+    "@biomejs/biome": "2.3.8",
     "sherif": "1.9.0"
   }
 }

@@ -4,12 +4,12 @@ import {
   Code,
   ColorSchemeScript,
   Container,
+  mantineHtmlProps,
   Text,
   Title,
-  mantineHtmlProps,
 } from '@mantine/core'
 import type React from 'react'
-import { Links, Meta, Outlet, Scripts, ScrollRestoration, isRouteErrorResponse } from 'react-router'
+import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from 'react-router'
 import type { Route } from './+types/root'
 import './app.css'
 import { useDisclosure } from '@mantine/hooks'

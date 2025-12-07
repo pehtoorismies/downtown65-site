@@ -1,5 +1,5 @@
 import { env } from 'cloudflare:test'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import app from '~/server'
 
 const headers = new Headers({

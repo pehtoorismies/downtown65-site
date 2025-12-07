@@ -12,7 +12,7 @@ import {
   Title,
 } from '@mantine/core'
 import { IconAlertCircle } from '@tabler/icons-react'
-import { Form, Link, redirect, useNavigation } from 'react-router'
+import { Form, Link, redirect } from 'react-router'
 import { apiClient } from '~/api/api-client'
 import { createSessionManager } from '~/session/session-manager.server'
 import type { Route } from './+types/route'
@@ -82,9 +82,7 @@ export async function action({ request, context }: Route.ActionArgs) {
   return { errorGeneral: 'Unknown error' }
 }
 
-export default function Login({ actionData, loaderData }: Route.ComponentProps) {
-  const navigation = useNavigation()
-
+export default function Login({ actionData }: Route.ComponentProps) {
   return (
     <>
       <Title ta="center" fw={900}>

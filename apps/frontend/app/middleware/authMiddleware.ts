@@ -12,17 +12,18 @@ export const authMiddleware =
     const sessionManager = createSessionManager(secrets)
     const result = await sessionManager.getUserSession(request)
 
-    if (allowAnonymous && result.success === false) {
-      context.set(AuthContext, null)
-    } else if (result.success === false) {
+    if (result.success === false && allowAnonymous === false) {
       return redirect('/login', { headers: result.headers })
-    } else {
-      context.set(AuthContext, {
-        user: result.user,
-        accessToken: result.accessToken,
-      })
     }
 
+    const authContextValue = result.success
+      ? {
+          user: result.user,
+          accessToken: result.accessToken,
+        }
+      : null
+
+    context.set(AuthContext, authContextValue)
     const response = (await next()) as Response
     response.headers.append('Set-Cookie', result.headers.get('Set-Cookie') || '')
 

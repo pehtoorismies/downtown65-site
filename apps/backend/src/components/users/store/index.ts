@@ -1,4 +1,4 @@
-import { type AuthConfig, getAuthConfigFromEnv } from '~/common/auth0/auth-config'
+import { getAuthConfigFromEnv } from '~/common/auth0/auth-config'
 import { getUser } from './getUser'
 import { getUserByNickname } from './getUserByNickname'
 import { getUsers } from './getUsers'
