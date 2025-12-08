@@ -45,11 +45,19 @@ const UserSchema = z.object({
   nickname: z.string().min(1).openapi({ example: 'ada' }),
 })
 
+const Participant = UserSchema.extend({
+  joinedAt: z.iso.datetime().openapi({
+    description: 'Timestamp when the user joined the event',
+    example: '2025-01-15T14:30:00Z',
+  }),
+})
+
 const ParticipantListSchema = z
-  .array(UserSchema)
+  .array(Participant)
   .openapi({ description: 'Users attending the event' })
 
-const EventBaseSchema = z.object({
+export const EventSchema = z.object({
+  id: ULID,
   title: z.string().min(1).openapi({ example: 'Engineering Sync' }),
   subtitle: z.string().min(1).openapi({ example: 'Weekly updates' }),
   date: z.iso.date().openapi({ example: '2025-01-15' }),
@@ -61,25 +69,22 @@ const EventBaseSchema = z.object({
   description: z.string().min(1).openapi({ example: 'Discuss roadmap' }),
   location: z.string().min(1).openapi({ example: 'Room 301' }),
   participants: ParticipantListSchema,
+  createdBy: UserSchema,
+  race: z.boolean().openapi({ example: false }),
 })
 
 export const EventPathParamSchema = z.object({
   id: ULID,
 })
 
-export const EventSchema = EventBaseSchema.extend({
-  id: ULID,
-})
-
 export const EventListSchema = z.array(EventSchema)
 
-export const EventCreateSchema = EventBaseSchema
-export const EventUpdateSchema = EventBaseSchema.partial().refine(
-  (value) => Object.keys(value).length > 0,
-  {
+export const EventCreateSchema = EventSchema
+export const EventUpdateSchema = EventSchema.omit({ id: true })
+  .partial()
+  .refine((value) => Object.keys(value).length > 0, {
     message: 'At least one field must be provided to update an event.',
-  },
-)
+  })
 
 export type Event = z.infer<typeof EventSchema>
 export type EventCreateInput = z.infer<typeof EventCreateSchema>

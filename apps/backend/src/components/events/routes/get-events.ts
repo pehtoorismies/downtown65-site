@@ -7,6 +7,7 @@ import { EventListSchema } from './api-schema'
 const route = createRoute({
   method: 'get',
   path: '/events',
+  description: 'Get list of events',
   security: [{ ApiKeyAuth: [], BearerToken: [] }],
   middleware: [apiKeyAuth, jwtToken()],
   responses: {

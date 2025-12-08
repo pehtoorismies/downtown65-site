@@ -33,7 +33,7 @@ const route = createRoute({
 
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
-    const { id } = c.req.valid('param')
+    // const { id } = c.req.valid('param')
     // const deleted = store.delete(id)
     // if (!deleted) {
     //   return c.json({ message: `Event ${id} not found` }, 404)

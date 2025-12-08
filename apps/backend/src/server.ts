@@ -1,13 +1,9 @@
-import { OpenAPIHono } from '@hono/zod-openapi'
+import { OpenAPIHono, z } from '@hono/zod-openapi'
 import { Scalar } from '@scalar/hono-api-reference'
 import { cors } from 'hono/cors'
-
 import type { SchemaObject } from 'openapi3-ts/oas31'
-import * as z from 'zod'
-
 import type { AppAPI } from './app-api'
 import { registerRoutes as authRoutes } from './components/auth/routes'
-import { EventStore } from './components/events/db/eventsStore'
 import { registerRoutes as eventRoutes } from './components/events/routes'
 import { registerRoutes as usersRoutes } from './components/users/routes'
 import { UnauthorizedErrorSchema } from './schemas/unauthorized -error'
@@ -77,7 +73,7 @@ app.use('*', cors())
 
 app.get('/healthz', (c) => c.json({ status: 'ok' }))
 
-eventRoutes(app, new EventStore())
+eventRoutes(app)
 authRoutes(app)
 usersRoutes(app)
 

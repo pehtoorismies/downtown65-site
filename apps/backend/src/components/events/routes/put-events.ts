@@ -2,7 +2,6 @@ import { createRoute } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
-
 import { EventPathParamSchema, EventSchema, EventUpdateSchema, MessageSchema } from './api-schema'
 
 const route = createRoute({
