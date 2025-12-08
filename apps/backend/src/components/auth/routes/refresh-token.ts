@@ -48,6 +48,6 @@ export const register = (app: AppAPI) => {
 
     const refreshedTokens = await refreshToken(authConfig, { refreshToken: refreshTokenValue })
 
-    return c.json(refreshedTokens)
+    return c.json(refreshedTokens, 200)
   })
 }

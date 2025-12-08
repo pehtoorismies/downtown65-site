@@ -1,8 +1,10 @@
+import { eq } from 'drizzle-orm'
+import { eventsTable } from '~/db/schema'
 import type { ULID } from '../shared-schema'
 import { getDb } from './get-db'
 
-export const getEventById = async (d1DB: D1Database, _idd: ULID) => {
+export const getEventById = async (d1DB: D1Database, id: ULID) => {
   const db = getDb(d1DB)
-  db.select
-  return undefined
+  const event = await db.select().from(eventsTable).where(eq(eventsTable.sub, id))
+  return event[0] ?? undefined
 }

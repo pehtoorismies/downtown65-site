@@ -39,8 +39,12 @@ export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
     const { id } = c.req.valid('param')
 
-    const _event = await getEventById(c.env.D1_DB, id)
+    const event = await getEventById(c.env.D1_DB, id)
 
-    throw new Error('Not implemented')
+    if (!event) {
+      return c.json({ message: `Event with id ${id} not found` }, 404)
+    }
+
+    return c.json(EventSchema.parse(event), 200)
   })
 }
