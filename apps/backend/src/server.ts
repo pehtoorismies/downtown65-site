@@ -9,7 +9,7 @@ import type { AppAPI } from './app-api'
 import { registerRoutes as authRoutes } from './components/auth/routes'
 import { registerRoutes as eventRoutes } from './components/events/routes'
 import { EventStore } from './components/events/store/eventsStore'
-import { registerUserRoutes as usersRoutes } from './components/users/routes'
+import { registerRoutes as usersRoutes } from './components/users/routes'
 import { UnauthorizedErrorSchema } from './schemas/unauthorized -error'
 import { formatZodErrors, ValidationErrorSchema } from './schemas/validation-error'
 

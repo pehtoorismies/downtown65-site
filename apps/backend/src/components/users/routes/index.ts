@@ -4,7 +4,7 @@ import { register as registerGetUser } from './get-user'
 import { register as registerGetUsers } from './get-users'
 import { register as registerPutMe } from './put-me'
 
-export const registerUserRoutes = (app: AppAPI): void => {
+export const registerRoutes = (app: AppAPI): void => {
   registerGetUsers(app)
   registerGetUser(app)
   registerGetMe(app)
