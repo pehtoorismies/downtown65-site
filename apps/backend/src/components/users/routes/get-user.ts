@@ -1,11 +1,12 @@
-import { ErrorResponseSchema } from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
 import { z } from 'zod'
 import type { AppAPI } from '~/app-api'
+import { getAuthConfigFromEnv } from '~/common/auth0/auth-config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
-import { createUsersStore } from '../store'
-import { DetailedUserResponseSchema, RESTDetailedUserSchema } from './schema'
+import { ErrorAPIResponseSchema } from '~/common/schema'
+import { getUserByNickname } from '../db/get-user-by-nickname'
+import { DetailedUserAPIResponseSchema } from './api-schema'
 
 const route = createRoute({
   method: 'get',
@@ -23,14 +24,14 @@ const route = createRoute({
       description: 'User information',
       content: {
         'application/json': {
-          schema: DetailedUserResponseSchema,
+          schema: DetailedUserAPIResponseSchema,
         },
       },
     },
     404: {
       description: 'User not found',
       content: {
-        'application/json': { schema: ErrorResponseSchema },
+        'application/json': { schema: ErrorAPIResponseSchema },
       },
     },
     // 422: {
@@ -42,13 +43,12 @@ const route = createRoute({
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
     const { nickname } = c.req.valid('param')
-    const store = createUsersStore(c.env)
-    const user = await store.getUserByNickname(nickname)
+    const authConfig = getAuthConfigFromEnv(c.env)
+    const user = await getUserByNickname(authConfig, nickname)
 
     if (!user) {
       return c.json({ message: 'User not found', code: 404 }, 404)
     }
-    const response = RESTDetailedUserSchema.parse(user)
-    return c.json(response, 200)
+    return c.json(user, 200)
   })
 }

@@ -1,9 +1,10 @@
 import { createRoute } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
+import { getAuthConfigFromEnv } from '~/common/auth0/auth-config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
-import { createUsersStore } from '../store'
-import { DetailedUserResponseSchema, RESTDetailedUserSchema } from './schema'
+import { getUser } from '../db/get-user'
+import { DetailedUserAPIResponseSchema } from './api-schema'
 
 const route = createRoute({
   method: 'get',
@@ -16,7 +17,7 @@ const route = createRoute({
       description: 'User information',
       content: {
         'application/json': {
-          schema: DetailedUserResponseSchema,
+          schema: DetailedUserAPIResponseSchema,
         },
       },
     },
@@ -26,9 +27,8 @@ const route = createRoute({
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
     const { sub } = c.get('jwtPayload')
-    const store = createUsersStore(c.env)
-    const user = await store.getUser(sub)
-    const response = RESTDetailedUserSchema.parse(user)
-    return c.json(response, 200)
+    const authConfig = getAuthConfigFromEnv(c.env)
+    const user = await getUser(authConfig, sub)
+    return c.json(user, 200)
   })
 }

@@ -1,19 +1,9 @@
 import type { AuthConfig } from '~/common/auth0/auth-config'
 import { getManagementClient } from '~/common/auth0/client'
-import { DetailedAuth0UserSchema } from './schema'
+import { Auth0UserSchema } from './support/auth0-schema'
+import { QUERY_USER_RETURNED_FIELDS } from './support/query-user-returned-fields'
 
-const QUERY_USER_RETURNED_FIELDS = [
-  'nickname',
-  'name',
-  'user_id',
-  'picture',
-  'email',
-  'created_at',
-  'app_metadata',
-  'user_metadata',
-].join(',')
-
-export const getUserByNickname = (config: AuthConfig) => async (nickname: string) => {
+export const getUserByNickname = async (config: AuthConfig, nickname: string) => {
   const management = await getManagementClient(config)
 
   const { data } = await management.users.list({
@@ -26,7 +16,7 @@ export const getUserByNickname = (config: AuthConfig) => async (nickname: string
     throw new Error('Multiple users found with the same nickname')
   }
   if (data.length === 1) {
-    return DetailedAuth0UserSchema.parse(data[0])
+    return Auth0UserSchema.parse(data[0])
   }
 
   return undefined

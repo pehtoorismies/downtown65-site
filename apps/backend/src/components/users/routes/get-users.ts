@@ -1,23 +1,12 @@
 import { createRoute } from '@hono/zod-openapi'
-
 import z from 'zod'
 import type { AppAPI } from '~/app-api'
+import { getAuthConfigFromEnv } from '~/common/auth0/auth-config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
-import { createUsersStore } from '../store'
-import { Auth0UserListResponseSchema, PaginationQuerySchema } from '../store/schema'
-import { UserResponseSchema } from './schema'
-
-const RESTUserListSchema = Auth0UserListResponseSchema.transform((data) => ({
-  ...data,
-  users: data.users.map((user) => {
-    return {
-      ...user,
-      id: user.user_id,
-      createdAt: user.created_at,
-    }
-  }),
-}))
+import { listUsers } from '../db/list-users'
+import { PaginationQuerySchema } from '../shared-schema'
+import { UserAPIResponseSchema } from './api-schema'
 
 const route = createRoute({
   method: 'get',
@@ -34,7 +23,7 @@ const route = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            users: z.array(UserResponseSchema),
+            users: z.array(UserAPIResponseSchema),
             total: z.number(),
             start: z.number(),
             limit: z.number(),
@@ -52,10 +41,10 @@ const route = createRoute({
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
     const { page, limit } = c.req.valid('query')
-    const store = createUsersStore(c.env)
-    const paginatedUsers = await store.getUsers({ page, limit })
+    const authConfig = getAuthConfigFromEnv(c.env)
 
-    const response = RESTUserListSchema.parse(paginatedUsers)
-    return c.json(response, 200)
+    const paginatedUsers = await listUsers(authConfig, { page, limit })
+
+    return c.json(paginatedUsers, 200)
   })
 }

@@ -1,6 +1,6 @@
-import { ErrorResponseSchema } from '@downtown65/schema'
 import { z } from 'zod'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
+import { ErrorAPIResponseSchema } from '~/common/schema'
 import type { AppAPI } from '../../app-api'
 import {
   ForgotPasswordParamSchema,
@@ -52,7 +52,7 @@ export function registerRoutes(app: AppAPI) {
         400: {
           content: {
             'application/json': {
-              schema: ErrorResponseSchema,
+              schema: ErrorAPIResponseSchema,
             },
           },
           description: 'Returns an error',
@@ -64,7 +64,7 @@ export function registerRoutes(app: AppAPI) {
           description: 'Access denied',
           content: {
             'application/json': {
-              schema: ErrorResponseSchema,
+              schema: ErrorAPIResponseSchema,
             },
           },
         },
@@ -75,7 +75,7 @@ export function registerRoutes(app: AppAPI) {
           description: 'Internal server error',
           content: {
             'application/json': {
-              schema: ErrorResponseSchema,
+              schema: ErrorAPIResponseSchema,
             },
           },
         },
