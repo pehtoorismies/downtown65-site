@@ -12,12 +12,19 @@
     "API_KEY": "get from secrets",
     "REGISTER_SECRET": "get from secrets",
     "AUTH_CLIENT_SECRET": "get from secrets"
-
   },
   "routes": [
     {
       "pattern": "api.downtown65.site",
       "custom_domain": true
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "D1_DB",
+      "database_name": "dt65-test",
+      "database_id": "fc97044a-c30a-4288-ba0d-7c884daeea14",
+      "migrations_dir": "drizzle"
     }
   ],
 
@@ -32,9 +39,10 @@
       },
       "d1_databases": [
         {
-          "binding": "pehtoorismies_development",
+          "binding": "D1_DB",
           "database_name": "pehtoorismies-development",
-          "database_id": "1f425fbb-7dec-49f0-b158-0d0963a27ad2"
+          "database_id": "1f425fbb-7dec-49f0-b158-0d0963a27ad2",
+          "migrations_dir": "drizzle"
         }
       ]
     },

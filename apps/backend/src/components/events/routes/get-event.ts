@@ -2,7 +2,7 @@ import { createRoute } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
-
+import { getEventById } from '../db/get-event-by-id'
 import { EventPathParamSchema, EventSchema, MessageSchema } from './api-schema'
 
 const route = createRoute({
@@ -36,7 +36,11 @@ const route = createRoute({
 })
 
 export const register = (app: AppAPI) => {
-  app.openapi(route, async (_c) => {
+  app.openapi(route, async (c) => {
+    const { id } = c.req.valid('param')
+
+    const _event = await getEventById(c.env.D1_DB, id)
+
     throw new Error('Not implemented')
   })
 }

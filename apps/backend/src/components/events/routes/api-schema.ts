@@ -1,5 +1,5 @@
-import { isValid as isValidULID } from 'ulidx'
 import { z } from 'zod'
+import { ULID } from '../shared-schema'
 
 const eventTypes = [
   'CYCLING',
@@ -27,16 +27,6 @@ const TimeHHMM = z
   .openapi({
     description: 'Must be HH:MM (00–23:59)',
     example: '14:30',
-  })
-
-const ULID = z
-  .string()
-  .refine((v) => {
-    return isValidULID(v)
-  }, 'Invalid ULID')
-  .openapi({
-    description: 'Id is ULID. ULIDs are Universally Unique Lexicographically Sortable Identifiers.',
-    example: '01KBAWMEFMZTHDD52MA2D8PTDY',
   })
 
 const UserSchema = z.object({
