@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const Auth0UserSchema = z.object({
+const Auth0UserSchema = z.object({
   name: z.string(),
   nickname: z.string(),
   email: z.string(),

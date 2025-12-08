@@ -9,6 +9,7 @@
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
+    "find-unused": "pnpm -r find-unused",
     "ci:lint": "pnpm -r ci:lint",
     "format": "pnpm -r format",
     "typecheck": "pnpm -r typecheck",

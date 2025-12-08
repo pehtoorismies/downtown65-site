@@ -18,8 +18,6 @@ export const DetailedUserResponseSchema = UserResponseSchema.extend({
   }),
 })
 
-export type DetailedUserResponse = z.infer<typeof DetailedUserResponseSchema>
-
 export const RESTDetailedUserSchema = DetailedAuth0UserSchema.transform((user) => ({
   ...user,
   id: user.user_id,

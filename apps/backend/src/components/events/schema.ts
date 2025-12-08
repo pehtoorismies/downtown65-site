@@ -39,17 +39,17 @@ const ULID = z
     example: '01KBAWMEFMZTHDD52MA2D8PTDY',
   })
 
-export const UserSchema = z.object({
+const UserSchema = z.object({
   id: z.string().min(1).openapi({ example: 'usr_123' }),
   name: z.string().min(1).openapi({ example: 'Ada Lovelace' }),
   nickname: z.string().min(1).openapi({ example: 'ada' }),
 })
 
-export const ParticipantListSchema = z
+const ParticipantListSchema = z
   .array(UserSchema)
   .openapi({ description: 'Users attending the event' })
 
-export const EventBaseSchema = z.object({
+const EventBaseSchema = z.object({
   title: z.string().min(1).openapi({ example: 'Engineering Sync' }),
   subtitle: z.string().min(1).openapi({ example: 'Weekly updates' }),
   date: z.iso.date().openapi({ example: '2025-01-15' }),
@@ -81,7 +81,6 @@ export const EventUpdateSchema = EventBaseSchema.partial().refine(
   },
 )
 
-export type User = z.infer<typeof UserSchema>
 export type Event = z.infer<typeof EventSchema>
 export type EventCreateInput = z.infer<typeof EventCreateSchema>
 export type EventUpdateInput = z.infer<typeof EventUpdateSchema>

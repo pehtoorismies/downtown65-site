@@ -11,7 +11,7 @@ export default defineWorkersProject(() => {
     test: {
       environment: 'node',
       coverage: {
-        reporter: ['text', 'lcov'],
+        reporter: ['text', 'v8'],
       },
       globals: true,
       poolOptions: {

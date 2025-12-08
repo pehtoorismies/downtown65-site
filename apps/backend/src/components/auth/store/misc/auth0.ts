@@ -13,8 +13,6 @@ export const Auth0UserSchema = z
     ...rest,
   }))
 
-export type Auth0User = z.infer<typeof Auth0UserSchema>
-
 const Auth0TokensBaseSchema = z.object({
   access_token: z.string(),
   id_token: z.string(),
@@ -36,10 +34,4 @@ export const Auth0TokensRefreshSchema = Auth0TokensBaseSchema.transform((tokens)
   expiresIn: tokens.expires_in,
 }))
 
-export type Auth0Tokens = z.infer<typeof Auth0TokensSchema>
 export type Auth0TokensRefresh = z.infer<typeof Auth0TokensRefreshSchema>
-
-export type InvalidCredentialsError = {
-  type: 'InvalidCredentials'
-  error: string
-}

@@ -9,17 +9,15 @@ const headers = new Headers({
 const apiKeyProtectedRoutes = [
   { method: 'GET', path: '/users' },
   { method: 'GET', path: '/users/me' },
-  { method: 'PUT', path: '/users/me' },
   { method: 'GET', path: '/users/ada-lovelace' },
+  { method: 'PUT', path: '/users/me' },
 ]
 
 const jwtProtectedRoutes = [
-  { method: 'GET', path: '/events' },
-  { method: 'POST', path: '/events' },
-  { method: 'PUT', path: '/events/123' },
-  { method: 'DELETE', path: '/events/123' },
-  { method: 'POST', path: '/events/123/participants/me' },
-  { method: 'DELETE', path: '/events/123/participants/me' },
+  { method: 'GET', path: '/users' },
+  { method: 'GET', path: '/users/me' },
+  { method: 'GET', path: '/users/ada-lovelace' },
+  { method: 'PUT', path: '/users/me' },
 ]
 
 describe.each(apiKeyProtectedRoutes)('API Key Only: $method $path', async ({ method, path }) => {

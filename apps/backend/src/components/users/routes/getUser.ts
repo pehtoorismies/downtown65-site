@@ -7,10 +7,6 @@ import { jwtToken } from '~/common/middleware/jwt'
 import { createUsersStore } from '../store'
 import { DetailedUserResponseSchema, RESTDetailedUserSchema } from './schema'
 
-export const UserPathParamSchema = z.object({
-  nickname: z.string().min(1).openapi({ example: 'ada' }),
-})
-
 const route = createRoute({
   method: 'get',
   path: '/users/{nickname}',
@@ -18,7 +14,9 @@ const route = createRoute({
   security: [{ ApiKeyAuth: [], BearerToken: [] }],
   middleware: [apiKeyAuth, jwtToken()],
   request: {
-    params: UserPathParamSchema,
+    params: z.object({
+      nickname: z.string().min(1).openapi({ example: 'ada' }),
+    }),
   },
   responses: {
     200: {
