@@ -46,6 +46,8 @@ export const UserSchema = z.object({
   nickname: z.string().min(1).openapi({ example: 'ada' }),
 })
 
+export type User = z.infer<typeof UserSchema>
+
 const Participant = UserSchema.extend({
   joinedAt: z.iso.datetime().openapi({
     description: 'Timestamp when the user joined the event',

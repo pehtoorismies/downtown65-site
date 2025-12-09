@@ -3,7 +3,7 @@ import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { EventSchema, EventUpdateSchema } from '../shared-schema'
-import { EventPathParamSchema, MessageSchema } from './api-schema'
+import { EventPathIDParamSchema, MessageSchema } from './api-schema'
 
 const route = createRoute({
   method: 'put',
@@ -11,7 +11,7 @@ const route = createRoute({
   security: [{ ApiKeyAuth: [], BearerToken: [] }],
   middleware: [apiKeyAuth, jwtToken()],
   request: {
-    params: EventPathParamSchema,
+    params: EventPathIDParamSchema,
     body: {
       required: true,
       content: {

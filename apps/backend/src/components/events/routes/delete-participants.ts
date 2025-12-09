@@ -2,7 +2,7 @@ import { createRoute } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
-import { EventPathParamSchema, MessageSchema } from './api-schema'
+import { EventPathIDParamSchema, MessageSchema } from './api-schema'
 
 const route = createRoute({
   method: 'delete',
@@ -11,7 +11,7 @@ const route = createRoute({
   security: [{ ApiKeyAuth: [], BearerToken: [] }],
   middleware: [apiKeyAuth, jwtToken()],
   request: {
-    params: EventPathParamSchema,
+    params: EventPathIDParamSchema,
   },
   responses: {
     200: {

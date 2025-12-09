@@ -4,7 +4,7 @@ import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { getEventByULID } from '../db/get-event-by-id'
 import { EventSchema } from '../shared-schema'
-import { EventPathParamSchema, MessageSchema } from './api-schema'
+import { EventPathULIDParamSchema, MessageSchema } from './api-schema'
 
 const route = createRoute({
   method: 'get',
@@ -12,7 +12,7 @@ const route = createRoute({
   security: [{ ApiKeyAuth: [] }],
   middleware: [apiKeyAuth, jwtToken({ allowAnon: true })],
   request: {
-    params: EventPathParamSchema,
+    params: EventPathULIDParamSchema,
   },
   responses: {
     200: {
