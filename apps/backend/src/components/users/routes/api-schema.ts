@@ -9,6 +9,8 @@ export const UserAPIResponseSchema = z.object({
   createdAt: z.iso.datetime(),
 })
 
+export const SyncedUsersResponseSchema = z.array(UserAPIResponseSchema)
+
 export const DetailedUserAPIResponseSchema = UserAPIResponseSchema.extend({
   roles: z.array(z.string()),
   preferences: z.object({

@@ -1,10 +1,11 @@
+import { sql } from 'drizzle-orm/sql/sql'
 import { index, sqliteTable } from 'drizzle-orm/sqlite-core'
 
 export const eventsTable = sqliteTable(
   'events_table',
   (t) => ({
     id: t.integer('id').primaryKey({ autoIncrement: true }),
-    sub: t.text().notNull().unique(),
+    eventULID: t.text().notNull().unique(),
     title: t.text().notNull(),
     subtitle: t.text().notNull(),
     description: t.text().default(''),
@@ -13,22 +14,23 @@ export const eventsTable = sqliteTable(
     time: t.text().notNull(),
     location: t.text().notNull(),
     race: t.integer({ mode: 'boolean' }).notNull().default(false),
+    createdAt: t.text().notNull().default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: t.text().notNull().default(sql`CURRENT_TIMESTAMP`),
   }),
-  (table) => [index('events_sub_idx').on(table.sub)],
+  (table) => [index('events_eventULID_idx').on(table.eventULID)],
 )
 
-// export const eventsTable = sqliteTable(
-//   'events_table',
-//   {
-//     id: int().primaryKey({ autoIncrement: true }),
-//     sub: text().notNull().unique(),
-//     name: text().notNull(),
-//     age: int().notNull(),
-//     email: text().notNull().unique(),
-//   },
-//   (table) => ({
-//     subIdx: index('events_sub_idx').on(table.sub),
-//     // If sub must be unique:
-//     // subUnique: uniqueIndex("events_sub_unique").on(table.sub),
-//   }),
-// )
+export const usersTable = sqliteTable(
+  'users_table',
+  (t) => ({
+    id: t.integer('id').primaryKey({ autoIncrement: true }),
+    auth0Sub: t.text().notNull().unique(), // Link to Auth0
+    email: t.text().notNull().unique(),
+    nickname: t.text().notNull().unique(),
+    name: t.text(),
+    picture: t.text(),
+    createdAt: t.text().notNull(),
+    updatedAt: t.text().notNull(),
+  }),
+  (table) => [index('users_auth0Sub_idx').on(table.auth0Sub)],
+)

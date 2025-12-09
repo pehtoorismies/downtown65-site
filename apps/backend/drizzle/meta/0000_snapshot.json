@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "135ee7b9-94e8-463a-a3b9-00523b5d1d45",
+  "id": "cdf18e80-a83a-413a-8144-70691d7bb170",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "events_table": {
@@ -14,8 +14,8 @@
           "notNull": true,
           "autoincrement": true
         },
-        "sub": {
-          "name": "sub",
+        "eventULID": {
+          "name": "eventULID",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -78,20 +78,131 @@
           "notNull": true,
           "autoincrement": false,
           "default": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
         }
       },
       "indexes": {
-        "events_table_sub_unique": {
-          "name": "events_table_sub_unique",
+        "events_table_eventULID_unique": {
+          "name": "events_table_eventULID_unique",
           "columns": [
-            "sub"
+            "eventULID"
           ],
           "isUnique": true
         },
-        "events_sub_idx": {
-          "name": "events_sub_idx",
+        "events_eventULID_idx": {
+          "name": "events_eventULID_idx",
           "columns": [
-            "sub"
+            "eventULID"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "users_table": {
+      "name": "users_table",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "auth0Sub": {
+          "name": "auth0Sub",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "nickname": {
+          "name": "nickname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "picture": {
+          "name": "picture",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "users_table_auth0Sub_unique": {
+          "name": "users_table_auth0Sub_unique",
+          "columns": [
+            "auth0Sub"
+          ],
+          "isUnique": true
+        },
+        "users_table_email_unique": {
+          "name": "users_table_email_unique",
+          "columns": [
+            "email"
+          ],
+          "isUnique": true
+        },
+        "users_table_nickname_unique": {
+          "name": "users_table_nickname_unique",
+          "columns": [
+            "nickname"
+          ],
+          "isUnique": true
+        },
+        "users_auth0Sub_idx": {
+          "name": "users_auth0Sub_idx",
+          "columns": [
+            "auth0Sub"
           ],
           "isUnique": false
         }

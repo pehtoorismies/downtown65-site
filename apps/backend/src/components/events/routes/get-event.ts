@@ -2,8 +2,9 @@ import { createRoute } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
-import { getEventById } from '../db/get-event-by-id'
-import { EventPathParamSchema, EventSchema, MessageSchema } from './api-schema'
+import { getEventByULID } from '../db/get-event-by-id'
+import { EventSchema } from '../shared-schema'
+import { EventPathParamSchema, MessageSchema } from './api-schema'
 
 const route = createRoute({
   method: 'get',
@@ -37,12 +38,12 @@ const route = createRoute({
 
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
-    const { id } = c.req.valid('param')
+    const { eventULID } = c.req.valid('param')
 
-    const event = await getEventById(c.env.D1_DB, id)
+    const event = await getEventByULID(c.env.D1_DB, eventULID)
 
     if (!event) {
-      return c.json({ message: `Event with id ${id} not found` }, 404)
+      return c.json({ message: `Event with id ${eventULID} not found` }, 404)
     }
 
     return c.json(EventSchema.parse(event), 200)

@@ -3,8 +3,8 @@ import { eventsTable } from '~/db/schema'
 import type { ULID } from '../shared-schema'
 import { getDb } from './get-db'
 
-export const getEventById = async (d1DB: D1Database, id: ULID) => {
+export const getEventByULID = async (d1DB: D1Database, id: ULID) => {
   const db = getDb(d1DB)
-  const event = await db.select().from(eventsTable).where(eq(eventsTable.sub, id))
+  const event = await db.select().from(eventsTable).where(eq(eventsTable.eventULID, id))
   return event[0] ?? undefined
 }

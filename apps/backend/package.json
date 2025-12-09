@@ -17,6 +17,7 @@
     "find-unused": "knip"
   },
   "dependencies": {
+    "@downtown65/logger": "workspace:*",
     "@downtown65/schema": "workspace:*",
     "@hono/zod-openapi": "1.1.5",
     "@scalar/hono-api-reference": " 0.9.25",

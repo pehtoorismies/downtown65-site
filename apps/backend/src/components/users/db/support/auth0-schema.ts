@@ -8,6 +8,7 @@ export const Auth0UserSchema = z
     picture: z.string(),
     user_id: z.string(),
     created_at: z.iso.datetime(),
+    updated_at: z.iso.datetime(),
     app_metadata: z.object({
       role: z.string(),
     }),
@@ -20,6 +21,7 @@ export const Auth0UserSchema = z
     ...user,
     id: user.user_id,
     createdAt: user.created_at,
+    updatedAt: user.created_at,
     roles: [user.app_metadata.role],
     preferences: {
       subscribeWeeklyEmail: user.user_metadata.subscribeWeeklyEmail,
