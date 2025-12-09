@@ -44,7 +44,7 @@ export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
     const { nickname } = c.req.valid('param')
     const authConfig = getAuthConfigFromEnv(c.env)
-    const user = await getUserByNickname(authConfig, nickname)
+    const user = await getUserByNickname(authConfig, c.env.D1_DB, nickname)
 
     if (!user) {
       return c.json({ message: 'User not found', code: 404 }, 404)

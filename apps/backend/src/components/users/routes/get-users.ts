@@ -23,7 +23,7 @@ const route = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            users: z.array(UserAPIResponseSchema),
+            users: z.array(UserAPIResponseSchema.omit({ id: true })),
             total: z.number(),
             start: z.number(),
             limit: z.number(),

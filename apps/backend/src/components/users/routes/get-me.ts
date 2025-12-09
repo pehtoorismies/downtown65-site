@@ -28,7 +28,7 @@ export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
     const { sub } = c.get('jwtPayload')
     const authConfig = getAuthConfigFromEnv(c.env)
-    const user = await getUser(authConfig, sub)
+    const user = await getUser(authConfig, c.env.D1_DB, sub)
 
     return c.json(user, 200)
   })
