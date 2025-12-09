@@ -1,11 +1,11 @@
 import { ulid } from 'ulidx'
+import type { Config } from '~/common/config/config'
+import { getDb } from '~/common/db/get-db'
 import { eventsTable } from '~/db/schema'
-import type {} from '../routes/api-schema'
 import type { Event, EventCreateInput } from '../shared-schema'
-import { getDb } from './get-db'
 
-export const createEvent = async (d1DB: D1Database, input: EventCreateInput): Promise<Event> => {
-  const db = getDb(d1DB)
+export const createEvent = async (config: Config, input: EventCreateInput): Promise<Event> => {
+  const db = getDb(config.D1_DB)
   const ULID = ulid()
 
   const event = await db

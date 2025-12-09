@@ -1,7 +1,7 @@
 import { createRoute } from '@hono/zod-openapi'
 import z from 'zod'
 import type { AppAPI } from '~/app-api'
-import { getAuthConfigFromEnv } from '~/common/auth0/auth-config'
+import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { forgotPassword } from '../db/forgot-password'
 import { ForgotPasswordParamSchema } from '../shared-schema'
@@ -43,8 +43,7 @@ const route = createRoute({
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
     const { email } = c.req.valid('json')
-    const authConfig = getAuthConfigFromEnv(c.env)
-    await forgotPassword(authConfig, { email })
+    await forgotPassword(getConfig(c.env), { email })
 
     return c.json({ message: 'Password reset email sent' })
   })

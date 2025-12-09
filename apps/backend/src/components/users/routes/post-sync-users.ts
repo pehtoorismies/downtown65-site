@@ -1,7 +1,7 @@
 import { createRoute } from '@hono/zod-openapi'
 import z from 'zod'
 import type { AppAPI } from '~/app-api'
-import { getAuthConfigFromEnv } from '~/common/auth0/auth-config'
+import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { syncUsers } from '../db/sync-users'
@@ -30,9 +30,7 @@ const route = createRoute({
 
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
-    const authConfig = getAuthConfigFromEnv(c.env)
-
-    const updated = await syncUsers(authConfig, c.env.D1_DB)
+    const updated = await syncUsers(getConfig(c.env))
 
     return c.json(updated, 200)
   })

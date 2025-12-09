@@ -1,17 +1,17 @@
 import { createLogger } from '@downtown65/logger'
 import { eq } from 'drizzle-orm'
 import z from 'zod'
-import type { AuthConfig } from '~/common/auth0/auth-config'
 import { getManagementClient } from '~/common/auth0/client'
-import { getDb } from '~/components/events/db/get-db'
+import type { Config } from '~/common/config/config'
+import { getDb } from '~/common/db/get-db'
 import { usersTable } from '~/db/schema'
 import { Auth0UserSchema } from './support/auth0-schema'
 import { QUERY_USER_RETURNED_FIELDS } from './support/query-user-returned-fields'
 
 const Auth0UserListSchema = z.array(Auth0UserSchema)
 
-export const syncUsers = async (config: AuthConfig, d1DB: D1Database) => {
-  const management = await getManagementClient(config)
+export const syncUsers = async (config: Config) => {
+  const management = await getManagementClient(config.authConfig)
   const logger = createLogger()
   logger.info('Listing users from Auth0')
 
@@ -22,7 +22,7 @@ export const syncUsers = async (config: AuthConfig, d1DB: D1Database) => {
 
   const users = response.users || []
 
-  const db = getDb(d1DB)
+  const db = getDb(config.D1_DB)
 
   const userList = Auth0UserListSchema.parse(users)
 

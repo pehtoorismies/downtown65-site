@@ -1,8 +1,8 @@
 import { AuthApiError } from 'auth0'
 import { jwtDecode } from 'jwt-decode'
 import { z } from 'zod'
-import type { AuthConfig } from '~/common/auth0/auth-config'
 import { createAuthClient } from '~/common/auth0/client'
+import type { Config } from '~/common/config/config'
 import type { LoginInput } from '../shared-schema'
 import { Auth0TokensSchema, Auth0UserSchema } from './misc/auth0'
 
@@ -15,13 +15,13 @@ const LoginResponse = z.discriminatedUnion('type', [
 
 type LoginResponse = z.infer<typeof LoginResponse>
 
-export const login = async (config: AuthConfig, input: LoginInput): Promise<LoginResponse> => {
+export const login = async (config: Config, input: LoginInput): Promise<LoginResponse> => {
   try {
-    const authClient = createAuthClient(config)
+    const authClient = createAuthClient(config.authConfig)
     const result = await authClient.oauth.passwordGrant({
       username: input.email,
       password: input.password,
-      audience: config.AUTH_AUDIENCE,
+      audience: config.authConfig.AUTH_AUDIENCE,
       // scope:
       //   'read:events write:events read:me write:me read:users openid profile email offline_access',
       scope: 'openid profile email offline_access',

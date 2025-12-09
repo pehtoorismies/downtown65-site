@@ -1,12 +1,12 @@
-import type { AuthConfig } from '~/common/auth0/auth-config'
 import { getManagementClient } from '~/common/auth0/client'
+import type { Config } from '~/common/config/config'
 import type { PaginationQuery } from '../shared-schema'
 import { Auth0UserListResponseSchema } from './support/auth0-schema'
 import { QUERY_USER_RETURNED_FIELDS } from './support/query-user-returned-fields'
 
-export const listUsers = async (config: AuthConfig, params: PaginationQuery) => {
+export const listUsers = async (config: Config, params: PaginationQuery) => {
   const { page, limit } = params
-  const management = await getManagementClient(config)
+  const management = await getManagementClient(config.authConfig)
 
   const { response } = await management.users.list({
     page: page,

@@ -1,6 +1,6 @@
 import { createRoute } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
-import { getAuthConfigFromEnv } from '~/common/auth0/auth-config'
+import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { updateUser } from '../db/update-user'
@@ -48,11 +48,10 @@ const route = createRoute({
 
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
-    const payload = c.req.valid('json')
+    const userParams = c.req.valid('json')
     const { sub } = c.get('jwtPayload')
-    const authConfig = getAuthConfigFromEnv(c.env)
 
-    const updated = await updateUser(authConfig, sub, payload)
+    const updated = await updateUser(getConfig(c.env), sub, userParams)
 
     if (!updated) {
       throw new Error(`User with sub ${sub} not found`)

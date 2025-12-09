@@ -1,9 +1,10 @@
 import { createLogger } from '@downtown65/logger'
 import { eq } from 'drizzle-orm'
 import z from 'zod'
+import type { Config } from '~/common/config/config'
+import { getDb } from '~/common/db/get-db'
 import { eventsTable, usersTable } from '~/db/schema'
 import { EventSchema, UserSchema } from '../shared-schema'
-import { getDb } from './get-db'
 
 const LeftJoinResult = z
   .object({
@@ -25,8 +26,8 @@ const LeftJoinResult = z
 
 const EventParser = z.array(LeftJoinResult)
 
-export const getEvents = async (d1DB: D1Database) => {
-  const db = getDb(d1DB)
+export const getEvents = async (config: Config) => {
+  const db = getDb(config.D1_DB)
   const result = await db
     .select()
     .from(eventsTable)

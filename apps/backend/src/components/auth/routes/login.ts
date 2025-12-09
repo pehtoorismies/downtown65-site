@@ -1,7 +1,7 @@
 import { createRoute } from '@hono/zod-openapi'
 import z from 'zod'
 import type { AppAPI } from '~/app-api'
-import { getAuthConfigFromEnv } from '~/common/auth0/auth-config'
+import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { ErrorAPIResponseSchema } from '~/common/schema'
 import { login } from '../db/login'
@@ -79,9 +79,7 @@ export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
     const { email, password } = c.req.valid('json')
 
-    const authConfig = getAuthConfigFromEnv(c.env)
-
-    const response = await login(authConfig, { email, password })
+    const response = await login(getConfig(c.env), { email, password })
 
     switch (response.type) {
       case 'InvalidCredentials':

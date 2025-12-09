@@ -1,11 +1,11 @@
-import type { AuthConfig } from '~/common/auth0/auth-config'
 import { getManagementClient } from '~/common/auth0/client'
+import type { Config } from '~/common/config/config'
 import { getUserId } from './get-user-id'
 import { Auth0UserSchema } from './support/auth0-schema'
 import { QUERY_USER_RETURNED_FIELDS } from './support/query-user-returned-fields'
 
-export const getUserByNickname = async (config: AuthConfig, d1DB: D1Database, nickname: string) => {
-  const management = await getManagementClient(config)
+export const getUserByNickname = async (config: Config, nickname: string) => {
+  const management = await getManagementClient(config.authConfig)
 
   const { data } = await management.users.list({
     q: `nickname:${nickname}`,
@@ -18,7 +18,7 @@ export const getUserByNickname = async (config: AuthConfig, d1DB: D1Database, ni
   }
   const auth0User = Auth0UserSchema.parse(data[0])
 
-  const id = await getUserId(d1DB, auth0User.auth0Sub)
+  const id = await getUserId(config, auth0User.auth0Sub)
 
   if (id == null) {
     throw new Error('User not found in the database but in external Auth0')

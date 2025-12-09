@@ -1,6 +1,7 @@
 import { createRoute } from '@hono/zod-openapi'
 
 import type { AppAPI } from '~/app-api'
+import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { ErrorAPIResponseSchema } from '~/common/schema'
@@ -37,7 +38,7 @@ const route = createRoute({
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
     const { id } = c.req.valid('param')
-    const deleted = await deleteEvent(c.env.D1_DB, id)
+    const deleted = await deleteEvent(getConfig(c.env), id)
 
     if (!deleted) {
       return c.json({ message: 'Event not found', code: 404 }, 404)

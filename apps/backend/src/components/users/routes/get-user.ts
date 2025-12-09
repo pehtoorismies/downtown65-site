@@ -1,7 +1,7 @@
 import { createRoute } from '@hono/zod-openapi'
 import { z } from 'zod'
 import type { AppAPI } from '~/app-api'
-import { getAuthConfigFromEnv } from '~/common/auth0/auth-config'
+import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { ErrorAPIResponseSchema } from '~/common/schema'
@@ -43,8 +43,7 @@ const route = createRoute({
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
     const { nickname } = c.req.valid('param')
-    const authConfig = getAuthConfigFromEnv(c.env)
-    const user = await getUserByNickname(authConfig, c.env.D1_DB, nickname)
+    const user = await getUserByNickname(getConfig(c.env), nickname)
 
     if (!user) {
       return c.json({ message: 'User not found', code: 404 }, 404)

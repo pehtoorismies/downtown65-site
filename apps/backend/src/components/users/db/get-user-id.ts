@@ -1,10 +1,11 @@
 import { eq } from 'drizzle-orm'
+import type { Config } from '~/common/config/config'
+import { getDb } from '~/common/db/get-db'
 import type { Auth0Sub, ID } from '~/common/schema'
-import { getDb } from '~/components/events/db/get-db'
 import { usersTable } from '~/db/schema'
 
-export const getUserId = async (d1DB: D1Database, auth0Sub: Auth0Sub): Promise<ID | undefined> => {
-  const db = getDb(d1DB)
+export const getUserId = async (config: Config, auth0Sub: Auth0Sub): Promise<ID | undefined> => {
+  const db = getDb(config.D1_DB)
   const userId = await db
     .select({
       id: usersTable.id,

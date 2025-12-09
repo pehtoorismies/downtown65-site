@@ -1,6 +1,6 @@
 import { createRoute } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
-import { getAuthConfigFromEnv } from '~/common/auth0/auth-config'
+import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { getUser } from '../db/get-user'
@@ -27,8 +27,7 @@ const route = createRoute({
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
     const { sub } = c.get('jwtPayload')
-    const authConfig = getAuthConfigFromEnv(c.env)
-    const user = await getUser(authConfig, c.env.D1_DB, sub)
+    const user = await getUser(getConfig(c.env), sub)
 
     return c.json(user, 200)
   })

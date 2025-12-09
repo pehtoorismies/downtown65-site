@@ -1,7 +1,7 @@
 import { createRoute } from '@hono/zod-openapi'
 import z from 'zod'
 import type { AppAPI } from '~/app-api'
-import { getAuthConfigFromEnv } from '~/common/auth0/auth-config'
+import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { listUsers } from '../db/list-users'
@@ -41,9 +41,8 @@ const route = createRoute({
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
     const { page, limit } = c.req.valid('query')
-    const authConfig = getAuthConfigFromEnv(c.env)
 
-    const paginatedUsers = await listUsers(authConfig, { page, limit })
+    const paginatedUsers = await listUsers(getConfig(c.env), { page, limit })
 
     return c.json(paginatedUsers, 200)
   })

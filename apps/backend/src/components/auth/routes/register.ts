@@ -2,7 +2,7 @@ import { createRoute } from '@hono/zod-openapi'
 import z from 'zod'
 import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
-import { RegisterParamSchema } from './api-schema'
+import { RegisterParamSchema } from '../shared-schema'
 
 const route = createRoute({
   method: 'post',

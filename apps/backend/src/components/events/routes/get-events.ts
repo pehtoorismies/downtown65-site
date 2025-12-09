@@ -1,5 +1,6 @@
 import { createRoute } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
+import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { getEvents } from '../db/get-events'
@@ -28,8 +29,7 @@ const route = createRoute({
 
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
-    const db = c.env.D1_DB
-    const events = await getEvents(db)
+    const events = await getEvents(getConfig(c.env))
     return c.json(events, 200)
   })
 }
