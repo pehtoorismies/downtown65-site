@@ -13,6 +13,7 @@ export const createEvent = async (d1DB: D1Database, input: EventCreateInput): Pr
     .values({
       ...input,
       eventULID: ULID,
+      creatorId: input.createdByUserId,
     })
     .returning({ id: eventsTable.id })
 
@@ -20,5 +21,11 @@ export const createEvent = async (d1DB: D1Database, input: EventCreateInput): Pr
     ...input,
     id: event[0].id,
     eventULID: ULID,
+    createdBy: {
+      id: input.createdByUserId,
+      auth0Sub: 'auth0|unknown',
+      name: 'change',
+      nickname: 'change',
+    },
   }
 }

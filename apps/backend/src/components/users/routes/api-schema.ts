@@ -2,11 +2,13 @@ import z from 'zod'
 
 export const UserAPIResponseSchema = z.object({
   id: z.string(),
+  auth0Sub: z.string(),
   name: z.string(),
   nickname: z.string(),
   email: z.string(),
   picture: z.string(),
   createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
 })
 
 export const SyncedUsersResponseSchema = z.array(UserAPIResponseSchema)

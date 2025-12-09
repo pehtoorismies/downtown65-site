@@ -39,8 +39,9 @@ export const ULID = z
     example: '01KBAWMEFMZTHDD52MA2D8PTDY',
   })
 
-const UserSchema = z.object({
-  id: z.string().min(1).openapi({ example: 'usr_123' }),
+export const UserSchema = z.object({
+  auth0Sub: z.string().startsWith('auth0|').openapi({ example: 'auth0|1234567890' }),
+  id: z.int().positive().openapi({ example: 1 }),
   name: z.string().min(1).openapi({ example: 'Ada Lovelace' }),
   nickname: z.string().min(1).openapi({ example: 'ada' }),
 })
@@ -85,5 +86,11 @@ export type Event = z.infer<typeof EventSchema>
 export type EventUpdateInput = z.infer<typeof EventUpdateSchema>
 
 export type ULID = z.infer<typeof ULID>
-export const EventCreateSchema = EventSchema.omit({ id: true, eventULID: true })
+export const EventCreateSchema = EventSchema.omit({
+  id: true,
+  eventULID: true,
+  createdBy: true,
+}).extend({
+  createdByUserId: z.number().int().positive().openapi({ example: 12 }),
+})
 export type EventCreateInput = z.infer<typeof EventCreateSchema>

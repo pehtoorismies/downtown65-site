@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm'
 import { sql } from 'drizzle-orm/sql/sql'
 import { index, sqliteTable } from 'drizzle-orm/sqlite-core'
 
@@ -16,6 +17,10 @@ export const eventsTable = sqliteTable(
     race: t.integer({ mode: 'boolean' }).notNull().default(false),
     createdAt: t.text().notNull().default(sql`CURRENT_TIMESTAMP`),
     updatedAt: t.text().notNull().default(sql`CURRENT_TIMESTAMP`),
+    creatorId: t
+      .integer('user_id')
+      .notNull()
+      .references(() => usersTable.id),
   }),
   (table) => [index('events_eventULID_idx').on(table.eventULID)],
 )
@@ -34,3 +39,15 @@ export const usersTable = sqliteTable(
   }),
   (table) => [index('users_auth0Sub_idx').on(table.auth0Sub)],
 )
+
+// // Relations helpers (optional but recommended for type-safe joins)
+export const usersRelations = relations(usersTable, ({ many }) => ({
+  events: many(eventsTable), // User has many Events
+}))
+
+export const eventsRelations = relations(eventsTable, ({ one }) => ({
+  creator: one(usersTable, {
+    fields: [eventsTable.id],
+    references: [usersTable.id], // Event belongs to a User
+  }),
+}))
