@@ -1,7 +1,7 @@
 import z from 'zod'
 
 export const UserAPIResponseSchema = z.object({
-  id: z.string(),
+  id: z.int,
   auth0Sub: z.string(),
   name: z.string(),
   nickname: z.string(),

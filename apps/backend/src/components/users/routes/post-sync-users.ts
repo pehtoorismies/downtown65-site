@@ -19,8 +19,8 @@ const route = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            created: SyncedUsersResponseSchema,
-            updated: SyncedUsersResponseSchema,
+            createdUsers: SyncedUsersResponseSchema,
+            updatedUsers: SyncedUsersResponseSchema,
           }),
         },
       },

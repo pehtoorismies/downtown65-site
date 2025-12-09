@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1765274511295,
-      "tag": "0000_light_malcolm_colcord",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1765280457119,
-      "tag": "0001_quiet_mauler",
+      "when": 1765288642997,
+      "tag": "0000_simple_mariko_yashida",
       "breakpoints": true
     }
   ]

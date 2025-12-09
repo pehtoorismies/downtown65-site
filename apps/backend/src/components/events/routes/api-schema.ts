@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { IDSchema } from '~/common/schema'
 import { ULID } from '../shared-schema'
 
 export const EventPathULIDParamSchema = z
@@ -8,7 +9,7 @@ export const EventPathULIDParamSchema = z
   .openapi({ description: 'ULID of the event' })
 
 export const EventPathIDParamSchema = z.object({
-  id: z.number().int().positive().openapi({ example: 123, description: 'ID of the event' }),
+  id: IDSchema,
 })
 
 export const MessageSchema = z.object({

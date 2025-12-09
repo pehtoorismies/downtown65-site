@@ -1,1 +1,0 @@
-ALTER TABLE `events_table` ADD `user_id` integer NOT NULL REFERENCES users_table(id);

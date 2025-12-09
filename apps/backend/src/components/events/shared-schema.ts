@@ -1,5 +1,6 @@
 import { isValid as isValidULID } from 'ulidx'
 import { z } from 'zod'
+import { Auth0SubSchema, IDSchema } from '~/common/schema'
 
 const eventTypes = [
   'CYCLING',
@@ -40,8 +41,8 @@ export const ULID = z
   })
 
 export const UserSchema = z.object({
-  auth0Sub: z.string().startsWith('auth0|').openapi({ example: 'auth0|1234567890' }),
-  id: z.int().positive().openapi({ example: 1 }),
+  auth0Sub: Auth0SubSchema,
+  id: IDSchema,
   name: z.string().min(1).openapi({ example: 'Ada Lovelace' }),
   nickname: z.string().min(1).openapi({ example: 'ada' }),
 })
@@ -60,7 +61,7 @@ const ParticipantListSchema = z
   .openapi({ description: 'Users attending the event' })
 
 export const EventSchema = z.object({
-  id: z.int().positive().openapi({ example: 1 }),
+  id: IDSchema,
   eventULID: ULID,
   title: z.string().min(1).openapi({ example: 'Engineering Sync' }),
   subtitle: z.string().min(1).openapi({ example: 'Weekly updates' }),
@@ -93,6 +94,6 @@ export const EventCreateSchema = EventSchema.omit({
   eventULID: true,
   createdBy: true,
 }).extend({
-  createdByUserId: z.number().int().positive().openapi({ example: 12 }),
+  createdByUserId: IDSchema,
 })
 export type EventCreateInput = z.infer<typeof EventCreateSchema>

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { Auth0SubSchema } from '~/common/schema'
 
 export const Auth0UserSchema = z
   .object({
@@ -19,7 +20,7 @@ export const Auth0UserSchema = z
   })
   .transform((user) => ({
     ...user,
-    id: user.user_id,
+    auth0Sub: Auth0SubSchema.parse(user.user_id),
     createdAt: user.created_at,
     updatedAt: user.created_at,
     roles: [user.app_metadata.role],

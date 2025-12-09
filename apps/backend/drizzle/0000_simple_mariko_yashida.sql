@@ -10,7 +10,9 @@ CREATE TABLE `events_table` (
 	`location` text NOT NULL,
 	`race` integer DEFAULT false NOT NULL,
 	`createdAt` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	`updatedAt` text DEFAULT CURRENT_TIMESTAMP NOT NULL
+	`updatedAt` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	`user_id` integer NOT NULL,
+	FOREIGN KEY (`user_id`) REFERENCES `users_table`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `events_table_eventULID_unique` ON `events_table` (`eventULID`);--> statement-breakpoint

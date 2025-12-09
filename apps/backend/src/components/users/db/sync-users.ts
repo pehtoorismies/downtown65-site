@@ -24,7 +24,6 @@ export const syncUsers = async (config: AuthConfig, d1DB: D1Database) => {
 
   const db = getDb(d1DB)
 
-  // TODO: missing updatedAt
   const userList = Auth0UserListSchema.parse(users)
 
   const nicknames = userList.map((u) => `${u.nickname}: ${u.email}`)
@@ -38,16 +37,16 @@ export const syncUsers = async (config: AuthConfig, d1DB: D1Database) => {
     const existing = await db
       .select({ id: usersTable.id })
       .from(usersTable)
-      .where(eq(usersTable.auth0Sub, user.id))
+      .where(eq(usersTable.auth0Sub, user.auth0Sub))
       .limit(1)
 
     const isNew = existing.length === 0
 
     logger.info(`Syncing user (${isNew}): ${user.user_id} - ${user.email}`)
-    await db
+    const upsertedUser = await db
       .insert(usersTable)
       .values({
-        auth0Sub: user.id,
+        auth0Sub: user.auth0Sub,
         email: user.email,
         nickname: user.nickname,
         name: user.name,
@@ -66,12 +65,13 @@ export const syncUsers = async (config: AuthConfig, d1DB: D1Database) => {
           updatedAt: user.updatedAt,
         },
       })
+      .returning({ id: usersTable.id })
 
     logger.info(`${isNew ? 'Created' : 'Updated'} user ${user.email}`)
     if (isNew) {
-      createdUsers.push(user)
+      createdUsers.push({ ...user, id: upsertedUser[0].id })
     } else {
-      updatedUsers.push(user)
+      updatedUsers.push({ ...user, id: upsertedUser[0].id })
     }
   }
 
