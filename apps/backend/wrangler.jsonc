@@ -1,16 +1,67 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "downtown65-events-backend",
+  "name": "dt65-events-backend",
   "compatibility_date": "2025-04-04",
   "main": "./src/server.ts",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
-  "workers_dev": false,
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "vars": {
+    "AUTH_CLIENT_ID": "JaoAht7ggce7f5R8DCBGUyjUJeMQEDtz",
+    "AUTH_DOMAIN": "dev-dt65.eu.auth0.com",
+    "AUTH_AUDIENCE": "https://graphql-dev.downtown65.com",
+    "API_KEY": "get from secrets",
+    "REGISTER_SECRET": "get from secrets",
+    "AUTH_CLIENT_SECRET": "get from secrets"
+  },
   "routes": [
     {
       "pattern": "api.downtown65.site",
       "custom_domain": true
     }
-  ]
+  ],
+  "d1_databases": [
+    {
+      "binding": "D1_DB",
+      "database_name": "dt65-test",
+      "database_id": "fc97044a-c30a-4288-ba0d-7c884daeea14",
+      "migrations_dir": "drizzle"
+    }
+  ],
+
+  "env": {
+    // Developer environments
+    "pehtoorismies": {
+      "workers_dev": true,
+      "vars": {
+        "AUTH_CLIENT_ID": "JaoAht7ggce7f5R8DCBGUyjUJeMQEDtz",
+        "AUTH_DOMAIN": "dev-dt65.eu.auth0.com",
+        "AUTH_AUDIENCE": "https://graphql-dev.downtown65.com"
+      },
+      "d1_databases": [
+        {
+          "binding": "D1_DB",
+          "database_name": "pehtoorismies-development",
+          "database_id": "1f425fbb-7dec-49f0-b158-0d0963a27ad2",
+          "migrations_dir": "drizzle"
+        }
+      ]
+    },
+    // Production and staging environments
+    "staging": {
+      "routes": [
+        {
+          "pattern": "staging-api.downtown65.site",
+          "custom_domain": true
+        }
+      ]
+    },
+    "production": {
+      "routes": [
+        {
+          "pattern": "api.downtown65.site",
+          "custom_domain": true
+        }
+      ]
+    }
+  }
 }

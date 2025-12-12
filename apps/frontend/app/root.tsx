@@ -1,32 +1,100 @@
-import { Links, Meta, Outlet, Scripts, ScrollRestoration, isRouteErrorResponse } from 'react-router'
-
+import {
+  AppShell,
+  Box,
+  Code,
+  ColorSchemeScript,
+  Container,
+  mantineHtmlProps,
+  Text,
+  Title,
+} from '@mantine/core'
+import {
+  isRouteErrorResponse,
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useRouteLoaderData,
+} from 'react-router'
 import type { Route } from './+types/root'
 import './app.css'
+import { useDisclosure } from '@mantine/hooks'
+import type { PropsWithChildren } from 'react'
+import { AppTheme } from '~/app-theme'
+import {
+  LoggedInNavigation,
+  LoggedOutNavigation,
+  Navbar,
+} from './components/navigation'
+import { AuthContext } from './context/context'
+import type { User } from './domain/user'
 
-export const links: Route.LinksFunction = () => [
-  { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-  {
-    rel: 'preconnect',
-    href: 'https://fonts.gstatic.com',
-    crossOrigin: 'anonymous',
-  },
-  {
-    rel: 'stylesheet',
-    href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
-  },
-]
+export const loader = async ({ context }: Route.LoaderArgs) => {
+  const authContext = context.get(AuthContext)
 
-export function Layout({ children }: { children: React.ReactNode }) {
+  if (authContext) {
+    console.warn('Rendering Layout component', authContext.user)
+    return {
+      user: authContext.user,
+    }
+  }
+  return {
+    user: null,
+  }
+}
+
+export function Layout({
+  children,
+  loaderData,
+}: PropsWithChildren<Route.ComponentProps>) {
+  const data = useRouteLoaderData('root')
+  const user = (data?.user as User) ?? null
+
+  console.warn('Rendering Layout component', loaderData?.user)
+  // const user = null
+  const [navigationOpened, { toggle, close }] = useDisclosure()
+
   return (
-    <html lang="en">
+    <html lang="en" {...mantineHtmlProps}>
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1"
+        />
+        <ColorSchemeScript />
         <Meta />
         <Links />
       </head>
       <body>
-        {children}
+        <AppTheme>
+          <AppShell
+            header={{ height: { base: 60, md: 70, lg: 80 } }}
+            navbar={{
+              width: 300,
+              breakpoint: 'sm',
+              collapsed: { desktop: true, mobile: !navigationOpened },
+            }}
+            padding="xs"
+          >
+            <AppShell.Header>
+              {user && (
+                <LoggedInNavigation
+                  user={user}
+                  toggle={toggle}
+                  close={close}
+                  navigationOpened={navigationOpened}
+                />
+              )}
+              {!user && <LoggedOutNavigation />}
+            </AppShell.Header>
+            <AppShell.Navbar py="md" p="sm">
+              <Navbar close={close} />
+            </AppShell.Navbar>
+            <AppShell.Main>{children}</AppShell.Main>
+          </AppShell>
+        </AppTheme>
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -46,21 +114,23 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   if (isRouteErrorResponse(error)) {
     message = error.status === 404 ? '404' : 'Error'
     details =
-      error.status === 404 ? 'The requested page could not be found.' : error.statusText || details
+      error.status === 404
+        ? 'The requested page could not be found.'
+        : error.statusText || details
   } else if (import.meta.env.DEV && error && error instanceof Error) {
     details = error.message
     stack = error.stack
   }
 
   return (
-    <main className="pt-16 p-4 container mx-auto">
-      <h1>{message}</h1>
-      <p>{details}</p>
+    <Container component="main" pt="xl" p="md" mx="auto">
+      <Title>{message}</Title>
+      <Text>{details}</Text>
       {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
-          <code>{stack}</code>
-        </pre>
+        <Box component="pre" w="100%" style={{ overflowX: 'auto' }} p="md">
+          <Code>{stack}</Code>
+        </Box>
       )}
-    </main>
+    </Container>
   )
 }
