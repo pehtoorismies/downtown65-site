@@ -4,7 +4,10 @@ import { getDb } from '~/common/db/get-db'
 import type { Auth0Sub, ID } from '~/common/schema'
 import { usersTable } from '~/db/schema'
 
-export const getUserId = async (config: Config, auth0Sub: Auth0Sub): Promise<ID | undefined> => {
+export const getUserId = async (
+  config: Config,
+  auth0Sub: Auth0Sub,
+): Promise<ID | undefined> => {
   const db = getDb(config.D1_DB)
   const userId = await db
     .select({

@@ -58,7 +58,9 @@ export default function Profile() {
     eventCreated: preferences.subscribeEventCreationEmail,
   })
 
-  const onChangeEventCreatedSubscription: ChangeEventHandler<HTMLInputElement> = (event) => {
+  const onChangeEventCreatedSubscription: ChangeEventHandler<
+    HTMLInputElement
+  > = (event) => {
     setEmailSettings({
       ...emailSettings,
       eventCreated: event.currentTarget.checked,
@@ -80,7 +82,12 @@ export default function Profile() {
         </Breadcrumbs>
       </Container>
       <Container size={BOX_SIZE}>
-        <ProfileBox picture={user.picture} nickname={user.nickname} name={name} email={email} />
+        <ProfileBox
+          picture={user.picture}
+          nickname={user.nickname}
+          name={name}
+          email={email}
+        />
         <Center mt="sm">
           <Form action="/profile/change-avatar">
             <Button

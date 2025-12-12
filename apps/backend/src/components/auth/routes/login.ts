@@ -3,7 +3,11 @@ import z from 'zod'
 import type { AppAPI } from '~/app-api'
 import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
-import { Auth0SubSchema, ErrorAPIResponseSchema, IDSchema } from '~/common/schema'
+import {
+  Auth0SubSchema,
+  ErrorAPIResponseSchema,
+  IDSchema,
+} from '~/common/schema'
 import { login } from '../db/login'
 import { LoginParamSchema } from '../shared-schema'
 

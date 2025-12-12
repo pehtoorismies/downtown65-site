@@ -40,7 +40,8 @@ const isAccessTokenExpired = (accessToken: string): boolean => {
   return isAfter(new Date(), expirationDate)
 }
 
-const isSessionCookieExpired = (expiresAt: string) => isAfter(new Date(), parseISO(expiresAt))
+const isSessionCookieExpired = (expiresAt: string) =>
+  isAfter(new Date(), parseISO(expiresAt))
 
 interface Secrets {
   COOKIE_SESSION_SECRET: string
@@ -104,7 +105,9 @@ export const createSessionManager = (secrets: Secrets) => {
       headers,
     }
   }
-  const getUserSession = async (request: Request): Promise<UserSessionResponse> => {
+  const getUserSession = async (
+    request: Request,
+  ): Promise<UserSessionResponse> => {
     const session = await getSession(request.headers.get('Cookie'))
     const sessionData = CookieSessionDataSchema.safeParse(session.data)
 
@@ -115,7 +118,9 @@ export const createSessionManager = (secrets: Secrets) => {
     if (isSessionCookieExpired(sessionData.data.expiresAt)) {
       return getErrorResponse(session, 'Cookie session expired')
     }
-    const accessTokenExpired = isAccessTokenExpired(sessionData.data.accessToken)
+    const accessTokenExpired = isAccessTokenExpired(
+      sessionData.data.accessToken,
+    )
 
     if (!accessTokenExpired) {
       return {
@@ -126,15 +131,18 @@ export const createSessionManager = (secrets: Secrets) => {
       }
     }
 
-    const { data: renewedData, error } = await apiClient.POST('/auth/refresh-token', {
-      body: {
-        refreshToken: sessionData.data.refreshToken,
+    const { data: renewedData, error } = await apiClient.POST(
+      '/auth/refresh-token',
+      {
+        body: {
+          refreshToken: sessionData.data.refreshToken,
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': secrets.API_KEY,
+        },
       },
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': secrets.API_KEY,
-      },
-    })
+    )
 
     if (error) {
       return getErrorResponse(session, 'Failed to refresh access token')
@@ -153,7 +161,11 @@ export const createSessionManager = (secrets: Secrets) => {
     }
   }
 
-  const createUserSession = async ({ request, tokens, rememberMe }: CreateUserSessionProps) => {
+  const createUserSession = async ({
+    request,
+    tokens,
+    rememberMe,
+  }: CreateUserSessionProps) => {
     const session = await getSession(request.headers.get('Cookie'))
     const user = getUserFromIdToken(tokens.idToken)
     const now = new Date()

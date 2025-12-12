@@ -2,7 +2,10 @@ import { createAuthClient } from '~/common/auth0/client'
 import type { Config } from '~/common/config/config'
 import type { ForgotPasswordInput } from '../shared-schema'
 
-export const forgotPassword = async (config: Config, input: ForgotPasswordInput): Promise<void> => {
+export const forgotPassword = async (
+  config: Config,
+  input: ForgotPasswordInput,
+): Promise<void> => {
   try {
     const authClient = createAuthClient(config.authConfig)
     await authClient.database.changePassword({

@@ -9,7 +9,9 @@ export const createAuthClient = (authConfig: Config['authConfig']) => {
   })
 }
 
-export const getManagementClient = async ({ authConfig }: Config): Promise<ManagementClient> => {
+export const getManagementClient = async ({
+  authConfig,
+}: Config): Promise<ManagementClient> => {
   const authClient = createAuthClient(authConfig)
   const tokenResult = await authClient.oauth.clientCredentialsGrant({
     audience: `https://${authConfig.AUTH_DOMAIN}/api/v2/`,

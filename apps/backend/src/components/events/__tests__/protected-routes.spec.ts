@@ -25,7 +25,10 @@ const jwtProtectedRoutes = [
   { method: 'DELETE', path: '/events/123/participants/me' },
 ]
 
-describe.each(apiKeyProtectedRoutes)('API Key Only: $method $path', async ({ method, path }) => {
+describe.each(apiKeyProtectedRoutes)('API Key Only: $method $path', async ({
+  method,
+  path,
+}) => {
   it('returns 401 without API key', async () => {
     const res = await app.request(path, { method }, env)
     expect(res.status).toBe(401)
@@ -39,7 +42,10 @@ describe.each(apiKeyProtectedRoutes)('API Key Only: $method $path', async ({ met
   })
 })
 
-describe.each(jwtProtectedRoutes)('JWT Protected: $method $path', ({ method, path }) => {
+describe.each(jwtProtectedRoutes)('JWT Protected: $method $path', ({
+  method,
+  path,
+}) => {
   const testEnv = {
     ...env,
     API_KEY: 'test-api-key',

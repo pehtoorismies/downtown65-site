@@ -55,7 +55,10 @@ export const register = (app: AppAPI) => {
     const updated = await updateUser(getConfig(c.env), auth0Sub, userParams)
 
     if (!updated) {
-      return c.json({ code: 404, message: `User with sub ${auth0Sub} not found` }, 404)
+      return c.json(
+        { code: 404, message: `User with sub ${auth0Sub} not found` },
+        404,
+      )
     }
 
     return c.json(updated, 200)

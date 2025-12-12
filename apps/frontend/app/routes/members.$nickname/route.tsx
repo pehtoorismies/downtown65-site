@@ -11,7 +11,12 @@ import {
 } from '@mantine/core'
 
 import { IconArrowNarrowLeft } from '@tabler/icons-react'
-import { isRouteErrorResponse, Link, useLoaderData, useRouteError } from 'react-router'
+import {
+  isRouteErrorResponse,
+  Link,
+  useLoaderData,
+  useRouteError,
+} from 'react-router'
 
 import { ProfileBox } from '../../components/ProfileBox'
 import type { Route } from './+types/route'
@@ -33,7 +38,11 @@ export default function MemberPage() {
     <>
       <Container fluid mt={75}>
         <Breadcrumbs mb="xs">
-          <Anchor component={Link} to="/members" data-testid="breadcrumbs-parent">
+          <Anchor
+            component={Link}
+            to="/members"
+            data-testid="breadcrumbs-parent"
+          >
             Jäsenet
           </Anchor>
           <Text data-testid="breadcrumbs-current">{nickname}</Text>
@@ -43,9 +52,20 @@ export default function MemberPage() {
         <Title ta="center" order={1} mt="sm">
           Jäsenprofiili
         </Title>
-        <ProfileBox picture={picture} name={name} nickname={nickname} email={email} />
+        <ProfileBox
+          picture={picture}
+          name={name}
+          nickname={nickname}
+          email={email}
+        />
         <Divider my="sm" label="System stats" labelPosition="center" />
-        <Text ta="center" fz="sm" fw={500} fs="italic" data-testid="member-created-at">
+        <Text
+          ta="center"
+          fz="sm"
+          fw={500}
+          fs="italic"
+          data-testid="member-created-at"
+        >
           {createdAt}
         </Text>
 
@@ -76,7 +96,11 @@ export const ErrorBoundary = () => {
       <Title my="sm" ta="center" size={40}>
         {error.status}
       </Title>
-      <Image radius="md" src={notFoundProfileImage} alt="Anonymous holding fire" />
+      <Image
+        radius="md"
+        src={notFoundProfileImage}
+        alt="Anonymous holding fire"
+      />
       <Text ta="center"> {error.statusText}</Text>
       <Button
         component={Link}

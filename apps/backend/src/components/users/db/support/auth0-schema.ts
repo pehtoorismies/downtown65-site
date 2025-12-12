@@ -26,7 +26,8 @@ export const Auth0UserSchema = z
     roles: [user.app_metadata.role],
     preferences: {
       subscribeWeeklyEmail: user.user_metadata.subscribeWeeklyEmail,
-      subscribeEventCreationEmail: user.user_metadata.subscribeEventCreationEmail,
+      subscribeEventCreationEmail:
+        user.user_metadata.subscribeEventCreationEmail,
     },
   }))
 

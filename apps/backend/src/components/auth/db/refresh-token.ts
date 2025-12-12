@@ -1,7 +1,10 @@
 import { createAuthClient } from '~/common/auth0/client'
 import type { Config } from '~/common/config/config'
 import type { RefreshTokenInput } from '../shared-schema'
-import { type Auth0TokensRefresh, Auth0TokensRefreshSchema } from './support/auth0-schema'
+import {
+  type Auth0TokensRefresh,
+  Auth0TokensRefreshSchema,
+} from './support/auth0-schema'
 
 export const refreshToken = async (
   config: Config,

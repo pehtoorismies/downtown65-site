@@ -6,6 +6,9 @@ import type { ULID } from '../shared-schema'
 
 export const getEventByULID = async (config: Config, id: ULID) => {
   const db = getDb(config.D1_DB)
-  const event = await db.select().from(eventsTable).where(eq(eventsTable.eventULID, id))
+  const event = await db
+    .select()
+    .from(eventsTable)
+    .where(eq(eventsTable.eventULID, id))
   return event[0] ?? undefined
 }

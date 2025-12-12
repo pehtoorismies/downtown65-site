@@ -1,3 +1,4 @@
+import { createLogger } from '@downtown65/logger'
 import { AuthApiError } from 'auth0'
 import { eq } from 'drizzle-orm'
 import { jwtDecode } from 'jwt-decode'
@@ -23,7 +24,11 @@ const LoginResponse = z.discriminatedUnion('type', [
 
 type LoginResponse = z.infer<typeof LoginResponse>
 
-export const login = async (config: Config, input: LoginInput): Promise<LoginResponse> => {
+export const login = async (
+  config: Config,
+  input: LoginInput,
+): Promise<LoginResponse> => {
+  const logger = createLogger()
   try {
     const authClient = createAuthClient(config.authConfig)
     const result = await authClient.oauth.passwordGrant({
@@ -73,13 +78,14 @@ export const login = async (config: Config, input: LoginInput): Promise<LoginRes
             error: error.error_description,
           }
         default:
+          logger.error(error, 'Login error occurred')
           return {
             type: 'UnknownError',
             error: error.error_description,
           }
       }
     }
-
+    logger.error(error, 'Login error occurred')
     return {
       type: 'UnknownError',
       error: 'An unknown error occurred during login.',

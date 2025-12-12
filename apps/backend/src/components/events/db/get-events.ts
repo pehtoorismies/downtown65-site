@@ -18,7 +18,6 @@ const LeftJoinResult = z
       createdBy: {
         id: _obj.users_table.id,
         auth0Sub: _obj.users_table.auth0Sub,
-        name: _obj.users_table.name,
         nickname: _obj.users_table.nickname,
       },
     }

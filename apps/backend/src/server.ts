@@ -8,7 +8,10 @@ import { registerRoutes as authRoutes } from './components/auth/routes'
 import { registerRoutes as eventRoutes } from './components/events/routes'
 import { registerRoutes as usersRoutes } from './components/users/routes'
 import { UnauthorizedErrorSchema } from './schemas/unauthorized-error'
-import { formatZodErrors, ValidationErrorSchema } from './schemas/validation-error'
+import {
+  formatZodErrors,
+  ValidationErrorSchema,
+} from './schemas/validation-error'
 
 const app: AppAPI = new OpenAPIHono({
   defaultHook: (result, c) => {

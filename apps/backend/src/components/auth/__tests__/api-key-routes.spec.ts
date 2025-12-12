@@ -13,7 +13,10 @@ const apiKeyProtectedRoutes = [
   { method: 'POST', path: '/auth/refresh-token' },
 ]
 
-describe.each(apiKeyProtectedRoutes)('API Key Only: $method $path', async ({ method, path }) => {
+describe.each(apiKeyProtectedRoutes)('API Key Only: $method $path', async ({
+  method,
+  path,
+}) => {
   it('returns 401 without API key', async () => {
     const res = await app.request(path, { method }, env)
     expect(res.status).toBe(401)

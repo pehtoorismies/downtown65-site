@@ -8,7 +8,10 @@ import { type UserUpdateParams, UserUpdateParamsSchema } from '../shared-schema'
 import { Auth0UserSchema } from './support/auth0-schema'
 
 const UpdateSchema = UserUpdateParamsSchema.transform((obj) => {
-  if (obj.subscribeEventCreationEmail === undefined && obj.subscribeWeeklyEmail === undefined) {
+  if (
+    obj.subscribeEventCreationEmail === undefined &&
+    obj.subscribeWeeklyEmail === undefined
+  ) {
     return {
       name: obj.name,
       nickname: obj.nickname,
@@ -27,13 +30,21 @@ const UpdateSchema = UserUpdateParamsSchema.transform((obj) => {
   }
 })
 
-export const updateUser = async (config: Config, auth0Sub: string, params: UserUpdateParams) => {
+export const updateUser = async (
+  config: Config,
+  auth0Sub: string,
+  params: UserUpdateParams,
+) => {
   const logger = createLogger()
   const management = await getManagementClient(config)
   const parsedParams = UpdateSchema.parse(params)
-  logger.info(`Updating user ${auth0Sub} with params: ${JSON.stringify(parsedParams)}`)
+  logger.info(
+    `Updating user ${auth0Sub} with params: ${JSON.stringify(parsedParams)}`,
+  )
   const response = await management.users.update(auth0Sub, parsedParams)
-  logger.info(`Updated user ${auth0Sub} with params: ${JSON.stringify(response)}`)
+  logger.info(
+    `Updated user ${auth0Sub} with params: ${JSON.stringify(response)}`,
+  )
 
   const auth0User = Auth0UserSchema.parse(response)
 

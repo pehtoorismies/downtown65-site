@@ -1,4 +1,12 @@
-import { Anchor, Breadcrumbs, Container, Pagination, Table, Text, Title } from '@mantine/core'
+import {
+  Anchor,
+  Breadcrumbs,
+  Container,
+  Pagination,
+  Table,
+  Text,
+  Title,
+} from '@mantine/core'
 import { Link, redirect, useNavigate } from 'react-router'
 import { apiClient } from '~/api/api-client'
 import { AuthContext } from '~/context/context'
@@ -74,7 +82,15 @@ export async function loader({ request, context }: Route.LoaderArgs) {
 }
 
 export default function Users({ loaderData }: Route.ComponentProps) {
-  const { users, start, usersOnPage, userCount, numPages, currentPage, perPage } = loaderData
+  const {
+    users,
+    start,
+    usersOnPage,
+    userCount,
+    numPages,
+    currentPage,
+    perPage,
+  } = loaderData
 
   const navigate = useNavigate()
   const hasPagination = userCount > perPage
@@ -82,7 +98,11 @@ export default function Users({ loaderData }: Route.ComponentProps) {
   const rows = users.map((u, index) => (
     <Table.Tr key={u.id}>
       <Table.Td>
-        <Anchor component={Link} to={`/members/${u.nickname}`} data-testid={`member-nick-${index}`}>
+        <Anchor
+          component={Link}
+          to={`/members/${u.nickname}`}
+          data-testid={`member-nick-${index}`}
+        >
           {u.nickname}
         </Anchor>
       </Table.Td>

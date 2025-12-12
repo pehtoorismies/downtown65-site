@@ -12,7 +12,11 @@ const appTheme = createTheme({
   primaryColor: 'brand',
 })
 
-export function AppTheme({ children, theme = appTheme, ...props }: MantineProviderProps) {
+export function AppTheme({
+  children,
+  theme = appTheme,
+  ...props
+}: MantineProviderProps) {
   return (
     <MantineProvider theme={theme} {...props}>
       {children}

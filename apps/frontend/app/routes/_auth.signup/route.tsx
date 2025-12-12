@@ -1,4 +1,13 @@
-import { Anchor, Button, Group, Paper, PasswordInput, Text, TextInput, Title } from '@mantine/core'
+import {
+  Anchor,
+  Button,
+  Group,
+  Paper,
+  PasswordInput,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core'
 import { Form, Link, useNavigation } from 'react-router'
 
 export default function Signup() {
@@ -31,7 +40,13 @@ export default function Signup() {
             required
             mt="md"
           />
-          <TextInput name="name" label="Nimi" placeholder="Etunimi Sukunimi" required mt="md" />
+          <TextInput
+            name="name"
+            label="Nimi"
+            placeholder="Etunimi Sukunimi"
+            required
+            mt="md"
+          />
           <TextInput
             name="nickname"
             description="Tunnus/nickname, näkyy ilmoittautumisissa"
@@ -49,7 +64,12 @@ export default function Signup() {
             mt="md"
           />
           <Group justify="flex-end" mt="md">
-            <Anchor component={Link} to="/login" size="sm" data-testid="to-login">
+            <Anchor
+              component={Link}
+              to="/login"
+              size="sm"
+              data-testid="to-login"
+            >
               Kirjautumiseen
             </Anchor>
           </Group>

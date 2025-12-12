@@ -8,7 +8,12 @@ type Properties = PropsWithChildren<{
   email: string
 }>
 
-export const ProfileBox: FC<Properties> = ({ picture, name, nickname, email }: Properties) => {
+export const ProfileBox: FC<Properties> = ({
+  picture,
+  name,
+  nickname,
+  email,
+}: Properties) => {
   return (
     <Paper p="sm">
       <Avatar src={picture} size={120} radius={120} mx="auto" />

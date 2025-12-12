@@ -28,10 +28,12 @@ export const Auth0TokensSchema = Auth0TokensBaseSchema.extend({
   refreshToken: tokens.refresh_token,
 }))
 
-export const Auth0TokensRefreshSchema = Auth0TokensBaseSchema.transform((tokens) => ({
-  accessToken: tokens.access_token,
-  idToken: tokens.id_token,
-  expiresIn: tokens.expires_in,
-}))
+export const Auth0TokensRefreshSchema = Auth0TokensBaseSchema.transform(
+  (tokens) => ({
+    accessToken: tokens.access_token,
+    idToken: tokens.id_token,
+    expiresIn: tokens.expires_in,
+  }),
+)
 
 export type Auth0TokensRefresh = z.infer<typeof Auth0TokensRefreshSchema>

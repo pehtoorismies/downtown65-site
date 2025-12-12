@@ -25,12 +25,22 @@ interface LoggedInProps {
   navigationOpened: boolean
 }
 
-export const LoggedInNavigation = ({ user, toggle, close, navigationOpened }: LoggedInProps) => {
+export const LoggedInNavigation = ({
+  user,
+  toggle,
+  close,
+  navigationOpened,
+}: LoggedInProps) => {
   const fetcher = useFetcher()
 
   return (
     <Group h="100%" px="md" wrap="nowrap">
-      <Burger opened={navigationOpened} onClick={toggle} hiddenFrom="sm" size="sm" />
+      <Burger
+        opened={navigationOpened}
+        onClick={toggle}
+        hiddenFrom="sm"
+        size="sm"
+      />
       <Group gap={0} style={{ flex: 1 }} justify="space-between" wrap="nowrap">
         <Group style={{ width: 130 }}>
           <Text
@@ -53,7 +63,11 @@ export const LoggedInNavigation = ({ user, toggle, close, navigationOpened }: Lo
             <NavLink
               key={id}
               className={({ isActive }) => {
-                return cx(classes.control, classes.controlDesktop, isActive && classes.active)
+                return cx(
+                  classes.control,
+                  classes.controlDesktop,
+                  isActive && classes.active,
+                )
               }}
               to={to}
               data-testid={testId}
@@ -72,7 +86,14 @@ export const LoggedInNavigation = ({ user, toggle, close, navigationOpened }: Lo
           <Menu.Target>
             <Button
               variant="subtle"
-              leftSection={<Avatar src={user.picture} alt={user.nickname} radius="xl" size={20} />}
+              leftSection={
+                <Avatar
+                  src={user.picture}
+                  alt={user.nickname}
+                  radius="xl"
+                  size={20}
+                />
+              }
               rightSection={<IconChevronDown size={12} stroke={1.5} />}
             >
               {user.nickname}
@@ -109,7 +130,12 @@ export const LoggedOutNavigation = () => {
       <Group justify="space-between" style={{ flex: 1 }}>
         <Text style={{ userSelect: 'none' }}>Dt65 Events</Text>
         <Group ml="xl" gap={10} visibleFrom="sm">
-          <Button component={Link} to="/login" variant="default" data-testid="button-to-login">
+          <Button
+            component={Link}
+            to="/login"
+            variant="default"
+            data-testid="button-to-login"
+          >
             Kirjaudu
           </Button>
           <Button component={Link} to="/signup" data-testid="button-to-signup">
@@ -133,7 +159,11 @@ export const Navbar = ({ close }: NavbarProps) => {
           <NavLink
             key={id}
             className={({ isActive }) => {
-              return cx(classes.control, classes.controlMobile, isActive && classes.active)
+              return cx(
+                classes.control,
+                classes.controlMobile,
+                isActive && classes.active,
+              )
             }}
             to={to}
             onClick={close}

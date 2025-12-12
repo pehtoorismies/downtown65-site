@@ -9,7 +9,11 @@ import type { RegisterInput } from '../shared-schema'
 import { Auth0ErrorSchema } from './support/auth0-error'
 
 const CreateAuth0UserResponseSchema = z.discriminatedUnion('type', [
-  z.object({ type: z.literal('Error'), error: z.string(), statusCode: z.number() }),
+  z.object({
+    type: z.literal('Error'),
+    error: z.string(),
+    statusCode: z.number(),
+  }),
   z.object({
     type: z.literal('Success'),
     user: z.object({
@@ -24,7 +28,11 @@ const CreateAuth0UserResponseSchema = z.discriminatedUnion('type', [
 type CreateAuth0UserResponse = z.infer<typeof CreateAuth0UserResponseSchema>
 
 const SignupResponseSchema = z.discriminatedUnion('type', [
-  z.object({ type: z.literal('Error'), error: z.string(), statusCode: z.number() }),
+  z.object({
+    type: z.literal('Error'),
+    error: z.string(),
+    statusCode: z.number(),
+  }),
   z.object({
     type: z.literal('Success'),
     user: z.object({
@@ -88,7 +96,11 @@ const createAuth0User = async (
   }
 }
 
-const updateAuth0User = async (config: Config, auth0Sub: string, localUserId: number) => {
+const updateAuth0User = async (
+  config: Config,
+  auth0Sub: string,
+  localUserId: number,
+) => {
   try {
     const management = await getManagementClient(config)
     await management.users.update(auth0Sub, {
@@ -111,7 +123,10 @@ interface LocalUser {
 const createLocalUser = async (config: Config, values: LocalUser) => {
   const db = getDb(config.D1_DB)
   try {
-    const result = await db.insert(usersTable).values(values).returning({ id: usersTable.id })
+    const result = await db
+      .insert(usersTable)
+      .values(values)
+      .returning({ id: usersTable.id })
     return result[0].id
   } catch (error: unknown) {
     const logger = createLogger()
@@ -142,7 +157,10 @@ export const signup = async (
   })
 
   if (localUserId === undefined) {
-    logger.fatal(result.user, 'Failed to create local user after successful Auth0 signup')
+    logger.fatal(
+      result.user,
+      'Failed to create local user after successful Auth0 signup',
+    )
     return {
       type: 'Error',
       error: 'Failed to create local user but account was created in Auth0.',
@@ -150,13 +168,21 @@ export const signup = async (
     }
   }
 
-  const updated = await updateAuth0User(config, result.user.auth0Sub, localUserId)
+  const updated = await updateAuth0User(
+    config,
+    result.user.auth0Sub,
+    localUserId,
+  )
 
   if (updated === false) {
-    logger.fatal(result.user, 'Failed to update Auth0 user with local user ID after signup')
+    logger.fatal(
+      result.user,
+      'Failed to update Auth0 user with local user ID after signup',
+    )
     return {
       type: 'Error',
-      error: 'Failed to update Auth0 user but account and local user were created.',
+      error:
+        'Failed to update Auth0 user but account and local user were created.',
       statusCode: 500,
     }
   }

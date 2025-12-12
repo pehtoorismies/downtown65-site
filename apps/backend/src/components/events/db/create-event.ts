@@ -4,7 +4,10 @@ import { getDb } from '~/common/db/get-db'
 import { eventsTable } from '~/db/schema'
 import type { Event, EventCreateInput } from '../shared-schema'
 
-export const createEvent = async (config: Config, input: EventCreateInput): Promise<Event> => {
+export const createEvent = async (
+  config: Config,
+  input: EventCreateInput,
+): Promise<Event> => {
   const db = getDb(config.D1_DB)
   const ULID = ulid()
 

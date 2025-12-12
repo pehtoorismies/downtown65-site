@@ -79,13 +79,19 @@ export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
     const logger = createLogger({ requestId: c.var.requestId })
 
-    const { email, name, registerSecret, password, nickname } = c.req.valid('json')
+    const { email, name, registerSecret, password, nickname } =
+      c.req.valid('json')
     logger.info({ email, nickname }, 'Signup attempt')
     if (registerSecret !== c.env.REGISTER_SECRET) {
       return c.json({ error: 'Access denied' }, 409)
     }
 
-    const result = await signup(getConfig(c.env), { email, name, password, nickname })
+    const result = await signup(getConfig(c.env), {
+      email,
+      name,
+      password,
+      nickname,
+    })
 
     switch (result.type) {
       case 'Error': {

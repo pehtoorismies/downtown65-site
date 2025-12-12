@@ -1,4 +1,12 @@
-import { Button, Container, Image, SimpleGrid, Stack, Text, Title } from '@mantine/core'
+import {
+  Button,
+  Container,
+  Image,
+  SimpleGrid,
+  Stack,
+  Text,
+  Title,
+} from '@mantine/core'
 
 import { IconArrowNarrowLeft } from '@tabler/icons-react'
 import { Link } from 'react-router'
@@ -23,8 +31,9 @@ const NotFound = () => {
         <div>
           <Title fw={900}>PUMMI</Title>
           <Text c="dimmed" size="lg">
-            Sivua ei löytynyt. Tarkista oletko kirjoittanut osoitteen oikein. Sivu voi myös olla
-            siirretty. Tai sitten joku muu on vialla. Contact support (kuvassa)!
+            Sivua ei löytynyt. Tarkista oletko kirjoittanut osoitteen oikein.
+            Sivu voi myös olla siirretty. Tai sitten joku muu on vialla. Contact
+            support (kuvassa)!
           </Text>
           <Button
             component={Link}

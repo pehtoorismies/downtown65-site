@@ -26,7 +26,9 @@ declare module 'react-router' {
   }
 }
 
-function getLoadContext(ctx: { cloudflare: { env: Env; ctx: ExecutionContext } }) {
+function getLoadContext(ctx: {
+  cloudflare: { env: Env; ctx: ExecutionContext }
+}) {
   const routerCtx = new RouterContextProvider()
   routerCtx.cloudflare = {
     env: ctx.cloudflare.env,

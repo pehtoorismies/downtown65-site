@@ -89,7 +89,8 @@ export default function Login({ actionData }: Route.ComponentProps) {
         Kirjaudu
       </Title>
       <Text c="dimmed" size="sm" ta="center" mt={5}>
-        Rekisteröitymiseen tarvitset seuran jäsenyyden ja liittymistunnuksen.&nbsp;
+        Rekisteröitymiseen tarvitset seuran jäsenyyden ja
+        liittymistunnuksen.&nbsp;
         <Anchor component={Link} to="/signup" data-testid="to-signup">
           Rekisteröidy tästä.
         </Anchor>

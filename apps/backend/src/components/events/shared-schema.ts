@@ -36,14 +36,14 @@ export const ULID = z
     return isValidULID(v)
   }, 'Invalid ULID')
   .openapi({
-    description: 'Id is ULID. ULIDs are Universally Unique Lexicographically Sortable Identifiers.',
+    description:
+      'Id is ULID. ULIDs are Universally Unique Lexicographically Sortable Identifiers.',
     example: '01KBAWMEFMZTHDD52MA2D8PTDY',
   })
 
 export const UserSchema = z.object({
   auth0Sub: Auth0SubSchema,
   id: IDSchema,
-  name: z.string().min(1).openapi({ example: 'Ada Lovelace' }),
   nickname: z.string().min(1).openapi({ example: 'ada' }),
 })
 

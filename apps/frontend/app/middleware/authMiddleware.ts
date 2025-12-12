@@ -25,7 +25,10 @@ export const authMiddleware =
 
     context.set(AuthContext, authContextValue)
     const response = (await next()) as Response
-    response.headers.append('Set-Cookie', result.headers.get('Set-Cookie') || '')
+    response.headers.append(
+      'Set-Cookie',
+      result.headers.get('Set-Cookie') || '',
+    )
 
     return response
   }

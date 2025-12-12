@@ -1,4 +1,7 @@
-import { type RenderResult, render as testingLibraryRender } from '@testing-library/react'
+import {
+  type RenderResult,
+  render as testingLibraryRender,
+} from '@testing-library/react'
 import type React from 'react'
 import { AppTheme } from '~/app-theme'
 
