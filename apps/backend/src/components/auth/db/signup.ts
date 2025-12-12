@@ -31,6 +31,7 @@ const SignupResponseSchema = z.discriminatedUnion('type', [
       id: IDSchema,
       email: z.email(),
       nickname: z.string(),
+      auth0Sub: Auth0SubSchema,
     }),
   }),
 ])
@@ -166,6 +167,7 @@ export const signup = async (
       id: localUserId,
       email: result.user.email,
       nickname: result.user.nickname,
+      auth0Sub: result.user.auth0Sub,
     },
   }
 }

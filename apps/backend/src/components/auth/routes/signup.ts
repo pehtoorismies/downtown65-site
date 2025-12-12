@@ -4,7 +4,7 @@ import z from 'zod'
 import type { AppAPI } from '~/app-api'
 import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
-import { IDSchema } from '~/common/schema'
+import { Auth0SubSchema, IDSchema } from '~/common/schema'
 import { signup } from '../db/signup'
 import { RegisterParamSchema } from '../shared-schema'
 
@@ -29,6 +29,7 @@ const route = createRoute({
         'application/json': {
           schema: z.object({
             id: IDSchema,
+            auth0Sub: Auth0SubSchema,
             email: z.email(),
             nickname: z.string(),
           }),
@@ -99,14 +100,7 @@ export const register = (app: AppAPI) => {
       }
 
       case 'Success': {
-        return c.json(
-          {
-            id: result.user.id,
-            email: result.user.email,
-            nickname: result.user.nickname,
-          },
-          201,
-        )
+        return c.json(result.user, 201)
       }
     }
   })
