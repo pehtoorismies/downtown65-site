@@ -9,7 +9,7 @@ export const Auth0UserSchema = z
     picture: z.string(),
   })
   .transform(({ sub, ...rest }) => ({
-    id: sub,
+    auth0Sub: sub,
     ...rest,
   }))
 

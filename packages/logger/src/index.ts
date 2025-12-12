@@ -1,11 +1,16 @@
 import pino from 'pino'
 
-// logger.ts
-export const createLogger = (options?: { requestId?: string }) => {
-  return pino({
-    level: process.env.LOG_LEVEL || 'info',
-    base: {
-      requestId: options?.requestId,
+export const createLogger = (_options?: { requestId?: string }) =>
+  pino({
+    browser: {
+      asObject: true,
+      formatters: {
+        level(label, _number) {
+          return { level: label.toUpperCase() }
+        },
+      },
     },
+    enabled: true,
+    level: 'trace',
+    timestamp: pino.stdTimeFunctions.isoTime,
   })
-}

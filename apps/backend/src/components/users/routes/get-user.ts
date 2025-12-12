@@ -1,5 +1,5 @@
-import { createRoute } from '@hono/zod-openapi'
-import { z } from 'zod'
+import { createRoute, z } from '@hono/zod-openapi'
+// import { z } from 'zod'
 import type { AppAPI } from '~/app-api'
 import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
@@ -7,6 +7,8 @@ import { jwtToken } from '~/common/middleware/jwt'
 import { ErrorAPIResponseSchema } from '~/common/schema'
 import { getUserByNickname } from '../db/get-user-by-nickname'
 import { DetailedUserAPIResponseSchema } from './api-schema'
+
+// import { getUserByNickname } from '../db/get-user-by-nic
 
 const route = createRoute({
   method: 'get',

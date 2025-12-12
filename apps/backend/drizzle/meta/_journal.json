@@ -5,8 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1765288642997,
-      "tag": "0000_simple_mariko_yashida",
+      "when": 1765443356579,
+      "tag": "0000_init_schema",
       "breakpoints": true
     }
   ]

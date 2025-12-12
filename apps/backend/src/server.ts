@@ -1,12 +1,13 @@
 import { OpenAPIHono, z } from '@hono/zod-openapi'
 import { Scalar } from '@scalar/hono-api-reference'
 import { cors } from 'hono/cors'
+import { requestId } from 'hono/request-id'
 import type { SchemaObject } from 'openapi3-ts/oas31'
 import type { AppAPI } from './app-api'
 import { registerRoutes as authRoutes } from './components/auth/routes'
 import { registerRoutes as eventRoutes } from './components/events/routes'
 import { registerRoutes as usersRoutes } from './components/users/routes'
-import { UnauthorizedErrorSchema } from './schemas/unauthorized -error'
+import { UnauthorizedErrorSchema } from './schemas/unauthorized-error'
 import { formatZodErrors, ValidationErrorSchema } from './schemas/validation-error'
 
 const app: AppAPI = new OpenAPIHono({
@@ -22,6 +23,8 @@ const app: AppAPI = new OpenAPIHono({
     }
   },
 })
+
+app.use(requestId())
 
 app.openAPIRegistry.registerComponent(
   'schemas',
@@ -73,8 +76,8 @@ app.use('*', cors())
 
 app.get('/healthz', (c) => c.json({ status: 'ok' }))
 
-eventRoutes(app)
 authRoutes(app)
+eventRoutes(app)
 usersRoutes(app)
 
 app.doc31('/doc', {
@@ -91,6 +94,7 @@ app.get(
   Scalar(() => ({
     url: '/doc',
     theme: 'kepler',
+    pageTitle: 'Dt65 Events API Reference',
     authentication: {
       // Make your API key scheme the default selection
       preferredSecurityScheme: 'ApiKeyAuth',

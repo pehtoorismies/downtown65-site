@@ -3,7 +3,7 @@ import z from 'zod'
 import type { AppAPI } from '~/app-api'
 import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
-import { ErrorAPIResponseSchema } from '~/common/schema'
+import { Auth0SubSchema, ErrorAPIResponseSchema, IDSchema } from '~/common/schema'
 import { login } from '../db/login'
 import { LoginParamSchema } from '../shared-schema'
 
@@ -32,8 +32,9 @@ const route = createRoute({
             idToken: z.string(),
             expiresIn: z.number(),
             user: z.object({
-              id: z.string(),
-              email: z.string(),
+              id: IDSchema,
+              auth0Sub: Auth0SubSchema,
+              email: z.email(),
               name: z.string(),
               nickname: z.string(),
               picture: z.string(),

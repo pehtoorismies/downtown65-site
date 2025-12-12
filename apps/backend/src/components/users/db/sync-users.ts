@@ -11,7 +11,7 @@ import { QUERY_USER_RETURNED_FIELDS } from './support/query-user-returned-fields
 const Auth0UserListSchema = z.array(Auth0UserSchema)
 
 export const syncUsers = async (config: Config) => {
-  const management = await getManagementClient(config.authConfig)
+  const management = await getManagementClient(config)
   const logger = createLogger()
   logger.info('Listing users from Auth0')
 
@@ -47,22 +47,14 @@ export const syncUsers = async (config: Config) => {
       .insert(usersTable)
       .values({
         auth0Sub: user.auth0Sub,
-        email: user.email,
         nickname: user.nickname,
-        name: user.name,
         picture: user.picture,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
       })
       .onConflictDoUpdate({
         target: usersTable.auth0Sub, // Unique column(s)
         set: {
-          email: user.email,
           nickname: user.nickname,
-          name: user.name,
           picture: user.picture,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
         },
       })
       .returning({ id: usersTable.id })

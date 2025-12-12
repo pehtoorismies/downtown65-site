@@ -6,7 +6,7 @@ import { QUERY_USER_RETURNED_FIELDS } from './support/query-user-returned-fields
 
 export const listUsers = async (config: Config, params: PaginationQuery) => {
   const { page, limit } = params
-  const management = await getManagementClient(config.authConfig)
+  const management = await getManagementClient(config)
 
   const { response } = await management.users.list({
     page: page,

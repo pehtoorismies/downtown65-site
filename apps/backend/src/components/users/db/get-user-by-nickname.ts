@@ -5,7 +5,7 @@ import { Auth0UserSchema } from './support/auth0-schema'
 import { QUERY_USER_RETURNED_FIELDS } from './support/query-user-returned-fields'
 
 export const getUserByNickname = async (config: Config, nickname: string) => {
-  const management = await getManagementClient(config.authConfig)
+  const management = await getManagementClient(config)
 
   const { data } = await management.users.list({
     q: `nickname:${nickname}`,

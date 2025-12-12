@@ -30,12 +30,8 @@ export const usersTable = sqliteTable(
   (t) => ({
     id: t.integer('id').primaryKey({ autoIncrement: true }),
     auth0Sub: t.text().notNull().unique(), // Link to Auth0
-    email: t.text().notNull().unique(),
     nickname: t.text().notNull().unique(),
-    name: t.text(),
     picture: t.text(),
-    createdAt: t.text().notNull(),
-    updatedAt: t.text().notNull(),
   }),
   (table) => [index('users_auth0Sub_idx').on(table.auth0Sub)],
 )

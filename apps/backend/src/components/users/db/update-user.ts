@@ -29,7 +29,7 @@ const UpdateSchema = UserUpdateParamsSchema.transform((obj) => {
 
 export const updateUser = async (config: Config, auth0Sub: string, params: UserUpdateParams) => {
   const logger = createLogger()
-  const management = await getManagementClient(config.authConfig)
+  const management = await getManagementClient(config)
   const parsedParams = UpdateSchema.parse(params)
   logger.info(`Updating user ${auth0Sub} with params: ${JSON.stringify(parsedParams)}`)
   const response = await management.users.update(auth0Sub, parsedParams)
@@ -43,9 +43,7 @@ export const updateUser = async (config: Config, auth0Sub: string, params: UserU
     .update(usersTable)
     .set({
       nickname: auth0User.nickname,
-      name: auth0User.name,
       picture: auth0User.picture,
-      updatedAt: auth0User.updatedAt,
     })
     .where(eq(usersTable.auth0Sub, auth0Sub))
     .returning()

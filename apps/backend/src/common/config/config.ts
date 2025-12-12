@@ -7,7 +7,9 @@ const EnvironmentSchema = z.object({
   AUTH_AUDIENCE: z.url(),
   REGISTER_SECRET: z.string().min(1),
   API_KEY: z.string().min(1),
-  D1_DB: z.instanceof(D1Database),
+  D1_DB: z.custom<D1Database>((val) => val != null && typeof val === 'object', {
+    message: 'D1_DB binding is required',
+  }),
 })
 
 interface AuthConfig {

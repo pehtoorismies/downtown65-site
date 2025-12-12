@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "900ddf5c-0706-477a-8412-0190f0e4aded",
+  "id": "3eccf6ee-0c9c-4de0-b205-46850a0f9deb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "events_table": {
@@ -155,25 +155,11 @@
           "notNull": true,
           "autoincrement": false
         },
-        "email": {
-          "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "nickname": {
           "name": "nickname",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
           "autoincrement": false
         },
         "picture": {
@@ -182,20 +168,6 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
         }
       },
       "indexes": {
@@ -203,13 +175,6 @@
           "name": "users_table_auth0Sub_unique",
           "columns": [
             "auth0Sub"
-          ],
-          "isUnique": true
-        },
-        "users_table_email_unique": {
-          "name": "users_table_email_unique",
-          "columns": [
-            "email"
           ],
           "isUnique": true
         },

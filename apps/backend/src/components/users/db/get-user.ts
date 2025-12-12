@@ -7,7 +7,7 @@ import { Auth0UserSchema } from './support/auth0-schema'
 import { QUERY_USER_RETURNED_FIELDS } from './support/query-user-returned-fields'
 
 export const getUser = async (config: Config, auth0Sub: string) => {
-  const management = await getManagementClient(config.authConfig)
+  const management = await getManagementClient(config)
 
   const user = await management.users.get(auth0Sub, {
     fields: QUERY_USER_RETURNED_FIELDS,
@@ -33,12 +33,8 @@ export const getUser = async (config: Config, auth0Sub: string) => {
     .insert(usersTable)
     .values({
       auth0Sub: auth0User.auth0Sub,
-      email: auth0User.email,
       nickname: auth0User.nickname,
-      name: auth0User.name,
       picture: auth0User.picture,
-      createdAt: auth0User.createdAt,
-      updatedAt: auth0User.updatedAt,
     })
     .returning()
 
