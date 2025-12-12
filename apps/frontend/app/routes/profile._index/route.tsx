@@ -15,6 +15,9 @@ import type { ChangeEventHandler } from 'react'
 import { useState } from 'react'
 import { Form, useFetcher, useLoaderData } from 'react-router'
 import { ProfileBox } from '~/components/ProfileBox'
+import { authMiddleware } from '~/middleware/authMiddleware'
+
+export const middleware = [authMiddleware()]
 
 export const loader = async () => {
   return {

@@ -8,7 +8,6 @@ import {
   Text,
   Title,
 } from '@mantine/core'
-import type React from 'react'
 import {
   isRouteErrorResponse,
   Links,
@@ -16,26 +15,45 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useRouteLoaderData,
 } from 'react-router'
 import type { Route } from './+types/root'
 import './app.css'
 import { useDisclosure } from '@mantine/hooks'
+import type { PropsWithChildren } from 'react'
 import { AppTheme } from '~/app-theme'
 import {
   LoggedInNavigation,
   LoggedOutNavigation,
   Navbar,
 } from './components/navigation'
+import { AuthContext } from './context/context'
 import type { User } from './domain/user'
 
-export function Layout({ children }: { children: React.ReactNode }) {
-  const [navigationOpened, { toggle, close }] = useDisclosure()
+export const loader = async ({ context }: Route.LoaderArgs) => {
+  const authContext = context.get(AuthContext)
 
-  const user: User = {
-    id: 'user-1',
-    nickname: 'Testaaja Testinen',
-    picture: 'https://example.com/avatar.jpg',
+  if (authContext) {
+    console.warn('Rendering Layout component', authContext.user)
+    return {
+      user: authContext.user,
+    }
   }
+  return {
+    user: null,
+  }
+}
+
+export function Layout({
+  children,
+  loaderData,
+}: PropsWithChildren<Route.ComponentProps>) {
+  const data = useRouteLoaderData('root')
+  const user = (data?.user as User) ?? null
+
+  console.warn('Rendering Layout component', loaderData?.user)
+  // const user = null
+  const [navigationOpened, { toggle, close }] = useDisclosure()
 
   return (
     <html lang="en" {...mantineHtmlProps}>
