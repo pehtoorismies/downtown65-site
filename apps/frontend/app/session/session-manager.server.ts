@@ -194,5 +194,7 @@ export const createSessionManager = (secrets: Secrets) => {
     getUserSession,
     createUserSession,
     commitSession,
+    destroySession,
+    getSession,
   }
 }

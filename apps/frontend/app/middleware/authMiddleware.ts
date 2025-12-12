@@ -3,7 +3,11 @@ import { AuthContext } from '~/context/context'
 import { createSessionManager } from '~/session/session-manager.server'
 
 export const authMiddleware =
-  (allowAnonymous = false): MiddlewareFunction =>
+  ({
+    allowAnonymous = false,
+  }: {
+    allowAnonymous?: boolean
+  } = {}): MiddlewareFunction =>
   async ({ request, context }, next) => {
     const secrets = {
       COOKIE_SESSION_SECRET: context.cloudflare.env.COOKIE_SESSION_SECRET,

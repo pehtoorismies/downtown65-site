@@ -1,5 +1,8 @@
 import { Container, Text, Title } from '@mantine/core'
+import { authMiddleware } from '~/middleware/authMiddleware'
 import type { Route } from './+types/route'
+
+export const middleware = [authMiddleware({ allowAnonymous: true })]
 
 export async function loader() {
   // TODO: Replace with actual API call

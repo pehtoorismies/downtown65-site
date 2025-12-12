@@ -17,10 +17,12 @@ import {
   useLoaderData,
   useRouteError,
 } from 'react-router'
-
+import { authMiddleware } from '~/middleware/authMiddleware'
 import { ProfileBox } from '../../components/ProfileBox'
 import type { Route } from './+types/route'
 import notFoundProfileImage from './not-found.jpg'
+
+export const middleware = [authMiddleware()]
 
 export function loader({ params }: Route.LoaderArgs) {
   return {
