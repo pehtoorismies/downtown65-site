@@ -11,7 +11,7 @@ import { Link, redirect, useNavigate } from 'react-router'
 import { apiClient } from '~/api/api-client'
 import { AuthContext } from '~/context/context'
 import { createLogger } from '~/logger/logger.server'
-import { authMiddleware } from '~/middleware/authMiddleware'
+import { authMiddleware } from '~/middleware/auth-middleware'
 import type { Route } from './+types/route'
 
 export const middleware = [authMiddleware()]

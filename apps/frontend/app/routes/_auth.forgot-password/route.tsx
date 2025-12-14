@@ -12,6 +12,9 @@ import {
 
 import { IconArrowLeft } from '@tabler/icons-react'
 import { Form, Link } from 'react-router'
+import { redirectAuthenticatedMiddleware } from '~/middleware/redirect-authenticated'
+
+export const middleware = [redirectAuthenticatedMiddleware]
 
 export default function ForgotPassword() {
   return (

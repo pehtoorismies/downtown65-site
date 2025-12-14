@@ -36,3 +36,10 @@ export const authMiddleware =
 
     return response
   }
+
+// export const getAuth = (context:Contex) => {
+//   const authContext = context.get(AuthContext)
+//   if (!authContext) {
+//     return redirect('/login')
+//   }
+// }

@@ -16,8 +16,11 @@ import { IconAlertCircle } from '@tabler/icons-react'
 import { Form, Link, redirect } from 'react-router'
 import z from 'zod'
 import { apiClient } from '~/api/api-client'
+import { redirectAuthenticatedMiddleware } from '~/middleware/redirect-authenticated'
 import { createSessionManager } from '~/session/session-manager.server'
 import type { Route } from './+types/route'
+
+export const middleware = [redirectAuthenticatedMiddleware]
 
 export async function action({ request, context }: Route.ActionArgs) {
   const logger = createLogger({ appContext: 'Frontend Login' })

@@ -17,7 +17,7 @@ import {
   useLoaderData,
   useRouteError,
 } from 'react-router'
-import { authMiddleware } from '~/middleware/authMiddleware'
+import { authMiddleware } from '~/middleware/auth-middleware'
 import { ProfileBox } from '../../components/ProfileBox'
 import type { Route } from './+types/route'
 import notFoundProfileImage from './not-found.jpg'

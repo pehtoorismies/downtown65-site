@@ -9,6 +9,9 @@ import {
   Title,
 } from '@mantine/core'
 import { Form, Link, useNavigation } from 'react-router'
+import { redirectAuthenticatedMiddleware } from '~/middleware/redirect-authenticated'
+
+export const middleware = [redirectAuthenticatedMiddleware]
 
 export default function Signup() {
   const navigation = useNavigation()
