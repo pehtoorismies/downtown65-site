@@ -14,13 +14,13 @@ export type {
 } from './event'
 // Event schemas
 export {
+  EVENT_TYPES as eventTypes,
   EventBaseSchema,
   EventCreateSchema,
   EventListSchema,
   EventSchema,
   EventTypeEnum,
   EventUpdateSchema,
-  eventTypes,
 } from './event'
 export type { DetailedUser, User, UserList, UserUpdate } from './user'
 // User schemas

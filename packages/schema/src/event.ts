@@ -6,7 +6,7 @@ import { UserSchema } from './user'
 // Event Type Enum
 // ============================================
 
-export const eventTypes = [
+export const EVENT_TYPES = [
   'CYCLING',
   'KARONKKA',
   'MEETING',
@@ -24,7 +24,7 @@ export const eventTypes = [
   'ULTRAS',
 ] as const
 
-export const EventTypeEnum = z.enum(eventTypes)
+const EventTypeEnum = z.enum(EVENT_TYPES)
 
 // ============================================
 // Event Schemas
@@ -49,7 +49,7 @@ export const EventCreateSchema = EventBaseSchema
 
 export const EventUpdateSchema = EventBaseSchema.partial().refine(
   (data) => Object.keys(data).length > 0,
-  { message: 'At least one field must be provided' }
+  { message: 'At least one field must be provided' },
 )
 
 export const EventListSchema = z.array(EventSchema)
