@@ -3,8 +3,8 @@
 export type { Login } from './auth'
 // Auth schemas
 export { LoginSchema } from './auth'
-export type { TimeHHMM as TimeHHMMType } from './common'
-export { TimeHHMM } from './common'
+export type { PaginationQuery, TimeHHMM as TimeHHMMType } from './common'
+export { PaginationQuerySchema, TimeHHMM } from './common'
 export type {
   Event,
   EventCreate,

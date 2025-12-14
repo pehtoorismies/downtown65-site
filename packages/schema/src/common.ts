@@ -8,3 +8,10 @@ export const TimeHHMM = z
   .regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Must be HH:MM (00–23:59)')
 
 export type TimeHHMM = z.infer<typeof TimeHHMM>
+
+export const PaginationQuerySchema = z.object({
+  page: z.string().optional().default('1'),
+  limit: z.string().optional().default('10'),
+})
+
+export type PaginationQuery = z.infer<typeof PaginationQuerySchema>

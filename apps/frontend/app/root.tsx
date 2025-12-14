@@ -34,7 +34,6 @@ export const loader = async ({ context }: Route.LoaderArgs) => {
   const authContext = context.get(AuthContext)
 
   if (authContext) {
-    console.warn('Rendering Layout component', authContext.user)
     return {
       user: authContext.user,
     }
@@ -44,15 +43,10 @@ export const loader = async ({ context }: Route.LoaderArgs) => {
   }
 }
 
-export function Layout({
-  children,
-  loaderData,
-}: PropsWithChildren<Route.ComponentProps>) {
+export function Layout({ children }: PropsWithChildren<Route.ComponentProps>) {
   const data = useRouteLoaderData('root')
   const user = (data?.user as User) ?? null
 
-  console.warn('Rendering Layout component', loaderData?.user)
-  // const user = null
   const [navigationOpened, { toggle, close }] = useDisclosure()
 
   return (

@@ -10,37 +10,40 @@ import {
 import { Link, redirect, useNavigate } from 'react-router'
 import { apiClient } from '~/api/api-client'
 import { AuthContext } from '~/context/context'
+import { createLogger } from '~/logger/logger.server'
 import { authMiddleware } from '~/middleware/authMiddleware'
 import type { Route } from './+types/route'
 
-const defaultTo = (defaultValue: number, value: string | null): number => {
-  if (value === null || value.length === 0) {
-    return defaultValue
-  }
-  if (Number.isNaN(value)) {
-    return defaultValue
-  }
-
-  return Number(value)
-}
-
 export const middleware = [authMiddleware()]
 
+const toPage = (page: string | undefined | null) => {
+  if (!page) {
+    return '1'
+  }
+  const parsed = parseInt(page, 10)
+  if (Number.isNaN(parsed) || parsed < 1) {
+    return '1'
+  }
+  return parsed.toString()
+}
+
 export async function loader({ request, context }: Route.LoaderArgs) {
+  const logger = createLogger({ appContext: 'Frontend: Members Index' })
   const authContext = context.get(AuthContext)
   if (!authContext) {
     return redirect('/login')
   }
 
   const url = new URL(request.url)
-  const page = defaultTo(1, url.searchParams.get('page'))
-  const perPage = defaultTo(50, url.searchParams.get('per_page'))
+  const page = toPage(url.searchParams.get('page'))
 
   const { user, accessToken } = authContext
   const { data, error } = await apiClient.GET('/users', {
-    query: {
-      page: page - 1,
-      perPage,
+    params: {
+      query: {
+        page,
+        limit: '30',
+      },
     },
     headers: {
       'x-api-key': context.cloudflare.env.API_KEY,
@@ -49,8 +52,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   })
 
   if (error) {
-    console.error('Error fetching users:')
-    console.error(error)
+    logger.withError(error).error('Failed to load users list')
     return {
       user,
       users: [],
@@ -69,6 +71,9 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   const numberPages = Math.floor(total / limit) + extra
   const currentPage = Math.floor(start / limit) + 1
 
+  logger
+    .withMetadata({ data: { ...data, users: undefined } })
+    .debug('Loaded users list')
   return {
     user,
     users,
@@ -127,11 +132,9 @@ export default function Users({ loaderData }: Route.ComponentProps) {
             withControls={false}
             total={numPages}
             value={currentPage}
-            // TODO: fix below
-            // position="left"
             my="md"
             onChange={(page) => {
-              navigate(`?page=${page}&per_page=${perPage}`)
+              navigate(`?page=${page}`)
             }}
           />
         )}
@@ -157,11 +160,9 @@ export default function Users({ loaderData }: Route.ComponentProps) {
             withControls={false}
             total={numPages}
             value={currentPage}
-            // TODO: fix below
-            // position="left"
             my="md"
             onChange={(page) => {
-              navigate(`?page=${page}&per_page=${perPage}`)
+              navigate(`?page=${page}`)
             }}
           />
         )}
