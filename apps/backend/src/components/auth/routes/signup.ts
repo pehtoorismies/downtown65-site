@@ -77,31 +77,35 @@ const route = createRoute({
 
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
-    const logger = createLogger({ requestId: c.var.requestId })
+    const logger = createLogger({ prefix: 'backend' })
 
-    const { email, name, registerSecret, password, nickname } =
-      c.req.valid('json')
-    logger.info({ email, nickname }, 'Signup attempt')
-    if (registerSecret !== c.env.REGISTER_SECRET) {
+    const input = c.req.valid('json')
+
+    logger.withMetadata(input).debug('Signup attempt')
+    if (input.registerSecret !== c.env.REGISTER_SECRET) {
       return c.json({ error: 'Access denied' }, 409)
     }
 
     const result = await signup(getConfig(c.env), {
-      email,
-      name,
-      password,
-      nickname,
+      email: input.email,
+      name: input.name,
+      password: input.password,
+      nickname: input.nickname,
     })
 
     switch (result.type) {
       case 'Error': {
-        logger.info(result, 'Signup error')
         if (result.statusCode === 409) {
           return c.json({ error: result.error }, 409)
         }
+
         if (result.statusCode === 429) {
+          logger.withMetadata(result).info('Signup error 429 Too Many Requests')
           return c.json({ error: result.error }, 429)
         }
+        logger
+          .withMetadata(result)
+          .error('Signup error 500 Internal Server Error')
         return c.json({ error: result.error }, 500)
       }
 

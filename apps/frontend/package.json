@@ -20,6 +20,7 @@
     "find-unused": "knip"
   },
   "dependencies": {
+    "@downtown65/logger": "workspace:*",
     "@downtown65/schema": "workspace:*",
     "@mantine/core": "^8.3.9",
     "@mantine/hooks": "^8.3.9",

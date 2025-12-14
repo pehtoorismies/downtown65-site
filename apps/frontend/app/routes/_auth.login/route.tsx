@@ -1,3 +1,4 @@
+import { createLogger } from '@downtown65/logger'
 import { LoginSchema } from '@downtown65/schema'
 import {
   Alert,
@@ -13,24 +14,29 @@ import {
 } from '@mantine/core'
 import { IconAlertCircle } from '@tabler/icons-react'
 import { Form, Link, redirect } from 'react-router'
+import z from 'zod'
 import { apiClient } from '~/api/api-client'
 import { createSessionManager } from '~/session/session-manager.server'
 import type { Route } from './+types/route'
 
 export async function action({ request, context }: Route.ActionArgs) {
+  const logger = createLogger({ appContext: 'Frontend Login' })
   const formData = await request.formData()
   const email = formData.get('email')
   const password = formData.get('password')
+  const rememberMe = formData.get('remember')
 
-  const result = LoginSchema.safeParse({ email, password })
+  const result = LoginSchema.safeParse({ email, password, rememberMe })
   if (!result.success) {
-    console.error('Login form validation error:', result.error)
+    const errorTree = z.treeifyError(result.error)
+
     return {
-      errorGeneral: 'Invalid form data',
+      emailError: errorTree.properties?.email?.errors[0],
+      errorPassword: errorTree.properties?.password?.errors[0],
     }
   }
 
-  const { data, error, response } = await apiClient.POST('/auth/login', {
+  const { data, error } = await apiClient.POST('/auth/login', {
     body: {
       email: result.data.email,
       password: result.data.password,
@@ -42,24 +48,12 @@ export async function action({ request, context }: Route.ActionArgs) {
   })
 
   if (error) {
-    console.error('Login error:', error)
-
-    switch (response.status) {
-      case 400:
-        return { errorGeneral: 'virhe 400' }
-      case 401:
-        return { errorGeneral: 'virhe 401' }
-      case 403:
-        return { errorGeneral: 'virhe 403' }
-      case 422:
-        return { errorGeneral: 'virhe 422' }
-      default:
-        // Try to get message from error object
-        return {
-          errorGeneral: 'virhe 500',
-        }
+    if (error.code >= 500) {
+      logger.withError(error).error('Server error during login')
     }
+    return { errorGeneral: error.message, code: error.code }
   }
+
   if (data) {
     const secrets = {
       COOKIE_SESSION_SECRET: context.cloudflare.env.COOKIE_SESSION_SECRET,
@@ -69,7 +63,7 @@ export async function action({ request, context }: Route.ActionArgs) {
     const userSession = await createUserSession({
       request,
       tokens: data,
-      rememberMe: false,
+      rememberMe: result.data.rememberMe != null,
     })
 
     const headers = new Headers()
@@ -79,7 +73,8 @@ export async function action({ request, context }: Route.ActionArgs) {
     })
   }
 
-  return { errorGeneral: 'Unknown error' }
+  logger.fatal('Both error and data are undefined in login action response')
+  return { errorGeneral: 'Unknown error', code: 500 }
 }
 
 export default function Login({ actionData }: Route.ComponentProps) {
@@ -116,6 +111,7 @@ export default function Login({ actionData }: Route.ComponentProps) {
             label="Sähköposti"
             placeholder="me@downtown65.com"
             required
+            error={actionData?.emailError}
           />
           <PasswordInput
             id="password"
@@ -124,6 +120,7 @@ export default function Login({ actionData }: Route.ComponentProps) {
             placeholder="Salasanasi"
             required
             mt="md"
+            error={actionData?.errorPassword}
           />
           <Checkbox
             name="remember"

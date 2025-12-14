@@ -27,7 +27,7 @@ export const syncUsers = async (config: Config) => {
   const userList = Auth0UserListSchema.parse(users)
 
   const nicknames = userList.map((u) => `${u.nickname}: ${u.email}`)
-  logger.info(nicknames, 'Nicknames to sync')
+  logger.withMetadata(nicknames).info('Nicknames to sync')
 
   const createdUsers = []
   const updatedUsers = []

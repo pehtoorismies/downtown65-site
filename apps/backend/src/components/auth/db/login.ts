@@ -77,15 +77,10 @@ export const login = async (
             type: 'AccessDenied',
             error: error.error_description,
           }
-        default:
-          logger.error(error, 'Login error occurred')
-          return {
-            type: 'UnknownError',
-            error: error.error_description,
-          }
       }
     }
-    logger.error(error, 'Login error occurred')
+
+    logger.withError(error).error('Login error occurred')
     return {
       type: 'UnknownError',
       error: 'An unknown error occurred during login.',

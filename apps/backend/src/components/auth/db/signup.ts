@@ -86,7 +86,7 @@ const createAuth0User = async (
         statusCode: result.data.statusCode,
       }
     }
-    logger.error(error, 'Error during Auth0 user creation')
+    logger.withError(error).error('Error during Auth0 user creation')
 
     return {
       type: 'Error',
@@ -109,7 +109,7 @@ const updateAuth0User = async (
     return true
   } catch (error: unknown) {
     const logger = createLogger()
-    logger.error(error, 'Error during Auth0 user update')
+    logger.withError(error).error('Error during Auth0 user update')
     return false
   }
 }
@@ -130,7 +130,7 @@ const createLocalUser = async (config: Config, values: LocalUser) => {
     return result[0].id
   } catch (error: unknown) {
     const logger = createLogger()
-    logger.error(error, 'Error during local user creation')
+    logger.withError(error).error('Error during local user creation')
 
     return undefined
   }
@@ -157,10 +157,10 @@ export const signup = async (
   })
 
   if (localUserId === undefined) {
-    logger.fatal(
-      result.user,
-      'Failed to create local user after successful Auth0 signup',
-    )
+    logger
+      .withMetadata(result.user)
+      .fatal('Failed to create local user after successful Auth0 signup')
+
     return {
       type: 'Error',
       error: 'Failed to create local user but account was created in Auth0.',
@@ -175,10 +175,10 @@ export const signup = async (
   )
 
   if (updated === false) {
-    logger.fatal(
-      result.user,
-      'Failed to update Auth0 user with local user ID after signup',
-    )
+    logger
+      .withMetadata(result.user)
+      .fatal('Failed to update Auth0 user with local user ID after signup')
+
     return {
       type: 'Error',
       error:

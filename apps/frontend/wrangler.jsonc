@@ -4,6 +4,7 @@
   "compatibility_date": "2025-04-04",
   "main": "./workers/app.ts",
   "workers_dev": true,
+  "compatibility_flags": ["nodejs_compat"],
   "routes": [
     {
       "pattern": "downtown65.site",

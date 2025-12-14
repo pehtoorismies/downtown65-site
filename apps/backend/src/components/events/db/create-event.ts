@@ -27,7 +27,6 @@ export const createEvent = async (
     createdBy: {
       id: input.createdByUserId,
       auth0Sub: 'auth0|unknown',
-      name: 'change',
       nickname: 'change',
     },
   }
