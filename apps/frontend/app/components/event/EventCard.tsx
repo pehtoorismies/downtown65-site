@@ -1,19 +1,16 @@
-import type { EventType } from '@downtown65/schema'
+import type { EventType, ID } from '@downtown65/schema'
 import { Divider, Grid, Group, Text, Typography } from '@mantine/core'
 import { IconMedal } from '@tabler/icons-react'
-
-import { useParticipantsCount } from '../participants/use-participants'
-// import { Participants } from '~/components/participants'
-// import { ToggleJoinButton } from '~/components/toggle-join-button'
+import type { PropsWithChildren } from 'react'
+import type { User } from '~/domain/user'
+import { useParticipants } from '../participants/use-participants'
 import { Voucher } from '../voucher/Voucher'
 import { getEventTypeData } from './get-event-type-data'
 import { Participants } from './Participants'
 
-// import { useParticipantsCount } from '~/hooks/use-participants-count'
-// import { mapToData } from '~/util/event-type'
-
 interface Props {
-  eventId?: string
+  id?: ID
+  eventULID?: string
   title: string
   race: boolean
   subtitle: string
@@ -22,16 +19,11 @@ interface Props {
   createdBy: {
     nickname: string
   }
-  participants: {
-    id: string
-    nickname: string
-    picture: string
-  }[]
+  participants: User[]
   dateStart: string
   timeStart?: string | null
   description?: string
-  me: { id: string } | null
-  joinButton: React.ReactNode
+  me: { id: ID } | null
 }
 
 const getDescription = (description: string | undefined) => {
@@ -52,9 +44,9 @@ export const EventCard = ({
   timeStart,
   description,
   me,
-  joinButton,
-}: Props) => {
-  const { count, meAttending } = useParticipantsCount(participants, me)
+  children,
+}: PropsWithChildren<Props>) => {
+  const { count, meAttending } = useParticipants(participants, me)
 
   const time = timeStart ? `klo ${timeStart}` : ''
   const descriptionText = getDescription(description)
@@ -89,10 +81,7 @@ export const EventCard = ({
             </Text>
           </Grid.Col>
           <Grid.Col span={5}>
-            <Group justify="end">
-              {joinButton}
-              {/* <ToggleJoinButton isParticipating={meAttending} id={eventId} /> */}
-            </Group>
+            <Group justify="end">{children}</Group>
           </Grid.Col>
         </Grid>
         <Divider my="xs" label="Osallistujat" labelPosition="center" />

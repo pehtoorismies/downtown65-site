@@ -1,8 +1,8 @@
-export const useParticipantsCount = (
+export const useParticipants = (
   participants: {
-    id: string
+    id: number
   }[],
-  me: { id: string } | null,
+  me: { id: number } | null,
 ) => {
   const meAttending =
     me != null && participants.map(({ id }) => id).includes(me.id)

@@ -62,11 +62,14 @@ export async function action({ request, context }: Route.ActionArgs) {
       COOKIE_SESSION_SECRET: context.cloudflare.env.COOKIE_SESSION_SECRET,
       API_KEY: context.cloudflare.env.API_KEY,
     }
+
     const { createUserSession, commitSession } = createSessionManager(secrets)
     const userSession = await createUserSession({
       request,
-      tokens: data,
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
       rememberMe: result.data.rememberMe != null,
+      user: data.user,
     })
 
     const headers = new Headers()

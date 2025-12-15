@@ -10,26 +10,12 @@ const AccessTokenPartialSchema = z.object({
   exp: z.number(),
 })
 
-const Tokens = z.object({
-  refreshToken: z.string(),
-  accessToken: z.string(),
-  idToken: z.string(),
-})
-
-type Tokens = z.infer<typeof Tokens>
-
 interface CreateUserSessionProps {
-  tokens: Tokens
+  accessToken: string
+  refreshToken: string
   rememberMe: boolean
   request: Request
-}
-
-const getUserFromIdToken = (idTokenJWT: string): User => {
-  const decoded = jwtDecode(idTokenJWT)
-  return UserSchema.parse({
-    ...decoded,
-    id: decoded.sub,
-  })
+  user: User
 }
 
 const isAccessTokenExpired = (accessToken: string): boolean => {
@@ -163,21 +149,24 @@ export const createSessionManager = (secrets: Secrets) => {
 
   const createUserSession = async ({
     request,
-    tokens,
+    accessToken,
+    refreshToken,
     rememberMe,
+    user,
   }: CreateUserSessionProps) => {
     const session = await getSession(request.headers.get('Cookie'))
-    const user = getUserFromIdToken(tokens.idToken)
+    // const user = getUserFromIdToken(tokens.idToken)
     const now = new Date()
     const expiresAt = rememberMe ? addMonths(now, 12) : addDays(now, 2)
 
     const authResponse = CookieSessionDataSchema.safeParse({
-      refreshToken: tokens.refreshToken,
+      refreshToken,
       user,
-      accessToken: tokens.accessToken,
+      accessToken,
       expiresAt: expiresAt.toISOString(),
     })
     if (!authResponse.success) {
+      // TODO: log this error
       console.error(authResponse.error)
       throw new Error('Session data is malformed')
     }
