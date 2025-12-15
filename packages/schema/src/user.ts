@@ -1,8 +1,11 @@
 import { z } from 'zod'
 
-// ============================================
-// User Schemas
-// ============================================
+export const Auth0SubSchema = z.string().startsWith('auth0|')
+
+export const IDSchema = z.number().int().positive()
+
+export type Auth0Sub = z.infer<typeof Auth0SubSchema>
+export type ID = z.infer<typeof IDSchema>
 
 export const UserSchema = z.object({
   id: z.string().min(1),
