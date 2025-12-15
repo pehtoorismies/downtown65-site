@@ -1,10 +1,10 @@
 import { createLogger } from '@downtown65/logger'
+import { Auth0SubSchema, IDSchema } from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
 import z from 'zod'
 import type { AppAPI } from '~/app-api'
 import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
-import { Auth0SubSchema, IDSchema } from '~/common/schema'
 import { signup } from '../db/signup'
 import { RegisterParamSchema } from '../shared-schema'
 
@@ -77,7 +77,7 @@ const route = createRoute({
 
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
-    const logger = createLogger({ prefix: 'backend' })
+    const logger = createLogger({ appContext: 'Route signup' })
 
     const input = c.req.valid('json')
 

@@ -34,7 +34,7 @@ export const getEvents = async (config: Config) => {
 
   const events = EventParser.parse(result)
 
-  const logger = createLogger({ prefix: 'backend' })
+  const logger = createLogger({ appContext: 'DB getEvents' })
 
   logger.withMetadata(events).debug('Events fetched from DB')
 

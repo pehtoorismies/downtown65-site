@@ -1,45 +1,16 @@
-import { isValid as isValidULID } from 'ulidx'
+import {
+  Auth0SubSchema,
+  EventTypeEnum,
+  IDSchema,
+  TimeHHMM,
+  ULIDSchema,
+} from '@downtown65/schema'
 import { z } from 'zod'
-import { Auth0SubSchema, IDSchema } from '~/common/schema'
 
-const eventTypes = [
-  'CYCLING',
-  'KARONKKA',
-  'MEETING',
-  'NORDIC_WALKING',
-  'ICE_HOCKEY',
-  'ORIENTEERING',
-  'OTHER',
-  'RUNNING',
-  'SKIING',
-  'SPINNING',
-  'SWIMMING',
-  'TRACK_RUNNING',
-  'TRAIL_RUNNING',
-  'TRIATHLON',
-  'ULTRAS',
-] as const
-
-const EventTypeEnum = z.enum(eventTypes)
-
-const TimeHHMM = z
-  .string()
-  .regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Must be HH:MM (00–23:59)')
-  .openapi({
-    description: 'Must be HH:MM (00–23:59)',
-    example: '14:30',
-  })
-
-export const ULID = z
-  .string()
-  .refine((v) => {
-    return isValidULID(v)
-  }, 'Invalid ULID')
-  .openapi({
-    description:
-      'Id is ULID. ULIDs are Universally Unique Lexicographically Sortable Identifiers.',
-    example: '01KBAWMEFMZTHDD52MA2D8PTDY',
-  })
+// .openapi({
+//   description: 'Must be HH:MM (00–23:59)',
+//   example: '14:30',
+// })
 
 export const UserSchema = z.object({
   auth0Sub: Auth0SubSchema,
@@ -62,7 +33,7 @@ const ParticipantListSchema = z
 
 export const EventSchema = z.object({
   id: IDSchema,
-  eventULID: ULID,
+  eventULID: ULIDSchema,
   title: z.string().min(1).openapi({ example: 'Engineering Sync' }),
   subtitle: z.string().min(1).openapi({ example: 'Weekly updates' }),
   date: z.iso.date().openapi({ example: '2025-01-15' }),
@@ -88,7 +59,6 @@ export const EventUpdateSchema = EventSchema.omit({ id: true })
 export type Event = z.infer<typeof EventSchema>
 export type EventUpdateInput = z.infer<typeof EventUpdateSchema>
 
-export type ULID = z.infer<typeof ULID>
 export const EventCreateSchema = EventSchema.omit({
   id: true,
   eventULID: true,

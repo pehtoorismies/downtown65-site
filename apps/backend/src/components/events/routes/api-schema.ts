@@ -1,10 +1,9 @@
+import { IDSchema, ULIDSchema } from '@downtown65/schema'
 import { z } from 'zod'
-import { IDSchema } from '~/common/schema'
-import { ULID } from '../shared-schema'
 
 export const EventPathULIDParamSchema = z
   .object({
-    eventULID: ULID,
+    eventULID: ULIDSchema,
   })
   .openapi({ description: 'ULID of the event' })
 

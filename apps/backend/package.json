@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev --port 3002 | pino-pretty",
+    "dev": "wrangler dev --port 3002",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "test": "vitest",

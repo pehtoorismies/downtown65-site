@@ -1,5 +1,5 @@
+import { Auth0SubSchema, IDSchema } from '@downtown65/schema'
 import z from 'zod'
-import { Auth0SubSchema, IDSchema } from '~/common/schema'
 
 export const UserAPIResponseSchema = z.object({
   id: IDSchema,

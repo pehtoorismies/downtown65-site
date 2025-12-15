@@ -1,5 +1,5 @@
+import { Auth0SubSchema } from '@downtown65/schema'
 import { z } from 'zod'
-import { Auth0SubSchema } from '~/common/schema'
 
 export const Auth0UserSchema = z
   .object({

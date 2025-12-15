@@ -1,7 +1,7 @@
+import type { Auth0Sub, ID } from '@downtown65/schema'
 import { eq } from 'drizzle-orm'
 import type { Config } from '~/common/config/config'
 import { getDb } from '~/common/db/get-db'
-import type { Auth0Sub, ID } from '~/common/schema'
 import { usersTable } from '~/db/schema'
 
 export const getUserId = async (
