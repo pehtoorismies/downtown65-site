@@ -17,6 +17,7 @@ import { EventBreadcrumbs } from './EventBreadcrumbs'
 import { EventButtonContainer } from './EventButtonContainer'
 
 export const middleware = [authMiddleware({ allowAnonymous: true })]
+
 export const meta = ({ loaderData, location }: Route.MetaArgs) => {
   if (!loaderData) {
     return [
@@ -60,18 +61,16 @@ export const meta = ({ loaderData, location }: Route.MetaArgs) => {
   ]
 }
 
-export const action = async ({
-  request,
-  params,
-  context,
-}: Route.ActionArgs) => {
+export const action = async ({ request, context }: Route.ActionArgs) => {
   if (request.method !== 'DELETE') {
     throw new Error(`Unsupported request method ${request.method}`)
   }
-  const id = +params.id
+  const formData = await request.formData()
+  const eventId = formData.get('eventId')
 
+  const id = Number(eventId)
   if (Number.isNaN(id)) {
-    throw new Error('Event ID must be a number')
+    throw new Error('Invalid event ID')
   }
 
   const authContext = context.get(AuthContext)
@@ -96,9 +95,11 @@ export const action = async ({
   return redirect('/events')
 }
 
-export async function loader({ context }: Route.LoaderArgs) {
+export async function loader({ context, params }: Route.LoaderArgs) {
   const authContext = context.get(AuthContext)
   const me = authContext ? authContext.user : null
+
+  const _eventULID = params.eventULID
 
   const event = {
     id: 1,
@@ -119,7 +120,7 @@ export async function loader({ context }: Route.LoaderArgs) {
   return { eventItem: event, me, origin: 'http://localhost:3002' }
 }
 
-export default function EventsList({ loaderData }: Route.ComponentProps) {
+export default function GetEvent({ loaderData }: Route.ComponentProps) {
   const { eventItem, me } = loaderData
   const [opened, setOpened] = useState(false)
 
@@ -133,6 +134,7 @@ export default function EventsList({ loaderData }: Route.ComponentProps) {
         opened={opened}
         onCloseModal={onCloseModal}
         eventTitle={eventItem.title}
+        eventId={eventItem.id}
       />
 
       <Container p={{ base: 1, sm: 'xs' }}>
@@ -159,7 +161,7 @@ export default function EventsList({ loaderData }: Route.ComponentProps) {
         <Group justify="center" my="sm" gap="xl">
           <Button
             component={Link}
-            to={`/events/edit/${eventItem.id}`}
+            to={`/events/${eventItem.id}/edit/`}
             rightSection={<IconPencil size={18} />}
             data-testid="modify-event-btn"
           >

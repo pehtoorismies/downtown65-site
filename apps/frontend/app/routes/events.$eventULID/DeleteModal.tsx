@@ -1,3 +1,4 @@
+import type { ID } from '@downtown65/schema'
 import {
   Button,
   Group,
@@ -15,12 +16,14 @@ interface DeleteModalProps {
   opened: boolean
   onCloseModal: () => void
   eventTitle: string
+  eventId: ID
 }
 
 export const DeleteModal = ({
   opened,
   onCloseModal,
   eventTitle,
+  eventId,
 }: DeleteModalProps) => {
   const [formValue, setFormValue] = useState('')
   const navigation = useNavigation()
@@ -49,6 +52,7 @@ export const DeleteModal = ({
         </p>
       </Typography>
       <Form method="delete">
+        <TextInput type="hidden" name="eventId" value={eventId} />
         <TextInput
           placeholder="poista"
           label="Kirjoita 'poista'"
