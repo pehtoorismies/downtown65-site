@@ -4,6 +4,7 @@ import {
   IconCircleOff,
   IconPencil,
 } from '@tabler/icons-react'
+import { useState } from 'react'
 import { Link, redirect } from 'react-router'
 import { apiClient } from '~/api/api-client'
 import { EventCard } from '~/components/event/EventCard'
@@ -11,6 +12,7 @@ import { getEventTypeData } from '~/components/event/get-event-type-data'
 import { AuthContext } from '~/context/context'
 import { authMiddleware } from '~/middleware/auth-middleware'
 import type { Route } from './+types/route'
+import { DeleteModal } from './DeleteModal'
 import { EventBreadcrumbs } from './EventBreadcrumbs'
 import { EventButtonContainer } from './EventButtonContainer'
 
@@ -119,47 +121,60 @@ export async function loader({ context }: Route.LoaderArgs) {
 
 export default function EventsList({ loaderData }: Route.ComponentProps) {
   const { eventItem, me } = loaderData
+  const [opened, setOpened] = useState(false)
+
+  const onCloseModal = () => {
+    setOpened(false)
+  }
 
   return (
-    <Container p={{ base: 1, sm: 'xs' }}>
-      <EventBreadcrumbs title={eventItem.title} />
-      <EventCard {...eventItem} me={me}>
-        <EventButtonContainer
-          participants={eventItem.participants}
-          me={me}
-          eventId={eventItem.id}
-        />
-      </EventCard>
-      <Divider
-        mt="xl"
-        size="sm"
-        variant="dashed"
-        labelPosition="center"
-        label={
-          <>
-            <IconAlertTriangleFilled size={12} />
-            <Box ml={5}>Modification zone</Box>
-          </>
-        }
+    <>
+      <DeleteModal
+        opened={opened}
+        onCloseModal={onCloseModal}
+        eventTitle={eventItem.title}
       />
-      <Group justify="center" my="sm" gap="xl">
-        <Button
-          component={Link}
-          to={`/events/edit/${eventItem.id}`}
-          rightSection={<IconPencil size={18} />}
-          data-testid="modify-event-btn"
-        >
-          Muokkaa
-        </Button>
-        <Button
-          color="grape"
-          // onClick={() => setOpened(true)}
-          rightSection={<IconCircleOff size={18} />}
-          data-testid="delete-event-btn"
-        >
-          Poista tapahtuma
-        </Button>
-      </Group>
-    </Container>
+
+      <Container p={{ base: 1, sm: 'xs' }}>
+        <EventBreadcrumbs title={eventItem.title} />
+        <EventCard {...eventItem} me={me}>
+          <EventButtonContainer
+            participants={eventItem.participants}
+            me={me}
+            eventId={eventItem.id}
+          />
+        </EventCard>
+        <Divider
+          mt="xl"
+          size="sm"
+          variant="dashed"
+          labelPosition="center"
+          label={
+            <>
+              <IconAlertTriangleFilled size={12} />
+              <Box ml={5}>Modification zone</Box>
+            </>
+          }
+        />
+        <Group justify="center" my="sm" gap="xl">
+          <Button
+            component={Link}
+            to={`/events/edit/${eventItem.id}`}
+            rightSection={<IconPencil size={18} />}
+            data-testid="modify-event-btn"
+          >
+            Muokkaa
+          </Button>
+          <Button
+            color="grape"
+            onClick={() => setOpened(true)}
+            rightSection={<IconCircleOff size={18} />}
+            data-testid="delete-event-btn"
+          >
+            Poista tapahtuma
+          </Button>
+        </Group>
+      </Container>
+    </>
   )
 }
