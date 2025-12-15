@@ -1,33 +1,19 @@
-import {
-  Anchor,
-  Box,
-  Breadcrumbs,
-  Button,
-  Container,
-  Divider,
-  Group,
-  Text,
-} from '@mantine/core'
+import { Box, Button, Container, Divider, Group } from '@mantine/core'
 import {
   IconAlertTriangleFilled,
   IconCircleOff,
   IconPencil,
 } from '@tabler/icons-react'
-import { Link, useFetcher } from 'react-router'
-import {
-  JoinEventButton,
-  LeaveEventButton,
-  ToLoginButton,
-} from '~/components/event/EventButtons'
+import { Link } from 'react-router'
 import { EventCard } from '~/components/event/EventCard'
 import { getEventTypeData } from '~/components/event/get-event-type-data'
-import { useParticipants } from '~/components/participants/use-participants'
 import { AuthContext } from '~/context/context'
 import { authMiddleware } from '~/middleware/auth-middleware'
 import type { Route } from './+types/route'
+import { EventBreadcrumbs } from './EventBreadcrumbs'
+import { EventButtonContainer } from './EventButtonContainer'
 
 export const middleware = [authMiddleware({ allowAnonymous: true })]
-
 export const meta = ({ loaderData, location }: Route.MetaArgs) => {
   if (!loaderData) {
     return [
@@ -94,77 +80,14 @@ export async function loader({ context }: Route.LoaderArgs) {
   return { eventItem: event, me, origin: 'http://localhost:3002' }
 }
 
-const UserEventBreakcrumbs = ({ title }: { title: string }) => {
-  const breadcrumbItems = [
-    { title: 'Tapahtumat', href: '/events' },
-    { title: title },
-  ].map((item) => {
-    return item.href ? (
-      <Anchor component={Link} to={item.href} key={item.title}>
-        {item.title}
-      </Anchor>
-    ) : (
-      <Text key={item.title}>{item.title}</Text>
-    )
-  })
-  return <Breadcrumbs mb="xs">{breadcrumbItems}</Breadcrumbs>
-}
-
-interface EventButtonProps {
-  participants: { id: number }[]
-  me: { id: number } | null
-  eventId: number
-}
-
-const EventActionButton = (props: EventButtonProps) => {
-  const { meAttending } = useParticipants(props.participants, props.me)
-  const fetcher = useFetcher()
-
-  if (!props.me) {
-    return <ToLoginButton />
-  }
-
-  const isLoading =
-    fetcher.state === 'loading' || fetcher.state === 'submitting'
-
-  if (meAttending) {
-    const leaveEvent = () => {
-      fetcher.submit(
-        {},
-        {
-          action: `/events/${props.eventId}/participation`,
-          method: 'DELETE',
-        },
-      )
-    }
-    return (
-      <LeaveEventButton {...props} onClick={leaveEvent} isLoading={isLoading} />
-    )
-  }
-
-  const joinEvent = () => {
-    fetcher.submit(
-      {},
-      {
-        action: `/events/${props.eventId}/participation`,
-        method: 'POST',
-      },
-    )
-  }
-
-  return (
-    <JoinEventButton {...props} onClick={joinEvent} isLoading={isLoading} />
-  )
-}
-
 export default function EventsList({ loaderData }: Route.ComponentProps) {
   const { eventItem, me } = loaderData
 
   return (
     <Container p={{ base: 1, sm: 'xs' }}>
-      <UserEventBreakcrumbs title={eventItem.title} />
+      <EventBreadcrumbs title={eventItem.title} />
       <EventCard {...eventItem} me={me}>
-        <EventActionButton
+        <EventButtonContainer
           participants={eventItem.participants}
           me={me}
           eventId={eventItem.id}
