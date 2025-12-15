@@ -4,7 +4,8 @@ import {
   IconCircleOff,
   IconPencil,
 } from '@tabler/icons-react'
-import { Link } from 'react-router'
+import { Link, redirect } from 'react-router'
+import { apiClient } from '~/api/api-client'
 import { EventCard } from '~/components/event/EventCard'
 import { getEventTypeData } from '~/components/event/get-event-type-data'
 import { AuthContext } from '~/context/context'
@@ -55,6 +56,42 @@ export const meta = ({ loaderData, location }: Route.MetaArgs) => {
       content: 'image/jpg',
     },
   ]
+}
+
+export const action = async ({
+  request,
+  params,
+  context,
+}: Route.ActionArgs) => {
+  if (request.method !== 'DELETE') {
+    throw new Error(`Unsupported request method ${request.method}`)
+  }
+  const id = +params.id
+
+  if (Number.isNaN(id)) {
+    throw new Error('Event ID must be a number')
+  }
+
+  const authContext = context.get(AuthContext)
+  if (!authContext) {
+    return redirect('/login')
+  }
+  const { accessToken } = authContext
+  const { error } = await apiClient.DELETE('/events/{id}', {
+    params: {
+      path: { id },
+    },
+    headers: {
+      'x-api-key': context.cloudflare.env.API_KEY,
+      authorization: `Bearer ${accessToken}`,
+    },
+  })
+
+  if (error) {
+    throw new Error('Failed to delete event')
+  }
+
+  return redirect('/events')
 }
 
 export async function loader({ context }: Route.LoaderArgs) {
