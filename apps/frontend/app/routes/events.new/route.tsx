@@ -4,6 +4,7 @@ import { IconAlertTriangleFilled, IconCircleOff } from '@tabler/icons-react'
 import { useReducer } from 'react'
 import { authMiddleware } from '~/middleware/auth-middleware'
 import type { Route } from './+types/route'
+import { CancelModal } from './CancelModal'
 import { CreateEventContainer } from './CreateEventContainer'
 import { ActiveStep, reducer } from './reducer'
 
@@ -28,7 +29,7 @@ export async function loader() {
 
 export default function CreateEvent({ loaderData }: Route.ComponentProps) {
   const { me } = loaderData
-  const [_opened, handlers] = useDisclosure(false)
+  const [opened, handlers] = useDisclosure(false)
   const [eventState, dispatch] = useReducer(reducer, {
     activeStep: ActiveStep.STEP_EVENT_TYPE,
     date: new Date(),
@@ -45,6 +46,7 @@ export default function CreateEvent({ loaderData }: Route.ComponentProps) {
 
   return (
     <>
+      <CancelModal opened={opened} onClose={handlers.close} />
       <Title order={1} size="h5">
         Uusi tapahtuma: {eventState.title || 'ei nimeä'}
       </Title>
