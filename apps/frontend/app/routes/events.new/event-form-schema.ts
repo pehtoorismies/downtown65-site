@@ -1,5 +1,6 @@
-import { EventTypeEnum } from '@downtown65/schema'
+import { EventTypeEnum, ISODateSchema } from '@downtown65/schema'
 import z from 'zod'
+import { ISOTime } from '~/time-util'
 
 const preprocessEmptyString = (value: unknown) => {
   if (typeof value === 'string' && value.length === 0) {
@@ -9,7 +10,7 @@ const preprocessEmptyString = (value: unknown) => {
 }
 
 export const EventFormSchema = z.object({
-  date: z.iso.date(),
+  date: ISODateSchema,
   description: z.preprocess(
     preprocessEmptyString,
     z.string().trim().optional(),
@@ -17,10 +18,7 @@ export const EventFormSchema = z.object({
   race: z.stringbool(),
   location: z.string(),
   subtitle: z.string(),
-  time: z.preprocess(
-    preprocessEmptyString,
-    z.iso.time({ precision: -1 }).optional(),
-  ),
+  time: z.preprocess(preprocessEmptyString, ISOTime.optional()),
   title: z.string().trim().min(1),
   type: EventTypeEnum,
   includeEventCreator: z.stringbool(),

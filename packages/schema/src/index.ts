@@ -1,15 +1,6 @@
 import { isValid as isValidULID } from 'ulidx'
 import { z } from 'zod'
 
-/**
- * Time in HH:MM format (00:00 - 23:59)
- */
-export const TimeHHMM = z
-  .string()
-  .regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Must be HH:MM (00–23:59)')
-
-export type TimeHHMM = z.infer<typeof TimeHHMM>
-
 export const PaginationQuerySchema = z.object({
   page: z.string().optional().default('1'),
   limit: z.string().optional().default('10'),
@@ -69,38 +60,6 @@ export const StringIDSchema = z.object({
     .pipe(IDSchema),
 })
 
-// .openapi({
-//   description:
-//     'Id is ULID. ULIDs are Universally Unique Lexicographically Sortable Identifiers.',
-//   example: '01KBAWMEFMZTHDD52MA2D8PTDY',
-// })
-
-// export type { Login } from './auth'
-// // Auth schemas
-// export { LoginSchema } from './auth'
-
-// export type {
-//   Event,
-//   EventCreate,
-//   EventList,
-//   EventType,
-//   EventUpdate,
-// } from './event'
-// // Event schemas
-// export {
-//   EVENT_TYPES as eventTypes,
-//   EventBaseSchema,
-//   EventCreateSchema,
-//   EventListSchema,
-//   EventSchema,
-//   EventTypeEnum,
-//   EventUpdateSchema,
-// } from './event'
-// export type { DetailedUser, User, UserList, UserUpdate } from './user'
-// // User schemas
-// export {
-//   DetailedUserSchema,
-//   UserListSchema,
-//   UserSchema,
-//   UserUpdateSchema,
-// } from './user'
+export const ISODateSchema = z.iso.date()
+export const ISOTimeSchema = z.iso.time({ precision: -1 })
+export const ISODateTimeSchema = z.iso.datetime()

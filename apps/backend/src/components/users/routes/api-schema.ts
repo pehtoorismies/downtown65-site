@@ -1,4 +1,4 @@
-import { Auth0SubSchema, IDSchema } from '@downtown65/schema'
+import { Auth0SubSchema, IDSchema, ISODateTimeSchema } from '@downtown65/schema'
 import z from 'zod'
 
 export const UserAPIResponseSchema = z.object({
@@ -8,8 +8,8 @@ export const UserAPIResponseSchema = z.object({
   nickname: z.string(),
   email: z.email(),
   picture: z.url(),
-  createdAt: z.iso.datetime(),
-  updatedAt: z.iso.datetime(),
+  createdAt: ISODateTimeSchema,
+  updatedAt: ISODateTimeSchema,
 })
 
 export const SyncedUsersResponseSchema = z.array(UserAPIResponseSchema)

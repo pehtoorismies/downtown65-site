@@ -1,4 +1,4 @@
-import { Auth0SubSchema } from '@downtown65/schema'
+import { Auth0SubSchema, ISODateTimeSchema } from '@downtown65/schema'
 import { z } from 'zod'
 
 export const Auth0UserSchema = z
@@ -8,8 +8,8 @@ export const Auth0UserSchema = z
     email: z.string(),
     picture: z.string(),
     user_id: z.string(),
-    created_at: z.iso.datetime(),
-    updated_at: z.iso.datetime(),
+    created_at: ISODateTimeSchema,
+    updated_at: ISODateTimeSchema,
     app_metadata: z.object({
       role: z.string(),
     }),

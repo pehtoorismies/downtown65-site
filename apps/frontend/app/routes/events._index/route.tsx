@@ -3,16 +3,18 @@ import {
   Button,
   Center,
   Container,
+  SimpleGrid,
   Text,
   Title,
 } from '@mantine/core'
 import { IconSquarePlus } from '@tabler/icons-react'
 import type { PropsWithChildren } from 'react'
-import { Link, NavLink, redirect } from 'react-router'
+import { Link, redirect } from 'react-router'
 import { apiClient } from '~/api/api-client'
 import { AuthContext } from '~/context/context'
 import { authMiddleware } from '~/middleware/auth-middleware'
 import type { Route } from './+types/route'
+import { ListEventCard } from './ListEventCard'
 
 export const middleware = [authMiddleware()]
 
@@ -77,15 +79,17 @@ export default function EventsList({ loaderData }: Route.ComponentProps) {
     <Container>
       <Title>Tapahtumat</Title>
       <Text>Tulevat tapahtumat:</Text>
-      <ul>
-        {loaderData.events.map((event) => (
-          <li key={event.id}>
-            <NavLink to={`/events/${event.eventULID}`}>
-              {event.title} - {event.date}
-            </NavLink>
-          </li>
-        ))}
-      </ul>
+      <SimpleGrid
+        cols={{ base: 1, sm: 2 }}
+        spacing={{ base: 'sm', md: 'xl' }}
+        verticalSpacing={{ base: 'sm', md: 'xl' }}
+      >
+        {events.map((x) => {
+          return (
+            <ListEventCard key={x.id} {...x} dateStart={x.date} me={user} />
+          )
+        })}
+      </SimpleGrid>
     </Container>
   )
 }

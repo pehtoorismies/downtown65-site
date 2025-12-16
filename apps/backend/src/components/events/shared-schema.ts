@@ -2,6 +2,9 @@ import {
   Auth0SubSchema,
   EventTypeEnum,
   IDSchema,
+  ISODateSchema,
+  ISODateTimeSchema,
+  ISOTimeSchema,
   ULIDSchema,
 } from '@downtown65/schema'
 import { z } from 'zod'
@@ -20,7 +23,7 @@ export const UserSchema = z.object({
 export type User = z.infer<typeof UserSchema>
 
 const Participant = UserSchema.extend({
-  joinedAt: z.iso.datetime().openapi({
+  joinedAt: ISODateTimeSchema.openapi({
     description: 'Timestamp when the user joined the event',
     example: '2025-01-15T14:30:00Z',
   }),
@@ -35,8 +38,8 @@ export const EventSchema = z.object({
   eventULID: ULIDSchema,
   title: z.string().min(1).openapi({ example: 'Engineering Sync' }),
   subtitle: z.string().min(1).openapi({ example: 'Weekly updates' }),
-  date: z.iso.date().openapi({ example: '2025-01-15' }),
-  time: z.iso.time({ precision: -1 }).optional().openapi({ example: '14:30' }),
+  date: ISODateSchema.openapi({ example: '2025-01-15' }),
+  time: ISOTimeSchema.optional().openapi({ example: '14:30' }),
   type: EventTypeEnum.openapi({
     example: 'MEETING',
     description: 'Type of the event.',
