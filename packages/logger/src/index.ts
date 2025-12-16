@@ -4,28 +4,6 @@ interface LoggerOptions {
   appContext: string
 }
 
-const _censorSecrets = (value: unknown) => {
-  console.warn('censorSecrets called wit value:', value)
-  const _secretKeys = new Set([
-    'password',
-    'pass',
-    'pwd',
-    'secret',
-    'token',
-    'accessToken',
-    'refreshToken',
-    'apiKey',
-    'authorization',
-    'auth',
-    'cookie',
-    'session',
-  ])
-  // if (typeof key === 'string' && secretKeys.has(key)) {
-  //   return '[redacted]'
-  // }
-  return value
-}
-
 export const createLogger = (options?: LoggerOptions) => {
   const logger = new LogLayer({
     transport: [

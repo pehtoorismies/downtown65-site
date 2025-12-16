@@ -40,11 +40,11 @@ export const StepDate = ({ state, dispatch }: ReducerProps) => {
             if (date == null) {
               throw new Error('Date can not be null')
             }
-            if (date instanceof Date === false) {
-              throw new Error('Date is not instance of Date')
+            if (typeof date === 'string') {
+              dispatch({ kind: 'date', date: new Date(date) })
+            } else {
+              dispatch({ kind: 'date', date })
             }
-
-            dispatch({ kind: 'date', date })
           }}
           numberOfColumns={1}
           size={size}

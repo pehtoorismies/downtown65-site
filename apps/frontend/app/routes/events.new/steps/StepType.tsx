@@ -30,8 +30,6 @@ export const StepType = ({ state, dispatch }: ReducerProps) => {
       return 0
     })
     .map(({ eventText, type, icon: TypeIcon }) => {
-      console.warn(TypeIcon)
-
       return (
         <Button
           data-testid={

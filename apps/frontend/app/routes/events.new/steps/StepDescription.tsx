@@ -1,6 +1,5 @@
 import { Box } from '@mantine/core'
-import { Link, RichTextEditor } from '@mantine/tiptap'
-import { Underline } from '@tiptap/extension-underline'
+import { RichTextEditor } from '@mantine/tiptap'
 import { useEditor } from '@tiptap/react'
 import { StarterKit } from '@tiptap/starter-kit'
 import type { ReducerProps } from '../reducer'
@@ -8,7 +7,7 @@ import { NextButton, PreviousButton, StepLayout } from './LayoutSteps'
 
 export const StepDescription = ({ state, dispatch }: ReducerProps) => {
   const editor = useEditor({
-    extensions: [StarterKit, Link, Underline],
+    extensions: [StarterKit],
     content: state.description,
     autofocus: true,
     editable: true,
