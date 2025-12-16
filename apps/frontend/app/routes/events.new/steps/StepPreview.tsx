@@ -1,4 +1,3 @@
-import { Button } from '@mantine/core'
 import { IconDeviceFloppy, IconRocket } from '@tabler/icons-react'
 import { format } from 'date-fns'
 import { fi } from 'date-fns/locale'
@@ -9,6 +8,7 @@ import type { User } from '~/domain/user'
 import { padTime } from '~/time-util'
 import type { EventState } from '../event-state'
 import type { ReducerProps } from '../reducer'
+import { EventButtonContainer } from './EventButtonContainer'
 import { NextButton, PreviousButton, StepLayout } from './LayoutSteps'
 
 interface Properties extends ReducerProps {
@@ -93,7 +93,11 @@ export const StepPreview = ({
         description={state.description}
         me={me}
       >
-        <Button variant="outline">TODO</Button>
+        <EventButtonContainer
+          participants={state.participants}
+          me={me}
+          dispatch={dispatch}
+        />
       </EventCard>
     </StepLayout>
   )
