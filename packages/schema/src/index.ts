@@ -62,6 +62,13 @@ export const ULIDSchema = z.string().refine((v) => {
 
 export type ULID = z.infer<typeof ULIDSchema>
 
+export const StringIDSchema = z.object({
+  id: z
+    .string()
+    .transform((s) => Number(s))
+    .pipe(IDSchema),
+})
+
 // .openapi({
 //   description:
 //     'Id is ULID. ULIDs are Universally Unique Lexicographically Sortable Identifiers.',

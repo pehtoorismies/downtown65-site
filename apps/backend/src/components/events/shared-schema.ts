@@ -2,7 +2,6 @@ import {
   Auth0SubSchema,
   EventTypeEnum,
   IDSchema,
-  TimeHHMM,
   ULIDSchema,
 } from '@downtown65/schema'
 import { z } from 'zod'
@@ -37,12 +36,12 @@ export const EventSchema = z.object({
   title: z.string().min(1).openapi({ example: 'Engineering Sync' }),
   subtitle: z.string().min(1).openapi({ example: 'Weekly updates' }),
   date: z.iso.date().openapi({ example: '2025-01-15' }),
-  time: TimeHHMM,
+  time: z.iso.time({ precision: -1 }).optional().openapi({ example: '14:30' }),
   type: EventTypeEnum.openapi({
     example: 'MEETING',
     description: 'Type of the event.',
   }),
-  description: z.string().min(1).openapi({ example: 'Discuss roadmap' }),
+  description: z.string().optional().openapi({ example: 'Discuss roadmap' }),
   location: z.string().min(1).openapi({ example: 'Room 301' }),
   participants: ParticipantListSchema,
   createdBy: UserSchema,
@@ -63,7 +62,8 @@ export const EventCreateSchema = EventSchema.omit({
   id: true,
   eventULID: true,
   createdBy: true,
+  participants: true,
 }).extend({
-  createdByUserId: IDSchema,
+  includeEventCreator: z.boolean().optional().default(false),
 })
 export type EventCreateInput = z.infer<typeof EventCreateSchema>

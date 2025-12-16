@@ -1,12 +1,12 @@
+import { createLogger } from '@downtown65/logger'
 import { createRoute } from '@hono/zod-openapi'
-
 import type { AppAPI } from '~/app-api'
 import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { ErrorAPIResponseSchema } from '~/common/schema'
 import { deleteEvent } from '../db/delete-event'
-import { EventPathIDParamSchema } from './api-schema'
+import { IDParamSchema } from './api-schema'
 
 const route = createRoute({
   method: 'delete',
@@ -14,7 +14,7 @@ const route = createRoute({
   security: [{ ApiKeyAuth: [], BearerToken: [] }],
   middleware: [apiKeyAuth, jwtToken()],
   request: {
-    params: EventPathIDParamSchema,
+    params: IDParamSchema,
   },
   responses: {
     204: {
@@ -37,8 +37,13 @@ const route = createRoute({
 
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
+    const logger = createLogger({ appContext: 'Route: Delete Event By ID' })
     const { id } = c.req.valid('param')
+    logger.info(`Deleting event with ID ${id}`)
+
     const deleted = await deleteEvent(getConfig(c.env), id)
+
+    logger.info(`Delete successful: ${deleted}`)
 
     if (!deleted) {
       return c.json({ message: 'Event not found', code: 404 }, 404)

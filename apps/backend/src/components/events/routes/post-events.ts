@@ -39,7 +39,12 @@ const route = createRoute({
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
     const eventData = c.req.valid('json')
-    const created = await createEvent(getConfig(c.env), eventData)
+    const { sub } = c.get('jwtPayload')
+
+    const created = await createEvent(getConfig(c.env), eventData, {
+      auth0Sub: sub,
+      includeInEvent: true,
+    })
     return c.json(created, 201)
   })
 }

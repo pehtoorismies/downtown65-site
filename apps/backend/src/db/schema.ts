@@ -5,20 +5,20 @@ import { index, sqliteTable } from 'drizzle-orm/sqlite-core'
 export const eventsTable = sqliteTable(
   'events_table',
   (t) => ({
-    id: t.integer('id').primaryKey({ autoIncrement: true }),
+    id: t.integer().primaryKey({ autoIncrement: true }),
     eventULID: t.text().notNull().unique(),
     title: t.text().notNull(),
     subtitle: t.text().notNull(),
     description: t.text().default(''),
     type: t.text().notNull(),
     date: t.text().notNull(),
-    time: t.text().notNull(),
+    time: t.text(),
     location: t.text().notNull(),
     race: t.integer({ mode: 'boolean' }).notNull().default(false),
     createdAt: t.text().notNull().default(sql`CURRENT_TIMESTAMP`),
     updatedAt: t.text().notNull().default(sql`CURRENT_TIMESTAMP`),
     creatorId: t
-      .integer('user_id')
+      .integer()
       .notNull()
       .references(() => usersTable.id),
   }),

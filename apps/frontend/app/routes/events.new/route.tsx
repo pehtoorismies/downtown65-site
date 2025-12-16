@@ -1,34 +1,70 @@
-import { Box, Button, Center, Divider, Title } from '@mantine/core'
+import { Alert, Box, Button, Center, Divider, Title } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconAlertTriangleFilled, IconCircleOff } from '@tabler/icons-react'
+import {
+  IconAlertCircle,
+  IconAlertTriangleFilled,
+  IconCircleOff,
+} from '@tabler/icons-react'
 import { useReducer } from 'react'
+import { redirect } from 'react-router'
+import { apiClient } from '~/api/api-client'
+import { AuthContext } from '~/context/context'
 import { authMiddleware } from '~/middleware/auth-middleware'
 import type { Route } from './+types/route'
 import { CancelModal } from './CancelModal'
 import { CreateEventContainer } from './CreateEventContainer'
+import { EventFormSchema } from './event-form-schema'
 import { ActiveStep, reducer } from './reducer'
 
 export const middleware = [authMiddleware()]
 
-export async function loader() {
-  // TODO: Replace with actual API call
-  const events = [
-    { id: '1', title: 'Sample Event 1', date: '2025-12-01' },
-    { id: '2', title: 'Sample Event 2', date: '2025-12-15' },
-  ]
-  return {
-    events,
-    me: {
-      nickname: 'johndoe',
-      id: 1,
-      auth0Sub: 'auth0|asasd',
-      picture: 'https://asdfasdf',
+export const action = async ({ context, request }: Route.ActionArgs) => {
+  const authContext = context.get(AuthContext)
+  if (!authContext) {
+    return redirect('/login')
+  }
+
+  const formData = await request.formData()
+  console.warn('Raw event form data:', Object.fromEntries(formData))
+  const parsed = EventFormSchema.safeParse(Object.fromEntries(formData))
+  if (parsed.success === false) {
+    return { errorMessage: 'Invalid form data' }
+  }
+
+  const { error, data } = await apiClient.POST('/events', {
+    body: parsed.data,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authContext.accessToken}`,
+      'x-api-key': context.cloudflare.env.API_KEY,
     },
+  })
+
+  if (error) {
+    console.error('Error creating event:', error)
+    return { errorMessage: 'Error creating event' }
+  }
+
+  redirect(`/events/${data.eventULID}`)
+}
+
+export async function loader({ context }: Route.LoaderArgs) {
+  const authContext = context.get(AuthContext)
+  if (!authContext) {
+    return redirect('/login')
+  }
+
+  return {
+    me: authContext.user,
   }
 }
 
-export default function CreateEvent({ loaderData }: Route.ComponentProps) {
+export default function CreateEvent({
+  loaderData,
+  actionData,
+}: Route.ComponentProps) {
   const { me } = loaderData
+
   const [opened, handlers] = useDisclosure(false)
   const [eventState, dispatch] = useReducer(reducer, {
     activeStep: ActiveStep.STEP_EVENT_TYPE,
@@ -47,6 +83,16 @@ export default function CreateEvent({ loaderData }: Route.ComponentProps) {
   return (
     <>
       <CancelModal opened={opened} onClose={handlers.close} />
+      {actionData?.errorMessage && (
+        <Alert
+          icon={<IconAlertCircle size={16} />}
+          title="Virhe luomisessa"
+          color="red"
+          mb="sm"
+        >
+          {actionData?.errorMessage}
+        </Alert>
+      )}
       <Title order={1} size="h5">
         Uusi tapahtuma: {eventState.title || 'ei nimeä'}
       </Title>

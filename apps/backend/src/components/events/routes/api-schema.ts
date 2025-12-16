@@ -1,4 +1,4 @@
-import { IDSchema, ULIDSchema } from '@downtown65/schema'
+import { StringIDSchema, ULIDSchema } from '@downtown65/schema'
 import { z } from 'zod'
 
 export const EventPathULIDParamSchema = z
@@ -7,8 +7,12 @@ export const EventPathULIDParamSchema = z
   })
   .openapi({ description: 'ULID of the event' })
 
-export const EventPathIDParamSchema = z.object({
-  id: IDSchema,
+export const IDParamSchema = StringIDSchema.openapi({
+  param: {
+    name: 'id',
+    in: 'path',
+  },
+  example: '1212121',
 })
 
 export const MessageSchema = z.object({

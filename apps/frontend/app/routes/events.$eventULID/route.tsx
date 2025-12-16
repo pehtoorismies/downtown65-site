@@ -10,6 +10,7 @@ import { apiClient } from '~/api/api-client'
 import { EventCard } from '~/components/event/EventCard'
 import { getEventTypeData } from '~/components/event/get-event-type-data'
 import { AuthContext } from '~/context/context'
+import { createLogger } from '~/logger/logger.server'
 import { authMiddleware } from '~/middleware/auth-middleware'
 import type { Route } from './+types/route'
 import { DeleteModal } from './DeleteModal'
@@ -62,11 +63,13 @@ export const meta = ({ loaderData, location }: Route.MetaArgs) => {
 }
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
+  const logger = createLogger({ appContext: 'Frontend Delete Event Action' })
   if (request.method !== 'DELETE') {
     throw new Error(`Unsupported request method ${request.method}`)
   }
   const formData = await request.formData()
   const eventId = formData.get('eventId')
+  logger.info(`Deleting event with eventId ${eventId}`)
 
   const id = Number(eventId)
   if (Number.isNaN(id)) {
@@ -99,25 +102,23 @@ export async function loader({ context, params }: Route.LoaderArgs) {
   const authContext = context.get(AuthContext)
   const me = authContext ? authContext.user : null
 
-  const _eventULID = params.eventULID
-
-  const event = {
-    id: 1,
-    title: 'Sample Event 1',
-    dateStart: '2025-12-01',
-    description: 'This is a sample event description.',
-    location: 'Sample Location',
-    participants: [],
-    subtitle: 'Sample Subtitle',
-    timeStart: '10:00',
-    type: 'MEETING' as const,
-    race: false,
-    createdBy: {
-      nickname: 'EventCreator',
+  const { error, data } = await apiClient.GET('/events/{eventULID}', {
+    params: {
+      path: { eventULID: params.eventULID },
     },
+    headers: {
+      'x-api-key': context.cloudflare.env.API_KEY,
+      authorization: authContext
+        ? `Bearer ${authContext.accessToken}`
+        : undefined,
+    },
+  })
+
+  if (error) {
+    throw new Response('Event not found', { status: 404 })
   }
 
-  return { eventItem: event, me, origin: 'http://localhost:3002' }
+  return { eventItem: data, me, origin: 'http://localhost:3002' }
 }
 
 export default function GetEvent({ loaderData }: Route.ComponentProps) {

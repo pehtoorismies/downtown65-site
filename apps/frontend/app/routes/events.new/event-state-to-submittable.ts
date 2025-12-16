@@ -1,4 +1,5 @@
 import { toISODate, toISOTime } from '~/time-util'
+import type { EventForm } from './event-form-schema'
 import type { EventState } from './event-state'
 
 const getAsISOTime = (time: EventState['time']) => {
@@ -13,7 +14,7 @@ const getAsISOTime = (time: EventState['time']) => {
   return result.success ? result.data : undefined
 }
 
-export const eventStateToSubmittable = (eventState: EventState) => {
+export const eventStateToSubmittable = (eventState: EventState): EventForm => {
   if (eventState.eventType === undefined) {
     throw new Error('Cannot submit undefined eventType')
   }
@@ -28,10 +29,10 @@ export const eventStateToSubmittable = (eventState: EventState) => {
   return {
     date: dateResult.data,
     description: eventState.description,
-    eventType: eventState.eventType,
-    isRace: eventState.isRace ? 'true' : 'false',
+    type: eventState.eventType,
+    race: eventState.isRace,
     location: eventState.location,
-    participants: JSON.stringify(eventState.participants),
+    includeEventCreator: eventState.participants.length > 0,
     subtitle: eventState.subtitle,
     title: eventState.title,
     time: timeValue ?? '',

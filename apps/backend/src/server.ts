@@ -1,3 +1,4 @@
+import { createLogger } from '@downtown65/logger'
 import { OpenAPIHono, z } from '@hono/zod-openapi'
 import { Scalar } from '@scalar/hono-api-reference'
 import { cors } from 'hono/cors'
@@ -13,9 +14,12 @@ import {
   ValidationErrorSchema,
 } from './schemas/validation-error'
 
+const logger = createLogger({ appContext: 'Backend Server' })
+
 const app: AppAPI = new OpenAPIHono({
   defaultHook: (result, c) => {
     if (!result.success) {
+      logger.withMetadata({ errors: result.error }).warn('Validation failed')
       return c.json(
         {
           message: 'Validation failed',
