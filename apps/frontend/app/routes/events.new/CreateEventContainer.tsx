@@ -1,20 +1,15 @@
-import { Button, Container, Group, Modal, Stepper } from '@mantine/core'
+import { Container, Stepper } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import {
   IconAlignLeft,
   IconCalendar,
-  IconCircleOff,
-  IconCircleX,
   IconClockHour5,
   IconEdit,
   IconRocket,
   IconRun,
 } from '@tabler/icons-react'
 import type { Dispatch, FC } from 'react'
-import { useState } from 'react'
-import { useFetcher, useNavigate } from 'react-router'
-// import type { Context } from '~/contexts/participating-context'
-// import { ParticipatingContext } from '~/contexts/participating-context'
+import { useFetcher } from 'react-router'
 import type { User } from '~/domain/user'
 import type { EventState } from './event-state'
 import { eventStateToSubmittable } from './event-state-to-submittable'
@@ -27,17 +22,6 @@ import { StepTime } from './steps/StepTime'
 import { StepTitle } from './steps/StepTitle'
 import { StepType } from './steps/StepType'
 
-const getModalTitle = (kind: EventState['kind']): string => {
-  switch (kind) {
-    case 'create': {
-      return 'Keskeytä tapahtuman luonti'
-    }
-    case 'edit': {
-      return 'Keskeytä tapahtuman muokkaus'
-    }
-  }
-}
-
 interface Props {
   state: EventState
   dispatch: Dispatch<EventAction>
@@ -45,14 +29,7 @@ interface Props {
   cancelRedirectPath: string
 }
 
-export const CreateEventContainer: FC<Props> = ({
-  state,
-  me,
-  dispatch,
-  cancelRedirectPath,
-}) => {
-  const [opened, setOpened] = useState(false)
-  const navigate = useNavigate()
+export const CreateEventContainer: FC<Props> = ({ state, me, dispatch }) => {
   const fetcher = useFetcher()
   const matches = useMediaQuery('(max-width: 48em)', true, {
     getInitialValueInEffect: false,
@@ -67,78 +44,44 @@ export const CreateEventContainer: FC<Props> = ({
   }
 
   return (
-    <>
-      <Modal
-        zIndex={2000}
-        opened={opened}
-        onClose={() => setOpened(false)}
-        title={getModalTitle(state.kind)}
-        closeButtonProps={{ 'aria-label': 'Close' }}
+    <Container p={{ base: 1, sm: 'xs' }}>
+      <Stepper
+        allowNextStepsSelect={false}
+        color={state.kind === 'edit' ? 'dtPink.4' : 'blue'}
+        iconSize={iconSize}
+        active={state.activeStep}
+        onStepClick={(stepIndex: number) => {
+          if (!isStepNumber(stepIndex)) {
+            throw new Error('Not in step range')
+          }
+          dispatch({ kind: 'step', step: stepIndex })
+        }}
       >
-        <Group
-          justify="space-between"
-          mt={50}
-          data-testid="confirmation-modal-content"
-        >
-          <Button
-            onClick={() => setOpened(false)}
-            leftSection={<IconCircleX size={18} />}
-            data-testid="modal-close"
-          >
-            Sulje
-          </Button>
-          <Button
-            onClick={() => navigate(cancelRedirectPath)}
-            name="action"
-            value="delete"
-            type="submit"
-            color="red"
-            rightSection={<IconCircleOff size={18} />}
-            data-testid="modal-cancel-event-creation"
-          >
-            Keskeytä
-          </Button>
-        </Group>
-      </Modal>
-      <Container p={{ base: 1, sm: 'xs' }}>
-        <Stepper
-          allowNextStepsSelect={false}
-          color={state.kind === 'edit' ? 'dtPink.4' : 'blue'}
-          iconSize={iconSize}
-          active={state.activeStep}
-          onStepClick={(stepIndex: number) => {
-            if (!isStepNumber(stepIndex)) {
-              throw new Error('Not in step range')
-            }
-            dispatch({ kind: 'step', step: stepIndex })
-          }}
-        >
-          <Stepper.Step icon={<IconRun />} data-testid="step-type">
-            <StepType state={state} dispatch={dispatch} />
-          </Stepper.Step>
-          <Stepper.Step icon={<IconEdit />} data-testid="step-basic-info">
-            <StepTitle state={state} dispatch={dispatch} />
-          </Stepper.Step>
-          <Stepper.Step icon={<IconCalendar />} data-testid="step-date">
-            <StepDate state={state} dispatch={dispatch} />
-          </Stepper.Step>
-          <Stepper.Step icon={<IconClockHour5 />} data-testid="step-time">
-            <StepTime state={state} dispatch={dispatch} />
-          </Stepper.Step>
-          <Stepper.Step icon={<IconAlignLeft />} data-testid="step-description">
-            <StepDescription state={state} dispatch={dispatch} />
-          </Stepper.Step>
-          <Stepper.Step icon={<IconRocket />} data-testid="step-preview">
-            <StepPreview
-              state={state}
-              me={me}
-              dispatch={dispatch}
-              submit={submit}
-              submitState={fetcher.state}
-            />
-          </Stepper.Step>
-        </Stepper>
-      </Container>
-    </>
+        <Stepper.Step icon={<IconRun />} data-testid="step-type">
+          <StepType state={state} dispatch={dispatch} />
+        </Stepper.Step>
+        <Stepper.Step icon={<IconEdit />} data-testid="step-basic-info">
+          <StepTitle state={state} dispatch={dispatch} />
+        </Stepper.Step>
+        <Stepper.Step icon={<IconCalendar />} data-testid="step-date">
+          <StepDate state={state} dispatch={dispatch} />
+        </Stepper.Step>
+        <Stepper.Step icon={<IconClockHour5 />} data-testid="step-time">
+          <StepTime state={state} dispatch={dispatch} />
+        </Stepper.Step>
+        <Stepper.Step icon={<IconAlignLeft />} data-testid="step-description">
+          <StepDescription state={state} dispatch={dispatch} />
+        </Stepper.Step>
+        <Stepper.Step icon={<IconRocket />} data-testid="step-preview">
+          <StepPreview
+            state={state}
+            me={me}
+            dispatch={dispatch}
+            submit={submit}
+            submitState={fetcher.state}
+          />
+        </Stepper.Step>
+      </Stepper>
+    </Container>
   )
 }
