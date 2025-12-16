@@ -118,7 +118,15 @@ export async function loader({ context, params }: Route.LoaderArgs) {
     throw new Response('Event not found', { status: 404 })
   }
 
-  return { eventItem: data, me, origin: 'http://localhost:3002' }
+  return {
+    eventItem: {
+      ...data,
+      dateStart: data.date,
+      participants: [],
+    },
+    me,
+    origin: 'http://localhost:3002',
+  }
 }
 
 export default function GetEvent({ loaderData }: Route.ComponentProps) {

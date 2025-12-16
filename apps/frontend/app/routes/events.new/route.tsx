@@ -45,7 +45,7 @@ export const action = async ({ context, request }: Route.ActionArgs) => {
     return { errorMessage: 'Error creating event' }
   }
 
-  redirect(`/events/${data.eventULID}`)
+  return redirect(`/events/${data.eventULID}`)
 }
 
 export async function loader({ context }: Route.LoaderArgs) {

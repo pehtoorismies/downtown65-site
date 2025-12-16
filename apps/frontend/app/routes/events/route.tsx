@@ -4,6 +4,7 @@ import { Outlet } from 'react-router'
 export default function EventsList() {
   return (
     <Container>
+      Layout for events route
       <Outlet />
     </Container>
   )
