@@ -13,7 +13,6 @@ export const StepType = ({ state, dispatch }: ReducerProps) => {
   const size = matches ? 'xs' : 'sm'
 
   const buttons = EVENT_TYPES.map((v) => {
-    console.warn('Event type value:', v)
     return {
       type: v,
       ...getEventTypeData(v),
@@ -30,10 +29,8 @@ export const StepType = ({ state, dispatch }: ReducerProps) => {
       }
       return 0
     })
-    .map(({ eventText, type, icon }) => {
-      const _Icon = () => {
-        return icon
-      }
+    .map(({ eventText, type, icon: TypeIcon }) => {
+      console.warn(TypeIcon)
 
       return (
         <Button
@@ -47,7 +44,7 @@ export const StepType = ({ state, dispatch }: ReducerProps) => {
           onClick={() => {
             dispatch({ kind: 'type', type })
           }}
-          // leftSection={<Icon />}
+          leftSection={<TypeIcon size={20} />}
           rightSection={<span />}
           justify="space-between"
           variant="gradient"
