@@ -1,3 +1,4 @@
+import { EVENT_TYPES } from '@downtown65/schema'
 import { relations } from 'drizzle-orm'
 import { sql } from 'drizzle-orm/sql/sql'
 import { index, sqliteTable } from 'drizzle-orm/sqlite-core'
@@ -10,14 +11,14 @@ export const eventsTable = sqliteTable(
     title: t.text().notNull(),
     subtitle: t.text().notNull(),
     description: t.text().default(''),
-    type: t.text().notNull(),
-    date: t.text().notNull(),
-    time: t.text(),
+    eventType: t.text({ enum: EVENT_TYPES }).notNull(),
+    dateStart: t.text().notNull(),
+    timeStart: t.text(),
     location: t.text().notNull(),
     race: t.integer({ mode: 'boolean' }).notNull().default(false),
     createdAt: t.text().notNull().default(sql`CURRENT_TIMESTAMP`),
     updatedAt: t.text().notNull().default(sql`CURRENT_TIMESTAMP`),
-    creatorId: t
+    createdBy: t
       .integer()
       .notNull()
       .references(() => usersTable.id),
@@ -31,7 +32,7 @@ export const usersTable = sqliteTable(
     id: t.integer('id').primaryKey({ autoIncrement: true }),
     auth0Sub: t.text().notNull().unique(), // Link to Auth0
     nickname: t.text().notNull().unique(),
-    picture: t.text(),
+    picture: t.text().notNull(),
   }),
   (table) => [index('users_auth0Sub_idx').on(table.auth0Sub)],
 )

@@ -1,10 +1,15 @@
-import type { Auth0Sub } from '@downtown65/schema'
+import {
+  type Auth0Sub,
+  type Event,
+  type EventCreateInput,
+  ISODateSchema,
+  ISOTimeSchema,
+} from '@downtown65/schema'
 import { eq } from 'drizzle-orm'
 import { ulid } from 'ulidx'
 import type { Config } from '~/common/config/config'
 import { getDb } from '~/common/db/get-db'
 import { eventsTable, usersTable } from '~/db/schema'
-import type { Event, EventCreateInput } from '../shared-schema'
 
 export const createEvent = async (
   config: Config,
@@ -25,19 +30,22 @@ export const createEvent = async (
 
   const ULID = ulid()
 
+  // TODO: add input.includeEventCreator participation handling
+
   const event = await db
     .insert(eventsTable)
     .values({
       ...input,
       eventULID: ULID,
-      creatorId: localUser.id,
+      createdBy: localUser.id,
     })
-    .returning({ id: eventsTable.id })
+    .returning()
 
   return {
-    ...input,
-    id: event[0].id,
-    eventULID: ULID,
+    ...event[0],
+    timeStart: ISOTimeSchema.parse(event[0].timeStart),
+    dateStart: ISODateSchema.parse(event[0].dateStart),
     createdBy: localUser,
+    participants: [],
   }
 }

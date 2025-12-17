@@ -1,10 +1,10 @@
 import { createLogger } from '@downtown65/logger'
-import type { EventType, ULID } from '@downtown65/schema'
+import type { Event, ULID } from '@downtown65/schema'
+import { ISODateSchema, ISOTimeSchema } from '@downtown65/schema'
 import { eq } from 'drizzle-orm'
 import type { Config } from '~/common/config/config'
 import { getDb } from '~/common/db/get-db'
 import { eventsTable, usersTable } from '~/db/schema'
-import type { Event } from '../shared-schema'
 
 export const getEventByULID = async (
   config: Config,
@@ -16,7 +16,7 @@ export const getEventByULID = async (
     .select()
     .from(eventsTable)
     .where(eq(eventsTable.eventULID, eventULID))
-    .innerJoin(usersTable, eq(eventsTable.creatorId, usersTable.id))
+    .innerJoin(usersTable, eq(eventsTable.createdBy, usersTable.id))
 
   logger.withMetadata({ data: event }).debug('Queried event by ULID')
 
@@ -24,14 +24,15 @@ export const getEventByULID = async (
     return undefined
   }
 
+  const parseResult = ISOTimeSchema.safeParse(event[0].events_table.timeStart)
+  const timeStart = parseResult.success ? parseResult.data : null
+  const dateStart = ISODateSchema.parse(event[0].events_table.dateStart)
+
   const returnedEvent = {
     ...event[0].events_table,
-    type: event[0].events_table.type as EventType,
-    description: event[0].events_table.description || undefined,
-    createdBy: {
-      ...event[0].users_table,
-    },
-    time: event[0].events_table.time || undefined,
+    createdBy: event[0].users_table,
+    dateStart,
+    timeStart,
     participants: [],
   }
 

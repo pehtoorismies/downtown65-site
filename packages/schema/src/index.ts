@@ -1,5 +1,7 @@
 import { isValid as isValidULID } from 'ulidx'
 import { z } from 'zod'
+// add .openapi() to zod schemas
+import '@hono/zod-openapi'
 
 export const PaginationQuerySchema = z.object({
   page: z.string().optional().default('1'),
@@ -9,9 +11,56 @@ export const PaginationQuerySchema = z.object({
 export type PaginationQuery = z.infer<typeof PaginationQuerySchema>
 
 // ============================================
-// Event Type Enum
+// IDs
 // ============================================
+export const Auth0SubSchema = z.string().startsWith('auth0|').openapi({
+  description: 'Auth0 Subject Identifier',
+  example: 'auth0|1234567890',
+})
+export type Auth0Sub = z.infer<typeof Auth0SubSchema>
 
+export const IDSchema = z.number().int().positive().openapi({
+  description: 'Positive integer ID',
+  example: 1212121,
+})
+export type ID = z.infer<typeof IDSchema>
+
+export const ULIDSchema = z.string().refine((v) => {
+  return isValidULID(v)
+}, 'Invalid ULID')
+export type ULID = z.infer<typeof ULIDSchema>
+
+// ============================================
+// Dates and Times
+// ============================================
+export const ISODateSchema = z.iso.date().brand<'ISODate'>()
+export const ISOTimeSchema = z.iso.time({ precision: -1 }).brand<'ISOTime'>()
+export const ISODateTimeSchema = z.iso.datetime().brand<'ISODateTime'>()
+
+// ============================================
+// Dates and Times
+// ============================================
+export const UserSchema = z.object({
+  auth0Sub: Auth0SubSchema,
+  id: IDSchema,
+  nickname: z.string().min(1).openapi({ example: 'ada' }),
+  picture: z.url(),
+})
+
+const Participant = UserSchema.extend({
+  joinedAt: ISODateTimeSchema.openapi({
+    description: 'Timestamp when the user joined the event',
+    example: '2025-01-15T14:30:00Z',
+  }),
+})
+
+const ParticipantListSchema = z
+  .array(Participant)
+  .openapi({ description: 'Users attending the event' })
+
+// ============================================
+// Events
+// ============================================
 export const EVENT_TYPES = [
   'CYCLING',
   'KARONKKA',
@@ -33,25 +82,25 @@ export const EVENT_TYPES = [
 export const EventTypeEnum = z.enum(EVENT_TYPES)
 export type EventType = z.infer<typeof EventTypeEnum>
 
-export const LoginSchema = z.object({
-  email: z.email('Invalid email address'),
-  password: z.string('Password required'),
-  rememberMe: z.string().nullable().optional(),
+export const EventSchema = z.object({
+  id: IDSchema,
+  eventULID: ULIDSchema,
+  title: z.string().min(1).openapi({ example: 'Kaamoshiihto' }),
+  subtitle: z.string().min(1).openapi({ example: 'Lapin taikaa kaamoksessa' }),
+  dateStart: ISODateSchema.openapi({ example: '2025-01-15' }),
+  timeStart: ISOTimeSchema.nullable().openapi({ example: '14:30' }),
+  eventType: EventTypeEnum.openapi({
+    example: 'MEETING',
+    description: 'Type of the event.',
+  }),
+  description: z.string().nullable().openapi({ example: 'Hiihtokisat' }),
+  location: z.string().min(1).openapi({ example: 'Hakunila, Vantaa' }),
+  participants: ParticipantListSchema,
+  createdBy: UserSchema,
+  race: z.boolean().openapi({ example: false }),
+  // TODO: Add createdAt and updatedAt fields if needed
 })
-export type Login = z.infer<typeof LoginSchema>
-
-export const Auth0SubSchema = z.string().startsWith('auth0|')
-
-export const IDSchema = z.number().int().positive()
-
-export type Auth0Sub = z.infer<typeof Auth0SubSchema>
-export type ID = z.infer<typeof IDSchema>
-
-export const ULIDSchema = z.string().refine((v) => {
-  return isValidULID(v)
-}, 'Invalid ULID')
-
-export type ULID = z.infer<typeof ULIDSchema>
+export type Event = z.infer<typeof EventSchema>
 
 export const StringIDSchema = z.object({
   id: z
@@ -60,6 +109,37 @@ export const StringIDSchema = z.object({
     .pipe(IDSchema),
 })
 
-export const ISODateSchema = z.iso.date()
-export const ISOTimeSchema = z.iso.time({ precision: -1 })
-export const ISODateTimeSchema = z.iso.datetime()
+export const EventListSchema = z.array(EventSchema)
+export type EventList = z.infer<typeof EventListSchema>
+
+export const EventUpdateSchema = EventSchema.omit({
+  id: true,
+  eventULID: true,
+  createdBy: true,
+  participants: true,
+})
+  .partial()
+  .refine((value) => Object.keys(value).length > 0, {
+    message: 'At least one field must be provided to update an event.',
+  })
+export type EventUpdateInput = z.infer<typeof EventUpdateSchema>
+
+export const EventCreateSchema = EventSchema.omit({
+  id: true,
+  eventULID: true,
+  createdBy: true,
+  participants: true,
+}).extend({
+  includeEventCreator: z.boolean().optional().default(false),
+})
+export type EventCreateInput = z.infer<typeof EventCreateSchema>
+
+// ============================================
+// Authentication
+// ============================================
+export const LoginSchema = z.object({
+  email: z.email('Invalid email address'),
+  password: z.string('Password required'),
+  rememberMe: z.string().nullable().optional(),
+})
+export type Login = z.infer<typeof LoginSchema>

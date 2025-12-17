@@ -1,10 +1,10 @@
+import { EventCreateSchema, EventSchema } from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
 import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { createEvent } from '../db/create-event'
-import { EventCreateSchema, EventSchema } from '../shared-schema'
 
 const route = createRoute({
   method: 'post',

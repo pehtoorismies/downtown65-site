@@ -1,36 +1,32 @@
 import { createLogger } from '@downtown65/logger'
+import { type EventList, EventSchema, UserSchema } from '@downtown65/schema'
 import { eq } from 'drizzle-orm'
 import z from 'zod'
 import type { Config } from '~/common/config/config'
 import { getDb } from '~/common/db/get-db'
 import { eventsTable, usersTable } from '~/db/schema'
-import { EventSchema, UserSchema } from '../shared-schema'
 
 const LeftJoinResult = z
   .object({
     events_table: EventSchema.omit({ createdBy: true, participants: true }),
     users_table: UserSchema,
   })
-  .transform((_obj) => {
+  .transform((obj) => {
     return {
-      ..._obj.events_table,
+      ...obj.events_table,
       participants: [],
-      createdBy: {
-        id: _obj.users_table.id,
-        auth0Sub: _obj.users_table.auth0Sub,
-        nickname: _obj.users_table.nickname,
-      },
+      createdBy: obj.users_table,
     }
   })
 
 const EventParser = z.array(LeftJoinResult)
 
-export const getEvents = async (config: Config) => {
+export const getEvents = async (config: Config): Promise<EventList> => {
   const db = getDb(config.D1_DB)
   const result = await db
     .select()
     .from(eventsTable)
-    .leftJoin(usersTable, eq(usersTable.id, eventsTable.creatorId))
+    .leftJoin(usersTable, eq(usersTable.id, eventsTable.createdBy))
 
   const events = EventParser.parse(result)
 
