@@ -5,8 +5,8 @@ export const Auth0UserSchema = z
   .object({
     name: z.string(),
     nickname: z.string(),
-    email: z.string(),
-    picture: z.string(),
+    email: z.email(),
+    picture: z.httpUrl(),
     user_id: z.string(),
     created_at: ISODateTimeSchema,
     updated_at: ISODateTimeSchema,

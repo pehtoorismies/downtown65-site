@@ -1,13 +1,10 @@
-import { Auth0SubSchema, IDSchema, ISODateTimeSchema } from '@downtown65/schema'
+import { ISODateTimeSchema, UserSchema } from '@downtown65/schema'
 import z from 'zod'
 
 export const UserAPIResponseSchema = z.object({
-  id: IDSchema,
-  auth0Sub: Auth0SubSchema,
+  ...UserSchema.shape,
   name: z.string(),
-  nickname: z.string(),
   email: z.email(),
-  picture: z.url(),
   createdAt: ISODateTimeSchema,
   updatedAt: ISODateTimeSchema,
 })

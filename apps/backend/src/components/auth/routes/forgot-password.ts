@@ -1,5 +1,5 @@
+import { MessageSchema } from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
-import z from 'zod'
 import type { AppAPI } from '~/app-api'
 import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
@@ -25,9 +25,7 @@ const route = createRoute({
       description: 'Password reset email sent',
       content: {
         'application/json': {
-          schema: z.object({
-            message: z.string(),
-          }),
+          schema: MessageSchema,
         },
       },
     },

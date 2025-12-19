@@ -1,3 +1,4 @@
+import type { User } from '@downtown65/schema'
 import { Container, Stepper } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import {
@@ -10,9 +11,8 @@ import {
 } from '@tabler/icons-react'
 import type { Dispatch, FC } from 'react'
 import { useFetcher } from 'react-router'
-import type { User } from '~/domain/user'
 import type { EventState } from './event-state'
-import { eventStateToSubmittable } from './event-state-to-submittable'
+import { toSubmittable } from './event-state-to-submittable'
 import type { EventAction } from './reducer'
 import { isStepNumber } from './reducer'
 import { StepDate } from './steps/StepDate'
@@ -38,7 +38,7 @@ export const CreateEventContainer: FC<Props> = ({ state, me, dispatch }) => {
   const iconSize = matches ? 18 : 34
 
   const submit = () => {
-    fetcher.submit(eventStateToSubmittable(state), {
+    fetcher.submit(toSubmittable(state), {
       method: 'post',
     })
   }

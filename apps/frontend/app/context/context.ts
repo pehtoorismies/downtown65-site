@@ -1,5 +1,5 @@
+import type { User } from '@downtown65/schema'
 import { createContext } from 'react-router'
-import type { User } from '~/domain/user'
 
 interface AuthContextType {
   user: User

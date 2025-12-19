@@ -1,5 +1,10 @@
 import { createLogger } from '@downtown65/logger'
-import { Auth0SubSchema, IDSchema } from '@downtown65/schema'
+import {
+  type Auth0Sub,
+  Auth0SubSchema,
+  type ID,
+  IDSchema,
+} from '@downtown65/schema'
 import z from 'zod'
 import { getManagementClient } from '~/common/auth0/client'
 import type { Config } from '~/common/config/config'
@@ -8,41 +13,41 @@ import { usersTable } from '~/db/schema'
 import type { RegisterInput } from '../shared-schema'
 import { Auth0ErrorSchema } from './support/auth0-error'
 
+const ErrorSchema = z.object({
+  type: z.literal('Error'),
+  error: z.string(),
+  statusCode: z.number(),
+})
+
+const SignupUserSchema = z.object({
+  email: z.email(),
+  nickname: z.string(),
+  picture: z.httpUrl(),
+  auth0Sub: Auth0SubSchema,
+})
+
 const CreateAuth0UserResponseSchema = z.discriminatedUnion('type', [
-  z.object({
-    type: z.literal('Error'),
-    error: z.string(),
-    statusCode: z.number(),
-  }),
+  ErrorSchema,
   z.object({
     type: z.literal('Success'),
-    user: z.object({
-      auth0Sub: Auth0SubSchema,
-      email: z.email(),
-      nickname: z.string(),
-      picture: z.url(),
-    }),
+    user: SignupUserSchema,
   }),
 ])
 
 type CreateAuth0UserResponse = z.infer<typeof CreateAuth0UserResponseSchema>
 
 const SignupResponseSchema = z.discriminatedUnion('type', [
-  z.object({
-    type: z.literal('Error'),
-    error: z.string(),
-    statusCode: z.number(),
-  }),
+  ErrorSchema,
   z.object({
     type: z.literal('Success'),
-    user: z.object({
+    user: SignupUserSchema.extend({
       id: IDSchema,
-      email: z.email(),
-      nickname: z.string(),
-      auth0Sub: Auth0SubSchema,
     }),
   }),
 ])
+
+const LocalUserSchema = SignupUserSchema.omit({ email: true })
+type LocalUser = z.infer<typeof LocalUserSchema>
 
 const createAuth0User = async (
   config: Config,
@@ -68,15 +73,13 @@ const createAuth0User = async (
       app_metadata: { role: 'USER' },
     })
 
-    return {
+    return CreateAuth0UserResponseSchema.parse({
       type: 'Success',
       user: {
-        auth0Sub: Auth0SubSchema.parse(auth0User.user_id),
-        email: input.email,
-        nickname: input.nickname,
-        picture: auth0User.picture || '',
+        ...auth0User,
+        auth0Sub: auth0User.user_id,
       },
-    }
+    })
   } catch (error: unknown) {
     const result = Auth0ErrorSchema.safeParse(error)
     if (result.success) {
@@ -98,8 +101,8 @@ const createAuth0User = async (
 
 const updateAuth0User = async (
   config: Config,
-  auth0Sub: string,
-  localUserId: number,
+  auth0Sub: Auth0Sub,
+  localUserId: ID,
 ) => {
   try {
     const management = await getManagementClient(config)
@@ -112,12 +115,6 @@ const updateAuth0User = async (
     logger.withError(error).error('Error during Auth0 user update')
     return false
   }
-}
-
-interface LocalUser {
-  auth0Sub: string
-  nickname: string
-  picture: string
 }
 
 const createLocalUser = async (config: Config, values: LocalUser) => {
@@ -150,11 +147,10 @@ export const signup = async (
     return result
   }
 
-  const localUserId = await createLocalUser(config, {
-    auth0Sub: result.user.auth0Sub,
-    nickname: result.user.nickname,
-    picture: result.user.picture,
-  })
+  const localUserId = await createLocalUser(
+    config,
+    LocalUserSchema.decode(result.user),
+  )
 
   if (localUserId === undefined) {
     logger
@@ -187,13 +183,11 @@ export const signup = async (
     }
   }
 
-  return {
+  return SignupResponseSchema.decode({
     type: 'Success',
     user: {
       id: localUserId,
-      email: result.user.email,
-      nickname: result.user.nickname,
-      auth0Sub: result.user.auth0Sub,
+      ...result.user,
     },
-  }
+  })
 }

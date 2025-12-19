@@ -1,11 +1,7 @@
+import { ISODateSchema, ISOTimeSchema, type User } from '@downtown65/schema'
 import { IconDeviceFloppy, IconRocket } from '@tabler/icons-react'
-import { format } from 'date-fns'
-import { fi } from 'date-fns/locale'
-import type React from 'react'
 import { Gradient } from '~/components/colors'
 import { EventCard } from '~/components/event/EventCard'
-import type { User } from '~/domain/user'
-import { padTime } from '~/time-util'
 import type { EventState } from '../event-state'
 import type { ReducerProps } from '../reducer'
 import { EventButtonContainer } from './EventButtonContainer'
@@ -18,16 +14,15 @@ interface Properties extends ReducerProps {
 }
 
 const getDate = (date: EventState['date']) => {
-  if (!date) {
-    return 'Missing date'
-  }
-  return format(date, 'd.M.yyyy (EEEEEE)', { locale: fi })
+  return ISODateSchema.parse(date.toISOString().slice(0, 10))
 }
 
 const getTime = ({ hours, minutes }: EventState['time']) => {
   if (hours !== undefined && minutes !== undefined) {
-    return `${padTime(hours)}:${padTime(minutes)}`
+    const time = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+    return ISOTimeSchema.parse(time)
   }
+  return null
 }
 
 const getButtonProps = (
@@ -81,16 +76,15 @@ export const StepPreview = ({
       nextButton={nextButton}
     >
       <EventCard
-        title={state.title}
-        race={state.isRace}
-        subtitle={state.subtitle}
-        location={state.location}
-        type={state.eventType}
-        createdBy={me}
-        participants={state.participants}
-        dateStart={getDate(state.date)}
-        timeStart={getTime(state.time)}
-        description={state.description}
+        event={{
+          ...state,
+          dateStart: getDate(state.date),
+          timeStart: getTime(state.time),
+          createdBy: me,
+          race: state.isRace,
+          eventType: state.eventType,
+          participants: state.participants,
+        }}
         me={me}
       >
         <EventButtonContainer

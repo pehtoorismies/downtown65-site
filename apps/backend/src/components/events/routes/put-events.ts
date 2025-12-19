@@ -1,9 +1,13 @@
-import { EventSchema, EventUpdateSchema } from '@downtown65/schema'
+import {
+  EventSchema,
+  EventUpdateSchema,
+  MessageSchema,
+} from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
-import { IDParamSchema, MessageSchema } from './api-schema'
+import { IDParamSchema } from './api-schema'
 
 const route = createRoute({
   method: 'put',

@@ -1,50 +1,37 @@
-import type { EventType } from '@downtown65/schema'
+import type { Event } from '@downtown65/schema'
 import { Button, Grid, Group, Text } from '@mantine/core'
-
 import { IconArrowNarrowRight, IconMedal } from '@tabler/icons-react'
 import { Link } from 'react-router'
 import { getEventTypeData } from '~/components/event/get-event-type-data'
 import { useParticipants } from '~/components/participants/use-participants'
-
 import { Voucher } from '~/components/voucher/Voucher'
 
 interface Props {
-  id: number
-  eventULID: string
-  title: string
-  race: boolean
-  subtitle: string
-  location: string
-  type: EventType
-  createdBy: {
-    nickname: string
-  }
-  participants: { id: number }[]
-  dateStart: string
-  timeStart?: string | null
+  event: Event
   me: { id: number }
 }
 
-export const ListEventCard = ({
-  eventULID,
-  title,
-  race,
-  subtitle,
-  location,
-  type,
-  createdBy,
-  participants,
-  dateStart,
-  timeStart,
-  me,
-}: Props) => {
+export const ListEventCard = ({ event, me }: Props) => {
+  const {
+    eventULID,
+    title,
+    race,
+    subtitle,
+    location,
+    eventType,
+    createdBy,
+    participants,
+    dateStart,
+    timeStart,
+  } = event
+
   const { meAttending, count } = useParticipants(participants, me)
 
   const time = timeStart ? `klo ${timeStart}` : ''
 
   return (
     <Voucher>
-      <Voucher.Header bgImageUrl={getEventTypeData(type).imageUrl}>
+      <Voucher.Header bgImageUrl={getEventTypeData(eventType).imageUrl}>
         <Voucher.Header.Title>{title}</Voucher.Header.Title>
         <Voucher.Header.ParticipantCount
           count={count}
@@ -52,7 +39,7 @@ export const ListEventCard = ({
         />
         <Voucher.Header.Creator>{createdBy.nickname}</Voucher.Header.Creator>
         <Voucher.Header.Type>
-          {getEventTypeData(type).eventText}
+          {getEventTypeData(eventType).eventText}
         </Voucher.Header.Type>
         {race && <Voucher.Header.Icon icon={<IconMedal color="white" />} />}
       </Voucher.Header>

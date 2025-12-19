@@ -1,3 +1,4 @@
+import { EventSchema, stringToID } from '@downtown65/schema'
 import { Box, Button, Container, Divider, Group } from '@mantine/core'
 import {
   IconAlertTriangleFilled,
@@ -28,11 +29,11 @@ export const meta = ({ loaderData, location }: Route.MetaArgs) => {
     ]
   }
 
-  const { eventItem, origin } = loaderData
-  const typeData = getEventTypeData(eventItem.type)
+  const { event, origin } = loaderData
+  const typeData = getEventTypeData(event.eventType)
   return [
     {
-      title: eventItem.title,
+      title: event.title,
     },
     {
       property: 'og:type',
@@ -45,11 +46,11 @@ export const meta = ({ loaderData, location }: Route.MetaArgs) => {
     },
     {
       property: 'og:title',
-      content: `${eventItem.title}`,
+      content: `${event.title}`,
     },
     {
       property: 'og:description',
-      content: `${eventItem.dateStart} - ${eventItem.subtitle}`,
+      content: `${event.dateStart} - ${event.subtitle}`,
     },
     {
       property: 'og:image',
@@ -70,11 +71,11 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   const formData = await request.formData()
   const eventId = formData.get('eventId')
   logger.info(`Deleting event with eventId ${eventId}`)
-
-  const id = Number(eventId)
-  if (Number.isNaN(id)) {
-    throw new Error('Invalid event ID')
+  if (typeof eventId !== 'string') {
+    throw new Error('eventId must be a string')
   }
+
+  const eventIdDecoded = stringToID.decode(eventId)
 
   const authContext = context.get(AuthContext)
   if (!authContext) {
@@ -83,7 +84,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   const { accessToken } = authContext
   const { error } = await apiClient.DELETE('/events/{id}', {
     params: {
-      path: { id },
+      path: { id: stringToID.encode(eventIdDecoded) },
     },
     headers: {
       'x-api-key': context.cloudflare.env.API_KEY,
@@ -118,19 +119,17 @@ export async function loader({ context, params }: Route.LoaderArgs) {
     throw new Response('Event not found', { status: 404 })
   }
 
+  const event = EventSchema.parse(data)
+
   return {
-    eventItem: {
-      ...data,
-      dateStart: data.date,
-      participants: [],
-    },
+    event,
     me,
     origin: 'http://localhost:3002',
   }
 }
 
 export default function GetEvent({ loaderData }: Route.ComponentProps) {
-  const { eventItem, me } = loaderData
+  const { event, me } = loaderData
   const [opened, setOpened] = useState(false)
 
   const onCloseModal = () => {
@@ -142,17 +141,17 @@ export default function GetEvent({ loaderData }: Route.ComponentProps) {
       <DeleteModal
         opened={opened}
         onCloseModal={onCloseModal}
-        eventTitle={eventItem.title}
-        eventId={eventItem.id}
+        eventTitle={event.title}
+        eventId={event.id}
       />
 
       <Container p={{ base: 1, sm: 'xs' }}>
-        <EventBreadcrumbs title={eventItem.title} />
-        <EventCard {...eventItem} me={me}>
+        <EventBreadcrumbs title={event.title} />
+        <EventCard event={event} me={me}>
           <EventButtonContainer
-            participants={eventItem.participants}
+            participants={event.participants}
             me={me}
-            eventId={eventItem.id}
+            eventId={event.id}
           />
         </EventCard>
         <Divider
@@ -170,7 +169,7 @@ export default function GetEvent({ loaderData }: Route.ComponentProps) {
         <Group justify="center" my="sm" gap="xl">
           <Button
             component={Link}
-            to={`/events/${eventItem.id}/edit/`}
+            to={`/events/${event.id}/edit/`}
             rightSection={<IconPencil size={18} />}
             data-testid="modify-event-btn"
           >

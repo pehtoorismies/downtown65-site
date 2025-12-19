@@ -30,11 +30,19 @@ export const ULIDSchema = z.string().refine((v) => {
 }, 'Invalid ULID')
 export type ULID = z.infer<typeof ULIDSchema>
 
+export const StringIDSchema = z.object({
+  id: z
+    .string()
+    .transform((s) => Number(s))
+    .pipe(IDSchema),
+})
+
 // ============================================
 // Dates and Times
 // ============================================
 export const ISODateSchema = z.iso.date().brand<'ISODate'>()
 export const ISOTimeSchema = z.iso.time({ precision: -1 }).brand<'ISOTime'>()
+export type ISOTime = z.infer<typeof ISOTimeSchema>
 export const ISODateTimeSchema = z.iso.datetime().brand<'ISODateTime'>()
 
 // ============================================
@@ -44,8 +52,9 @@ export const UserSchema = z.object({
   auth0Sub: Auth0SubSchema,
   id: IDSchema,
   nickname: z.string().min(1).openapi({ example: 'ada' }),
-  picture: z.url(),
+  picture: z.httpUrl(),
 })
+export type User = z.infer<typeof UserSchema>
 
 const Participant = UserSchema.extend({
   joinedAt: ISODateTimeSchema.openapi({
@@ -57,6 +66,7 @@ const Participant = UserSchema.extend({
 const ParticipantListSchema = z
   .array(Participant)
   .openapi({ description: 'Users attending the event' })
+export type ParticipantList = z.infer<typeof ParticipantListSchema>
 
 // ============================================
 // Events
@@ -102,13 +112,6 @@ export const EventSchema = z.object({
 })
 export type Event = z.infer<typeof EventSchema>
 
-export const StringIDSchema = z.object({
-  id: z
-    .string()
-    .transform((s) => Number(s))
-    .pipe(IDSchema),
-})
-
 export const EventListSchema = z.array(EventSchema)
 export type EventList = z.infer<typeof EventListSchema>
 
@@ -143,3 +146,103 @@ export const LoginSchema = z.object({
   rememberMe: z.string().nullable().optional(),
 })
 export type Login = z.infer<typeof LoginSchema>
+
+// ============================================
+// Codecs
+// ============================================
+export const stringToID = z.codec(
+  z.string().regex(z.regexes.integer),
+  IDSchema,
+  {
+    decode: (str, ctx) => {
+      const num = Number.parseInt(str, 10)
+
+      // Must be positive integer
+      if (num <= 0) {
+        ctx.issues.push({
+          code: 'invalid_format',
+          format: 'integer',
+          input: str,
+          message: 'Invalid non-positive integer string',
+        })
+        return z.NEVER
+      }
+
+      return num
+    },
+    encode: (num) => {
+      return num.toString()
+    },
+  },
+)
+
+export const isoDateToDate = z.codec(ISODateSchema, z.date(), {
+  decode: (isoDateString, ctx) => {
+    // Expect "YYYY-MM-DD"
+    const [yearStr, monthStr, dayStr] = isoDateString.split('-')
+    const year = Number(yearStr)
+    const month = Number(monthStr)
+    const day = Number(dayStr)
+
+    // Basic numeric checks
+    if (
+      !Number.isInteger(year) ||
+      !Number.isInteger(month) ||
+      !Number.isInteger(day)
+    ) {
+      ctx.issues.push({
+        code: 'invalid_format',
+        format: 'iso_date',
+        input: isoDateString,
+        message: 'Expected YYYY-MM-DD',
+      })
+      return z.NEVER
+    }
+
+    // Construct in local time (month is 0-based)
+    const date = new Date(year, month - 1, day)
+
+    // Strict validation: ensure no rollover happened
+    if (
+      date.getFullYear() !== year ||
+      date.getMonth() !== month - 1 ||
+      date.getDate() !== day
+    ) {
+      ctx.issues.push({
+        code: 'invalid_format',
+        format: 'iso_date',
+        input: isoDateString,
+        message: 'Invalid calendar date',
+      })
+      return z.NEVER
+    }
+
+    return date
+  },
+
+  encode: (date) => {
+    console.error('Encoding date', date.getUTCDate())
+
+    // Format YYYY-MM-DD using UTC components to avoid TZ offsets
+    const y = date.getUTCFullYear()
+    const m = String(date.getUTCMonth() + 1).padStart(2, '0')
+    const d = String(date.getUTCDate()).padStart(2, '0')
+    const _iso = `${y}-${m}-${d}`
+    console.error('_iso', _iso)
+    // Return a branded ISODate string, verified by schema
+    //
+    return ISODateSchema.decode(date.toISOString().substring(0, 10))
+  },
+})
+
+// ============================================
+// Generic
+// ============================================
+export const MessageSchema = z.object({
+  message: z.string().openapi({ example: 'Information regarding request' }),
+})
+
+export const APIErrorResponseSchema = z.object({
+  code: z.number(),
+  message: z.string(),
+})

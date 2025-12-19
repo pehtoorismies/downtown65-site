@@ -1,11 +1,10 @@
-import type { ID } from '@downtown65/schema'
+import type { ID, ParticipantList } from '@downtown65/schema'
 import { Avatar, Badge, Group, Text, ThemeIcon } from '@mantine/core'
 import { IconUserOff } from '@tabler/icons-react'
 import { Gradient } from '~/components/colors'
-import type { User } from '~/domain/user'
 
 interface Props {
-  participants: User[]
+  participants: ParticipantList
   me: { id: ID } | null
 }
 

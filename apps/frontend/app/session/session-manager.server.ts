@@ -1,11 +1,10 @@
-import { ISODateSchema } from '@downtown65/schema'
+import { ISODateSchema, type User, UserSchema } from '@downtown65/schema'
 import { addDays, addMonths, isAfter, parseISO } from 'date-fns'
 import { jwtDecode } from 'jwt-decode'
 import type { Session } from 'react-router'
 import { createCookieSessionStorage } from 'react-router'
 import { z } from 'zod'
 import { apiClient } from '~/api/api-client'
-import { type User, UserSchema } from '~/domain/user'
 
 const AccessTokenPartialSchema = z.object({
   exp: z.number(),

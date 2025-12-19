@@ -1,12 +1,12 @@
 import { createLogger } from '@downtown65/logger'
-import { EventSchema } from '@downtown65/schema'
+import { EventSchema, MessageSchema } from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
 import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { getEventByULID } from '../db/get-event-by-id'
-import { EventPathULIDParamSchema, MessageSchema } from './api-schema'
+import { EventPathULIDParamSchema } from './api-schema'
 
 const route = createRoute({
   method: 'get',

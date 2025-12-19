@@ -19,6 +19,7 @@ import {
 } from 'react-router'
 import type { Route } from './+types/root'
 import './app.css'
+import type { User } from '@downtown65/schema'
 import { useDisclosure } from '@mantine/hooks'
 import type { PropsWithChildren } from 'react'
 import { AppTheme } from '~/app-theme'
@@ -28,7 +29,6 @@ import {
   Navbar,
 } from './components/navigation'
 import { AuthContext } from './context/context'
-import type { User } from './domain/user'
 
 export const loader = async ({ context }: Route.LoaderArgs) => {
   const authContext = context.get(AuthContext)

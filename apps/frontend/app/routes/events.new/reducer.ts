@@ -1,6 +1,9 @@
-import type { EventType } from '@downtown65/schema'
+import {
+  type EventType,
+  ISODateTimeSchema,
+  type User,
+} from '@downtown65/schema'
 import type { Dispatch } from 'react'
-import type { User } from '~/domain/user'
 import type { EventState } from './event-state'
 
 export const ActiveStep = {
@@ -154,7 +157,13 @@ export const reducer = (state: EventState, action: EventAction): EventState => {
     case 'participateEvent': {
       return {
         ...state,
-        participants: [...state.participants, action.me],
+        participants: [
+          ...state.participants,
+          {
+            ...action.me,
+            joinedAt: ISODateTimeSchema.parse(new Date().toISOString()),
+          },
+        ],
       }
     }
     case 'leaveEvent': {

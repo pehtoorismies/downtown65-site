@@ -1,51 +1,41 @@
-import type { EventType, ID } from '@downtown65/schema'
+import type { Event, ID } from '@downtown65/schema'
 import { Divider, Grid, Group, Text, Typography } from '@mantine/core'
 import { IconMedal } from '@tabler/icons-react'
 import type { PropsWithChildren } from 'react'
-import type { User } from '~/domain/user'
 import { useParticipants } from '../participants/use-participants'
 import { Voucher } from '../voucher/Voucher'
 import { getEventTypeData } from './get-event-type-data'
 import { Participants } from './Participants'
 
 interface Props {
-  id?: ID
-  eventULID?: string
-  title: string
-  race: boolean
-  subtitle: string
-  location: string
-  type: EventType
-  createdBy: {
-    nickname: string
-  }
-  participants: User[]
-  dateStart: string
-  timeStart?: string | null
-  description?: string
+  event: Omit<Event, 'id' | 'eventULID'>
   me: { id: ID } | null
 }
 
-const getDescription = (description: string | undefined) => {
+const getDescription = (description: string | null) => {
   if (description && description.trim().length > 0) {
     return description.trim()
   }
 }
 
 export const EventCard = ({
-  title,
-  race,
-  subtitle,
-  location,
-  type,
-  createdBy,
-  participants,
-  dateStart,
-  timeStart,
-  description,
+  event,
   me,
   children,
 }: PropsWithChildren<Props>) => {
+  const {
+    title,
+    race,
+    subtitle,
+    location,
+    eventType,
+    createdBy,
+    participants,
+    dateStart,
+    timeStart,
+    description,
+  } = event
+
   const { count, meAttending } = useParticipants(participants, me)
 
   const time = timeStart ? `klo ${timeStart}` : ''
@@ -53,7 +43,7 @@ export const EventCard = ({
 
   const formattedDate = time.length === 0 ? dateStart : `${dateStart} ${time}`
 
-  const { eventText, imageUrl } = getEventTypeData(type)
+  const { eventText, imageUrl } = getEventTypeData(eventType)
 
   return (
     <Voucher>

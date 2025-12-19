@@ -1,8 +1,8 @@
+import type { User } from '@downtown65/schema'
 import { Avatar, Burger, Button, Group, Menu, Text } from '@mantine/core'
 import { IconChevronDown, IconLogout, IconUser } from '@tabler/icons-react'
 import cx from 'clsx'
 import { Form, Link, NavLink, useFetcher } from 'react-router'
-import type { User } from '~/domain/user'
 import classes from './navigation.module.css'
 
 const navLinks = [

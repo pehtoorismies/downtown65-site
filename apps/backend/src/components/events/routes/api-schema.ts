@@ -14,7 +14,3 @@ export const IDParamSchema = StringIDSchema.openapi({
   },
   example: '1212121',
 })
-
-export const MessageSchema = z.object({
-  message: z.string().openapi({ example: 'Information regarding request' }),
-})

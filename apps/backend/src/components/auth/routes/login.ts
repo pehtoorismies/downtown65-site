@@ -1,10 +1,9 @@
-import { Auth0SubSchema, IDSchema } from '@downtown65/schema'
+import { APIErrorResponseSchema, UserSchema } from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
 import z from 'zod'
 import type { AppAPI } from '~/app-api'
 import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
-import { ErrorAPIResponseSchema } from '~/common/schema'
 import { login } from '../db/login'
 import { LoginParamSchema } from '../shared-schema'
 
@@ -32,14 +31,7 @@ const route = createRoute({
             refreshToken: z.string(),
             idToken: z.string(),
             expiresIn: z.number(),
-            user: z.object({
-              id: IDSchema,
-              auth0Sub: Auth0SubSchema,
-              email: z.email(),
-              name: z.string(),
-              nickname: z.string(),
-              picture: z.string(),
-            }),
+            user: UserSchema,
           }),
         },
       },
@@ -47,7 +39,7 @@ const route = createRoute({
     401: {
       content: {
         'application/json': {
-          schema: ErrorAPIResponseSchema,
+          schema: APIErrorResponseSchema,
         },
       },
       description: 'Returns an error',
@@ -59,7 +51,7 @@ const route = createRoute({
       description: 'Access denied',
       content: {
         'application/json': {
-          schema: ErrorAPIResponseSchema,
+          schema: APIErrorResponseSchema,
         },
       },
     },
@@ -70,7 +62,7 @@ const route = createRoute({
       description: 'Internal server error',
       content: {
         'application/json': {
-          schema: ErrorAPIResponseSchema,
+          schema: APIErrorResponseSchema,
         },
       },
     },

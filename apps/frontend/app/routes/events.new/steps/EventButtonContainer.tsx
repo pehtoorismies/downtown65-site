@@ -1,10 +1,10 @@
+import type { User } from '@downtown65/schema'
 import type { Dispatch } from 'react'
 import {
   JoinEventButton,
   LeaveEventButton,
 } from '~/components/event/EventButtons'
 import { useParticipants } from '~/components/participants/use-participants'
-import type { User } from '~/domain/user'
 import type { EventAction } from '../reducer'
 
 interface EventButtonProps {

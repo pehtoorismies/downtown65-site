@@ -1,10 +1,10 @@
 import { createLogger } from '@downtown65/logger'
+import { APIErrorResponseSchema } from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
 import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
-import { ErrorAPIResponseSchema } from '~/common/schema'
 import { deleteEvent } from '../db/delete-event'
 import { IDParamSchema } from './api-schema'
 
@@ -26,7 +26,7 @@ const route = createRoute({
     404: {
       description: 'Event not found',
       content: {
-        'application/json': { schema: ErrorAPIResponseSchema },
+        'application/json': { schema: APIErrorResponseSchema },
       },
     },
     // 422: {

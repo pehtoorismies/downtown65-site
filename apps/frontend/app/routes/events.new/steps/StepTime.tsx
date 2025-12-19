@@ -2,7 +2,7 @@ import { Button, Center, Grid, Stack, Text } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import type { PropsWithChildren } from 'react'
 import { Gradient, GradientInverse } from '~/components/colors'
-import { padTime } from '~/time-util'
+
 import type { EventState } from '../event-state'
 import type { ReducerProps } from '../reducer'
 import { NextButton, PreviousButton, StepLayout } from './LayoutSteps'
@@ -34,10 +34,10 @@ const getMinuteGradient = (currentValue: number, value?: number) => {
 
 const getTime = ({ time }: EventState): string => {
   if (time.hours !== undefined && time.minutes !== undefined) {
-    return `: ${padTime(time.hours)}:${padTime(time.minutes)}`
+    return `: ${String(time.hours).padStart(2, '0')}:${String(time.minutes).padStart(2, '0')}`
   }
   if (time.hours !== undefined) {
-    return `: ${padTime(time.hours)}:xx`
+    return `: ${String(time.hours).padStart(2, '0')}:xx`
   }
   return ''
 }
@@ -82,7 +82,7 @@ export const StepTime = ({ state, dispatch }: ReducerProps) => {
         }}
         data-testid={`hour-${hour}`}
       >
-        {padTime(hour)}
+        {String(hour).padStart(2, '0')}
       </Button>
     ))
   const getMinutesCol = (minutes: number[]) =>
@@ -105,7 +105,7 @@ export const StepTime = ({ state, dispatch }: ReducerProps) => {
         }}
         data-testid={`minute-${minute}`}
       >
-        {padTime(minute)}
+        {String(minute).padStart(2, '0')}
       </Button>
     ))
 

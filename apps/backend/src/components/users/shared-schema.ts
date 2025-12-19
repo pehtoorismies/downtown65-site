@@ -2,11 +2,10 @@ import z from 'zod'
 
 export const UserUpdateParamsSchema = z
   .object({
-    // email: z.email().optional().openapi({ example: 'ada@example.com' }),
     name: z.string().min(1).optional().openapi({ example: 'Ada Lovelace' }),
     nickname: z.string().min(1).optional().openapi({ example: 'ada' }),
     picture: z
-      .url()
+      .httpUrl()
       .optional()
       .openapi({ example: 'https://example.com/avatar.jpg' }),
     subscribeWeeklyEmail: z.boolean().optional().openapi({ example: true }),

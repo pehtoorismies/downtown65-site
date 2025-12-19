@@ -1,5 +1,4 @@
-import type { EventType } from '@downtown65/schema'
-import type { User } from '~/domain/user'
+import type { EventType, ParticipantList } from '@downtown65/schema'
 import type { StepNumber } from './reducer'
 
 export interface EventState {
@@ -15,7 +14,7 @@ export interface EventState {
     minutes?: number
   }
   description: string
-  participants: User[]
+  participants: ParticipantList
   submitEvent: boolean
   kind: 'edit' | 'create'
 }

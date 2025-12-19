@@ -1,3 +1,4 @@
+import { EventListSchema } from '@downtown65/schema'
 import {
   Breadcrumbs,
   Button,
@@ -37,7 +38,7 @@ export async function loader({ context }: Route.LoaderArgs) {
     throw new Error('Failed to load events list')
   }
 
-  return { events: data, user }
+  return { events: EventListSchema.parse(data), user }
 }
 
 const Layout = ({ children }: PropsWithChildren) => {
@@ -85,9 +86,7 @@ export default function EventsList({ loaderData }: Route.ComponentProps) {
         verticalSpacing={{ base: 'sm', md: 'xl' }}
       >
         {events.map((x) => {
-          return (
-            <ListEventCard key={x.id} {...x} dateStart={x.date} me={user} />
-          )
+          return <ListEventCard key={x.id} event={x} me={user} />
         })}
       </SimpleGrid>
     </Container>
