@@ -2,10 +2,9 @@ import { createLogger } from '@downtown65/logger'
 import { eq } from 'drizzle-orm'
 import { getManagementClient } from '~/common/auth0/client'
 import type { Config } from '~/common/config/config'
-import { getDb } from '~/common/db/get-db'
-import { usersTable } from '~/db/schema'
+import { getDb } from '~/db/get-db'
+import { users as usersTable } from '~/db/schema'
 import { type UserUpdateParams, UserUpdateParamsSchema } from '../shared-schema'
-import { Auth0UserSchema } from './support/auth0-schema'
 
 const UpdateSchema = UserUpdateParamsSchema.transform((obj) => {
   if (
@@ -30,6 +29,20 @@ const UpdateSchema = UserUpdateParamsSchema.transform((obj) => {
   }
 })
 
+const getUpdateValuesForLocal = (params: UserUpdateParams) => {
+  const values: Partial<Pick<UserUpdateParams, 'nickname' | 'picture'>> = {}
+  if (params.nickname !== undefined) {
+    values.nickname = params.nickname
+  }
+  if (params.picture !== undefined) {
+    values.picture = params.picture
+  }
+  if (Object.keys(values).length === 0) {
+    return undefined
+  }
+  return values
+}
+
 export const updateUser = async (
   config: Config,
   auth0Sub: string,
@@ -41,26 +54,25 @@ export const updateUser = async (
   logger.info(
     `Updating user ${auth0Sub} with params: ${JSON.stringify(parsedParams)}`,
   )
+  // TODO: handle errors
   const response = await management.users.update(auth0Sub, parsedParams)
   logger.info(
     `Updated user ${auth0Sub} with params: ${JSON.stringify(response)}`,
   )
 
-  const auth0User = Auth0UserSchema.parse(response)
+  const localUpdateValues = getUpdateValuesForLocal(params)
+  if (!localUpdateValues) {
+    return true
+  }
 
   const db = getDb(config.D1_DB)
 
-  const updated = await db
+  // just in case, update local user
+  await db
     .update(usersTable)
-    .set({
-      nickname: auth0User.nickname,
-      picture: auth0User.picture,
-    })
+    .set(localUpdateValues)
     .where(eq(usersTable.auth0Sub, auth0Sub))
     .returning()
 
-  return {
-    ...auth0User,
-    id: updated[0].id,
-  }
+  return true
 }

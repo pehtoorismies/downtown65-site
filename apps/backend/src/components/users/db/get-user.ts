@@ -1,7 +1,7 @@
 import { getManagementClient } from '~/common/auth0/client'
 import type { Config } from '~/common/config/config'
-import { getDb } from '~/common/db/get-db'
-import { usersTable } from '~/db/schema'
+import { getDb } from '~/db/get-db'
+import { users } from '~/db/schema'
 import { getUserId } from './get-user-id'
 import { Auth0UserSchema } from './support/auth0-schema'
 import { QUERY_USER_RETURNED_FIELDS } from './support/query-user-returned-fields'
@@ -30,7 +30,7 @@ export const getUser = async (config: Config, auth0Sub: string) => {
 
   const db = getDb(config.D1_DB)
   const inserted = await db
-    .insert(usersTable)
+    .insert(users)
     .values({
       auth0Sub: auth0User.auth0Sub,
       nickname: auth0User.nickname,

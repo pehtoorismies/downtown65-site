@@ -1,51 +1,54 @@
-import {
-  type Auth0Sub,
-  type Event,
-  type EventCreateInput,
-  ISODateSchema,
-  ISOTimeSchema,
-} from '@downtown65/schema'
-import { eq } from 'drizzle-orm'
+import type { Auth0Sub, EventCreateInput, ULID } from '@downtown65/schema'
 import { ulid } from 'ulidx'
 import type { Config } from '~/common/config/config'
-import { getDb } from '~/common/db/get-db'
-import { eventsTable, usersTable } from '~/db/schema'
+import { getDb } from '~/db/get-db'
+import { events, usersToEvent } from '~/db/schema'
 
 export const createEvent = async (
   config: Config,
   input: EventCreateInput,
   creator: { auth0Sub: Auth0Sub; includeInEvent: boolean },
-): Promise<Event> => {
+): Promise<ULID> => {
   const db = getDb(config.D1_DB)
 
-  const result = await db
-    .select()
-    .from(usersTable)
-    .where(eq(usersTable.auth0Sub, creator.auth0Sub))
+  const localUser = await db.query.users.findFirst({
+    where: {
+      auth0Sub: creator.auth0Sub,
+    },
+  })
 
-  if (result.length === 0) {
+  if (!localUser) {
     throw new Error('Creator user not found')
   }
-  const localUser = result[0]
 
-  const ULID = ulid()
+  const eventULID = ulid()
 
-  // TODO: add input.includeEventCreator participation handling
+  await db.transaction(
+    async (tx) => {
+      const createdEvent = await tx
+        .insert(events)
+        .values({
+          ...input,
+          eventULID,
+          createdBy: localUser.id,
+        })
+        .returning()
 
-  const event = await db
-    .insert(eventsTable)
-    .values({
-      ...input,
-      eventULID: ULID,
-      createdBy: localUser.id,
-    })
-    .returning()
+      if (createdEvent.length === 0) {
+        throw new Error('Failed to create event')
+      }
+      if (creator.includeInEvent) {
+        await tx.insert(usersToEvent).values({
+          userId: localUser.id,
+          eventId: createdEvent[0].id,
+        })
+      }
 
-  return {
-    ...event[0],
-    timeStart: ISOTimeSchema.parse(event[0].timeStart),
-    dateStart: ISODateSchema.parse(event[0].dateStart),
-    createdBy: localUser,
-    participants: [],
-  }
+      return createdEvent[0].eventULID
+    },
+    {
+      behavior: 'deferred',
+    },
+  )
+  return eventULID
 }

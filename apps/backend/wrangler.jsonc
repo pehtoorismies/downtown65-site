@@ -23,7 +23,7 @@
     {
       "binding": "D1_DB",
       "database_name": "dt65-test",
-      "database_id": "fc97044a-c30a-4288-ba0d-7c884daeea14",
+      "database_id": "78681f8f-1494-49d5-a890-e7ab7b2b55ca",
       "migrations_dir": "drizzle"
     }
   ],

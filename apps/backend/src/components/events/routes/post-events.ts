@@ -1,4 +1,4 @@
-import { EventCreateSchema, EventSchema } from '@downtown65/schema'
+import { EventCreateSchema, ULIDSchema } from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
 import { getConfig } from '~/common/config/config'
@@ -24,7 +24,7 @@ const route = createRoute({
     201: {
       description: 'Event created',
       content: {
-        'application/json': { schema: EventSchema },
+        'application/json': { schema: ULIDSchema },
       },
     },
     // 401: {

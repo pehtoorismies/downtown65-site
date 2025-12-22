@@ -1,11 +1,9 @@
 import { EVENT_TYPES } from '@downtown65/schema'
-import { relations } from 'drizzle-orm'
-// import { defineRelations } from 'drizzle-orm';
 import { sql } from 'drizzle-orm/sql/sql'
-import { index, sqliteTable } from 'drizzle-orm/sqlite-core'
+import { index, primaryKey, sqliteTable } from 'drizzle-orm/sqlite-core'
 
-export const eventsTable = sqliteTable(
-  'events_table',
+export const events = sqliteTable(
+  'events',
   (t) => ({
     id: t.integer().primaryKey({ autoIncrement: true }),
     eventULID: t.text().notNull().unique(),
@@ -22,13 +20,13 @@ export const eventsTable = sqliteTable(
     createdBy: t
       .integer()
       .notNull()
-      .references(() => usersTable.id),
+      .references(() => users.id),
   }),
   (table) => [index('events_eventULID_idx').on(table.eventULID)],
 )
 
-export const usersTable = sqliteTable(
-  'users_table',
+export const users = sqliteTable(
+  'users',
   (t) => ({
     id: t.integer('id').primaryKey({ autoIncrement: true }),
     auth0Sub: t.text().notNull().unique(), // Link to Auth0
@@ -38,14 +36,18 @@ export const usersTable = sqliteTable(
   (table) => [index('users_auth0Sub_idx').on(table.auth0Sub)],
 )
 
-// // Relations helpers (optional but recommended for type-safe joins)
-export const usersRelations = relations(usersTable, ({ many }) => ({
-  events: many(eventsTable), // User has many Events
-}))
-
-export const eventsRelations = relations(eventsTable, ({ one }) => ({
-  creator: one(usersTable, {
-    fields: [eventsTable.id],
-    references: [usersTable.id], // Event belongs to a User
+export const usersToEvent = sqliteTable(
+  'users_to_events',
+  (t) => ({
+    userId: t
+      .integer()
+      .notNull()
+      .references(() => users.id),
+    eventId: t
+      .integer()
+      .notNull()
+      .references(() => events.id),
+    createdAt: t.text().notNull().default(sql`CURRENT_TIMESTAMP`),
   }),
-}))
+  (table) => [primaryKey({ columns: [table.userId, table.eventId] })],
+)

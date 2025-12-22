@@ -1,4 +1,4 @@
-import { APIErrorResponseSchema } from '@downtown65/schema'
+import { APIErrorResponseSchema, MessageSchema } from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
 import { getConfig } from '~/common/config/config'
@@ -6,7 +6,6 @@ import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { updateUser } from '../db/update-user'
 import { UserUpdateParamsSchema } from '../shared-schema'
-import { DetailedUserAPIResponseSchema } from './api-schema'
 
 const route = createRoute({
   method: 'put',
@@ -28,7 +27,7 @@ const route = createRoute({
       description: 'User updated successfully',
       content: {
         'application/json': {
-          schema: DetailedUserAPIResponseSchema,
+          schema: MessageSchema,
         },
       },
     },
@@ -60,7 +59,6 @@ export const register = (app: AppAPI) => {
         404,
       )
     }
-
-    return c.json(updated, 200)
+    return c.json({ message: 'User updated successfully' }, 200)
   })
 }

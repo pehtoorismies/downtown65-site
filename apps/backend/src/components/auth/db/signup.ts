@@ -1,15 +1,10 @@
 import { createLogger } from '@downtown65/logger'
-import {
-  type Auth0Sub,
-  Auth0SubSchema,
-  type ID,
-  IDSchema,
-} from '@downtown65/schema'
+import { Auth0SubSchema, IDSchema } from '@downtown65/schema'
 import z from 'zod'
 import { getManagementClient } from '~/common/auth0/client'
 import type { Config } from '~/common/config/config'
-import { getDb } from '~/common/db/get-db'
-import { usersTable } from '~/db/schema'
+import { getDb } from '~/db/get-db'
+import { users as usersTable } from '~/db/schema'
 import type { RegisterInput } from '../shared-schema'
 import { Auth0ErrorSchema } from './support/auth0-error'
 
@@ -99,24 +94,6 @@ const createAuth0User = async (
   }
 }
 
-const updateAuth0User = async (
-  config: Config,
-  auth0Sub: Auth0Sub,
-  localUserId: ID,
-) => {
-  try {
-    const management = await getManagementClient(config)
-    await management.users.update(auth0Sub, {
-      app_metadata: { localUserId },
-    })
-    return true
-  } catch (error: unknown) {
-    const logger = createLogger()
-    logger.withError(error).error('Error during Auth0 user update')
-    return false
-  }
-}
-
 const createLocalUser = async (config: Config, values: LocalUser) => {
   const db = getDb(config.D1_DB)
   try {
@@ -160,25 +137,6 @@ export const signup = async (
     return {
       type: 'Error',
       error: 'Failed to create local user but account was created in Auth0.',
-      statusCode: 500,
-    }
-  }
-
-  const updated = await updateAuth0User(
-    config,
-    result.user.auth0Sub,
-    localUserId,
-  )
-
-  if (updated === false) {
-    logger
-      .withMetadata(result.user)
-      .fatal('Failed to update Auth0 user with local user ID after signup')
-
-    return {
-      type: 'Error',
-      error:
-        'Failed to update Auth0 user but account and local user were created.',
       statusCode: 500,
     }
   }

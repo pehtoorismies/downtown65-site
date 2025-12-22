@@ -26,7 +26,7 @@ export const EventButtonContainer = (props: EventButtonProps) => {
   }
 
   const joinEvent = () => {
-    props.dispatch({ kind: 'participateEvent', me: props.me })
+    props.dispatch({ kind: 'joinEvent', me: props.me })
   }
 
   return <JoinEventButton {...props} onClick={joinEvent} isLoading={false} />

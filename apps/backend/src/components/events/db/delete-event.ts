@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import type { Config } from '~/common/config/config'
-import { getDb } from '~/common/db/get-db'
-import { eventsTable } from '~/db/schema'
+import { getDb } from '~/db/get-db'
+import { events as eventsTable } from '~/db/schema'
 
 export const deleteEvent = async (
   config: Config,
