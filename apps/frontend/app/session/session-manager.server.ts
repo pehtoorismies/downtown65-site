@@ -1,4 +1,4 @@
-import { ISODateSchema, type User, UserSchema } from '@downtown65/schema'
+import { ISODateTimeSchema, type User, UserSchema } from '@downtown65/schema'
 import { addDays, addMonths, isAfter, parseISO } from 'date-fns'
 import { jwtDecode } from 'jwt-decode'
 import type { Session } from 'react-router'
@@ -37,7 +37,7 @@ interface Secrets {
 const CookieSessionDataSchema = z.object({
   accessToken: z.string(),
   refreshToken: z.string(),
-  expiresAt: ISODateSchema,
+  expiresAt: ISODateTimeSchema,
   user: UserSchema,
 })
 type CookieSessionData = z.infer<typeof CookieSessionDataSchema>

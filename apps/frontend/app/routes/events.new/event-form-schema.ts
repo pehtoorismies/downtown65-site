@@ -3,12 +3,12 @@ import z from 'zod'
 
 const preprocessEmptyString = (value: unknown) => {
   if (typeof value !== 'string') {
-    return undefined
+    return null
   }
   const trimmed = value.trim()
 
   if (trimmed.length === 0) {
-    return undefined
+    return null
   }
   return trimmed
 }

@@ -1,4 +1,5 @@
 import { createLogger } from '@downtown65/logger'
+import { MessageSchema } from '@downtown65/schema'
 import { OpenAPIHono, z } from '@hono/zod-openapi'
 import { Scalar } from '@scalar/hono-api-reference'
 import { cors } from 'hono/cors'
@@ -8,7 +9,6 @@ import type { AppAPI } from './app-api'
 import { registerRoutes as authRoutes } from './components/auth/routes'
 import { registerRoutes as eventRoutes } from './components/events/routes'
 import { registerRoutes as usersRoutes } from './components/users/routes'
-import { UnauthorizedErrorSchema } from './schemas/unauthorized-error'
 import {
   formatZodErrors,
   ValidationErrorSchema,
@@ -53,7 +53,7 @@ app.openAPIRegistry.registerComponent('responses', 'ValidationError', {
 app.openAPIRegistry.registerComponent(
   'schemas',
   'UnauthorizedError',
-  z.toJSONSchema(UnauthorizedErrorSchema) as SchemaObject,
+  z.toJSONSchema(MessageSchema) as SchemaObject,
 )
 app.openAPIRegistry.registerComponent('responses', 'UnauthorizedError', {
   description: 'Unauthorized Error',

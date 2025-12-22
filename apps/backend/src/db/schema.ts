@@ -1,5 +1,6 @@
 import { EVENT_TYPES } from '@downtown65/schema'
 import { relations } from 'drizzle-orm'
+// import { defineRelations } from 'drizzle-orm';
 import { sql } from 'drizzle-orm/sql/sql'
 import { index, sqliteTable } from 'drizzle-orm/sqlite-core'
 

@@ -3,7 +3,6 @@ import {
   Breadcrumbs,
   Button,
   Center,
-  Container,
   SimpleGrid,
   Text,
   Title,
@@ -43,12 +42,12 @@ export async function loader({ context }: Route.LoaderArgs) {
 
 const Layout = ({ children }: PropsWithChildren) => {
   return (
-    <Container data-testid="events" p={{ base: 1, sm: 'xs' }} size="1000">
+    <>
       <Breadcrumbs mb="xs">
         <Text data-testid="breadcrumbs-current">Tapahtumat</Text>
       </Breadcrumbs>
       {children}
-    </Container>
+    </>
   )
 }
 
@@ -77,7 +76,7 @@ export default function EventsList({ loaderData }: Route.ComponentProps) {
   }
 
   return (
-    <Container>
+    <Layout>
       <Title>Tapahtumat</Title>
       <Text>Tulevat tapahtumat:</Text>
       <SimpleGrid
@@ -89,6 +88,6 @@ export default function EventsList({ loaderData }: Route.ComponentProps) {
           return <ListEventCard key={x.id} event={x} me={user} />
         })}
       </SimpleGrid>
-    </Container>
+    </Layout>
   )
 }

@@ -23,6 +23,7 @@ const EventParser = z.array(LeftJoinResult)
 
 export const getEvents = async (config: Config): Promise<EventList> => {
   const db = getDb(config.D1_DB)
+
   const result = await db
     .select()
     .from(eventsTable)

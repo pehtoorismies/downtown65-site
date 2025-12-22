@@ -1,10 +1,9 @@
 import { Container } from '@mantine/core'
 import { Outlet } from 'react-router'
 
-export default function EventsList() {
+export default function EventBase() {
   return (
-    <Container>
-      Layout for events route
+    <Container p={{ base: 1, sm: 'xs' }}>
       <Outlet />
     </Container>
   )

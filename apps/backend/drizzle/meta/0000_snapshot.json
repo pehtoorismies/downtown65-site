@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "df5577a1-4fd0-472b-a664-d29452b34851",
+  "id": "43f71a31-31d1-47a9-941e-7aef43dae9f9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "events_table": {
@@ -43,22 +43,22 @@
           "autoincrement": false,
           "default": "''"
         },
-        "type": {
-          "name": "type",
+        "eventType": {
+          "name": "eventType",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "date": {
-          "name": "date",
+        "dateStart": {
+          "name": "dateStart",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "time": {
-          "name": "time",
+        "timeStart": {
+          "name": "timeStart",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -95,8 +95,8 @@
           "autoincrement": false,
           "default": "CURRENT_TIMESTAMP"
         },
-        "creatorId": {
-          "name": "creatorId",
+        "createdBy": {
+          "name": "createdBy",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -120,12 +120,12 @@
         }
       },
       "foreignKeys": {
-        "events_table_creatorId_users_table_id_fk": {
-          "name": "events_table_creatorId_users_table_id_fk",
+        "events_table_createdBy_users_table_id_fk": {
+          "name": "events_table_createdBy_users_table_id_fk",
           "tableFrom": "events_table",
           "tableTo": "users_table",
           "columnsFrom": [
-            "creatorId"
+            "createdBy"
           ],
           "columnsTo": [
             "id"
@@ -166,7 +166,7 @@
           "name": "picture",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         }
       },

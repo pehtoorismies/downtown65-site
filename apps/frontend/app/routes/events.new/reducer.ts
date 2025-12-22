@@ -30,8 +30,8 @@ type InfoAction = {
 }
 
 type TypeAction = {
-  kind: 'type'
-  type: EventType
+  kind: 'eventType'
+  eventType: EventType
 }
 
 type StepAction = {
@@ -63,8 +63,8 @@ type DescriptionAction = {
   kind: 'description'
   description: string
 }
-type ParticipateEventAction = {
-  kind: 'participateEvent'
+type JoinEventAction = {
+  kind: 'joinEvent'
   me: User
 }
 type LeaveEventAction = {
@@ -81,7 +81,7 @@ export type EventAction =
   | InfoAction
   | LeaveEventAction
   | NextStepAction
-  | ParticipateEventAction
+  | JoinEventAction
   | PreviousStepAction
   | RaceAction
   | StepAction
@@ -96,15 +96,15 @@ export interface ReducerProps {
 
 export const reducer = (state: EventState, action: EventAction): EventState => {
   switch (action.kind) {
-    case 'type': {
+    case 'eventType': {
       if (!state.eventType) {
         return {
           ...state,
-          eventType: action.type,
+          eventType: action.eventType,
           activeStep: ActiveStep.STEP_TITLE,
         }
       }
-      return { ...state, eventType: action.type }
+      return { ...state, eventType: action.eventType }
     }
     case 'info': {
       return {
@@ -154,7 +154,7 @@ export const reducer = (state: EventState, action: EventAction): EventState => {
         description: action.description,
       }
     }
-    case 'participateEvent': {
+    case 'joinEvent': {
       return {
         ...state,
         participants: [

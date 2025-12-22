@@ -6,7 +6,7 @@ import { getEventTypeData } from '~/components/event/get-event-type-data'
 import type { ReducerProps } from '../reducer'
 import { NextButton, StepLayout } from './LayoutSteps'
 
-export const StepType = ({ state, dispatch }: ReducerProps) => {
+export const StepEventType = ({ state, dispatch }: ReducerProps) => {
   const matches = useMediaQuery('(max-width: 48em)', true, {
     getInitialValueInEffect: false,
   })
@@ -40,7 +40,7 @@ export const StepType = ({ state, dispatch }: ReducerProps) => {
           color={state.eventType === type ? 'dtPink' : 'blue'}
           key={type}
           onClick={() => {
-            dispatch({ kind: 'type', type })
+            dispatch({ kind: 'eventType', eventType: type })
           }}
           leftSection={<TypeIcon size={20} />}
           rightSection={<span />}
