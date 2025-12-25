@@ -1,0 +1,12 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": ["app/root.tsx", "app/entry.server.tsx", "app/routes/**/*.tsx"],
+  "project": ["app/**/*.{ts,tsx}"],
+  "paths": {
+    "~/*": ["app/*"]
+  },
+  "ignoreDependencies": ["@downtown65/schema"],
+  "rules": {
+    "unresolved": "off"
+  }
+}

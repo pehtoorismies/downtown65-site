@@ -1,0 +1,16 @@
+.DS_Store
+.env
+/node_modules/
+*.tsbuildinfo
+
+# React Router
+/build/
+
+# Cloudflare
+.mf
+.wrangler
+
+
+.dev.vars*
+
+db.sqlite
