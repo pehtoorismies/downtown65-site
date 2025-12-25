@@ -10,8 +10,9 @@ export const relations = defineRelations(schema, (r) => ({
   },
   events: {
     createdBy: r.one.users({
-      from: r.events.createdBy,
+      from: r.events.creatorId,
       to: r.users.id,
+      optional: false,
     }),
     participants: r.many.users({
       from: r.events.id.through(r.usersToEvent.eventId),

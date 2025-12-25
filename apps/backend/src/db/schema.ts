@@ -17,10 +17,7 @@ export const events = sqliteTable(
     race: t.integer({ mode: 'boolean' }).notNull().default(false),
     createdAt: t.text().notNull().default(sql`CURRENT_TIMESTAMP`),
     updatedAt: t.text().notNull().default(sql`CURRENT_TIMESTAMP`),
-    createdBy: t
-      .integer()
-      .notNull()
-      .references(() => users.id),
+    creatorId: t.integer().notNull(),
   }),
   (table) => [index('events_eventULID_idx').on(table.eventULID)],
 )

@@ -42,20 +42,13 @@ export const syncUsers = async (config: Config) => {
 
     const isNew = existing.length === 0
 
-    logger.info(`Syncing user (${isNew}): ${user.user_id} - ${user.email}`)
+    logger.withMetadata({ data: user }).info(`Syncing user ${user.nickname}`)
     const upsertedUser = await db
       .insert(usersTable)
       .values({
         auth0Sub: user.auth0Sub,
         nickname: user.nickname,
         picture: user.picture,
-      })
-      .onConflictDoUpdate({
-        target: usersTable.auth0Sub, // Unique column(s)
-        set: {
-          nickname: user.nickname,
-          picture: user.picture,
-        },
       })
       .returning({ id: usersTable.id })
 

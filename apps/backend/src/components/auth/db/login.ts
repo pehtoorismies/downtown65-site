@@ -1,12 +1,11 @@
 import { createLogger } from '@downtown65/logger'
 import { UserSchema } from '@downtown65/schema'
-import { AuthApiError } from 'auth0'
 import { jwtDecode } from 'jwt-decode'
 import { z } from 'zod'
-import { createAuthClient } from '~/common/auth0/client'
 import type { Config } from '~/common/config/config'
 import { getDb } from '~/db/get-db'
 import type { LoginInput } from '../shared-schema'
+import { auth0Login } from './auth0-login'
 import { Auth0TokensSchema, Auth0UserSchema } from './support/auth0-schema'
 
 const LoginResponse = z.discriminatedUnion('type', [
@@ -27,60 +26,32 @@ export const login = async (
   input: LoginInput,
 ): Promise<LoginResponse> => {
   const logger = createLogger()
-  try {
-    const authClient = createAuthClient(config.authConfig)
-    const result = await authClient.oauth.passwordGrant({
-      username: input.email,
-      password: input.password,
-      audience: config.authConfig.AUTH_AUDIENCE,
-      // scope:
-      //   'read:events write:events read:me write:me read:users openid profile email offline_access',
-      scope: 'openid profile email offline_access',
-    })
 
-    const tokens = Auth0TokensSchema.parse(result.data)
-    const user = Auth0UserSchema.parse(jwtDecode(tokens.idToken))
+  const auth0 = await auth0Login(config, input)
 
-    const db = getDb(config.D1_DB)
-    const localUser = await db.query.users.findFirst({
-      where: {
-        auth0Sub: user.auth0Sub,
-      },
-    })
+  if (auth0.type !== 'Success') {
+    return auth0
+  }
 
-    if (!localUser) {
-      // TODO: insert if not found
-      logger.fatal(
-        `User not found locally after successful authentication: ${user.auth0Sub}`,
-      )
-      throw new Error('User not found locally after successful authentication')
-    }
+  const { auth0Sub } = Auth0UserSchema.parse(jwtDecode(auth0.tokens.idToken))
 
-    return {
-      type: 'Success',
-      tokens,
-      user: localUser,
-    }
-  } catch (error: unknown) {
-    if (error instanceof AuthApiError) {
-      switch (error.error) {
-        case 'invalid_grant':
-          return {
-            type: 'InvalidCredentials',
-            error: error.error_description,
-          }
-        case 'access_denied':
-          return {
-            type: 'AccessDenied',
-            error: error.error_description,
-          }
-      }
-    }
+  const db = getDb(config.D1_DB)
+  const localUser = await db.query.users.findFirst({
+    where: {
+      auth0Sub,
+    },
+  })
 
-    logger.withError(error).error('Login error occurred')
-    return {
-      type: 'UnknownError',
-      error: 'An unknown error occurred during login.',
-    }
+  if (!localUser) {
+    // TODO: insert if not found
+    logger.fatal(
+      `User not found locally after successful authentication: ${auth0Sub}`,
+    )
+    throw new Error('User not found locally after successful authentication')
+  }
+  return {
+    type: 'Success',
+    tokens: auth0.tokens,
+    user: localUser,
   }
 }

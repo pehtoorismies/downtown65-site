@@ -23,32 +23,25 @@ export const createEvent = async (
 
   const eventULID = ulid()
 
-  await db.transaction(
-    async (tx) => {
-      const createdEvent = await tx
-        .insert(events)
-        .values({
-          ...input,
-          eventULID,
-          createdBy: localUser.id,
-        })
-        .returning()
+  const createdEvent = await db
+    .insert(events)
+    .values({
+      ...input,
+      eventULID,
+      creatorId: localUser.id,
+    })
+    .returning()
 
-      if (createdEvent.length === 0) {
-        throw new Error('Failed to create event')
-      }
-      if (creator.includeInEvent) {
-        await tx.insert(usersToEvent).values({
-          userId: localUser.id,
-          eventId: createdEvent[0].id,
-        })
-      }
+  if (createdEvent.length === 0) {
+    throw new Error('Failed to create event')
+  }
 
-      return createdEvent[0].eventULID
-    },
-    {
-      behavior: 'deferred',
-    },
-  )
+  if (creator.includeInEvent) {
+    await db.insert(usersToEvent).values({
+      userId: localUser.id,
+      eventId: createdEvent[0].id,
+    })
+  }
+
   return eventULID
 }

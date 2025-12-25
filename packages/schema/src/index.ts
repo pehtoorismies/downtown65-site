@@ -25,9 +25,15 @@ export const IDSchema = z.number().int().positive().openapi({
 })
 export type ID = z.infer<typeof IDSchema>
 
-export const ULIDSchema = z.string().refine((v) => {
-  return isValidULID(v)
-}, 'Invalid ULID')
+export const ULIDSchema = z
+  .string()
+  .refine((v) => {
+    return isValidULID(v)
+  }, 'Invalid ULID')
+  .openapi({
+    description: 'ULID string identifier',
+    example: '01KDANZQYE8463VT7K51XTRHTV',
+  })
 export type ULID = z.infer<typeof ULIDSchema>
 
 export const StringIDSchema = z.object({

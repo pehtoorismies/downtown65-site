@@ -1,5 +1,6 @@
 import { EventCreateSchema, ULIDSchema } from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
+import { z } from 'zod'
 import type { AppAPI } from '~/app-api'
 import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
@@ -24,7 +25,7 @@ const route = createRoute({
     201: {
       description: 'Event created',
       content: {
-        'application/json': { schema: ULIDSchema },
+        'application/json': { schema: z.object({ eventULID: ULIDSchema }) },
       },
     },
     // 401: {
@@ -41,10 +42,10 @@ export const register = (app: AppAPI) => {
     const eventData = c.req.valid('json')
     const { sub } = c.get('jwtPayload')
 
-    const created = await createEvent(getConfig(c.env), eventData, {
+    const eventULID = await createEvent(getConfig(c.env), eventData, {
       auth0Sub: sub,
       includeInEvent: true,
     })
-    return c.json(created, 201)
+    return c.json({ eventULID: ULIDSchema.parse(eventULID) }, 201)
   })
 }
