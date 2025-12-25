@@ -12,3 +12,5 @@
 
 
 .dev.vars*
+
+db.sqlite

@@ -7,10 +7,14 @@ export const EventPathULIDParamSchema = z
   })
   .openapi({ description: 'ULID of the event' })
 
-export const IDParamSchema = StringIDSchema.openapi({
-  param: {
-    name: 'id',
-    in: 'path',
-  },
-  example: '1212121',
-})
+export const IDParamSchema = z
+  .object({
+    id: StringIDSchema,
+  })
+  .openapi({
+    param: {
+      name: 'id',
+      in: 'path',
+    },
+    example: '1212121',
+  })

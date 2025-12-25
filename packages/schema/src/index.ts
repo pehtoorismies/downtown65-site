@@ -36,12 +36,10 @@ export const ULIDSchema = z
   })
 export type ULID = z.infer<typeof ULIDSchema>
 
-export const StringIDSchema = z.object({
-  id: z
-    .string()
-    .transform((s) => Number(s))
-    .pipe(IDSchema),
-})
+export const StringIDSchema = z
+  .string()
+  .transform((s) => Number(s))
+  .pipe(IDSchema)
 
 // ============================================
 // Dates and Times
