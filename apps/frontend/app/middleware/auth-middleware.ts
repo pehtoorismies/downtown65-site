@@ -1,3 +1,4 @@
+import { createLogger } from '@downtown65/logger'
 import { type MiddlewareFunction, redirect } from 'react-router'
 import { AuthContext } from '~/context/context'
 import { createSessionManager } from '~/session/session-manager.server'
@@ -9,6 +10,8 @@ export const authMiddleware =
     allowAnonymous?: boolean
   } = {}): MiddlewareFunction =>
   async ({ request, context }, next) => {
+    const logger = createLogger({ appContext: 'Auth Middleware' })
+
     const secrets = {
       COOKIE_SESSION_SECRET: context.cloudflare.env.COOKIE_SESSION_SECRET,
       API_KEY: context.cloudflare.env.API_KEY,
@@ -17,6 +20,9 @@ export const authMiddleware =
     const result = await sessionManager.getUserSession(request)
 
     if (result.success === false && allowAnonymous === false) {
+      logger
+        .withContext({ message: result.message })
+        .info('User not authenticated, redirecting to /login')
       return redirect('/login', { headers: result.headers })
     }
 

@@ -91,6 +91,7 @@ export const createSessionManager = (secrets: Secrets) => {
       headers,
     }
   }
+
   const getUserSession = async (
     request: Request,
   ): Promise<UserSessionResponse> => {
@@ -102,7 +103,10 @@ export const createSessionManager = (secrets: Secrets) => {
     }
 
     if (isSessionCookieExpired(sessionData.data.expiresAt)) {
-      return getErrorResponse(session, 'Cookie session expired')
+      return getErrorResponse(
+        session,
+        `Cookie session expired at ${sessionData.data.expiresAt}`,
+      )
     }
     const accessTokenExpired = isAccessTokenExpired(
       sessionData.data.accessToken,
