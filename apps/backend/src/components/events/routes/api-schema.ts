@@ -18,3 +18,5 @@ export const IDParamSchema = z
     },
     example: '1212121',
   })
+
+export const TestSchema = z.union([ULIDSchema, StringIDSchema])

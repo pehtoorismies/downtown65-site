@@ -103,9 +103,9 @@ export async function loader({ context, params }: Route.LoaderArgs) {
   const authContext = context.get(AuthContext)
   const me = authContext ? authContext.user : null
 
-  const { error, data } = await apiClient.GET('/events/{eventULID}', {
+  const { error, data } = await apiClient.GET('/events/{idOrULID}', {
     params: {
-      path: { eventULID: params.eventULID },
+      path: { idOrULID: params.eventULID },
     },
     headers: {
       'x-api-key': context.cloudflare.env.API_KEY,

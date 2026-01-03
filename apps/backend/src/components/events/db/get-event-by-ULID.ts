@@ -1,19 +1,19 @@
 import { createLogger } from '@downtown65/logger'
-import type { Event, ID } from '@downtown65/schema'
+import type { Event, ULID } from '@downtown65/schema'
 import { EventSchema } from '@downtown65/schema'
 import type { Config } from '~/common/config/config'
 import { getDb } from '~/db/get-db'
 
-export const getEventById = async (
+export const getEventByULID = async (
   config: Config,
-  id: ID,
+  eventULID: ULID,
 ): Promise<Event | undefined> => {
   const logger = createLogger({ appContext: 'DB: Get Event By ULID' })
   const db = getDb(config.D1_DB)
 
   const event = await db.query.events.findFirst({
     where: {
-      id,
+      eventULID,
     },
     with: {
       createdBy: true,
@@ -21,7 +21,7 @@ export const getEventById = async (
     },
   })
 
-  logger.withMetadata({ event }).debug('Queried event by ID')
+  logger.withMetadata({ event }).debug('Queried event by ULID')
 
   if (!event) {
     return undefined
