@@ -1,42 +1,119 @@
-import { OpenAPIHono } from '@hono/zod-openapi'
-import { apiReference } from '@scalar/hono-api-reference'
+import { createLogger } from '@downtown65/logger'
+import { MessageSchema } from '@downtown65/schema'
+import { OpenAPIHono, z } from '@hono/zod-openapi'
+import { Scalar } from '@scalar/hono-api-reference'
 import { cors } from 'hono/cors'
+import { requestId } from 'hono/request-id'
+import type { SchemaObject } from 'openapi3-ts/oas31'
 import type { AppAPI } from './app-api'
-import { registerEventRoutes } from './routes/events'
-import { eventStore } from './store/events'
+import { registerRoutes as authRoutes } from './components/auth/routes'
+import { registerRoutes as eventRoutes } from './components/events/routes'
+import { registerRoutes as usersRoutes } from './components/users/routes'
+import {
+  formatZodErrors,
+  ValidationErrorSchema,
+} from './schemas/validation-error'
 
-export type OpenAPIHonoType = OpenAPIHono<{ Bindings: Env }>
+const logger = createLogger({ appContext: 'Backend Server' })
 
-const app: AppAPI = new OpenAPIHono<{ Bindings: Env }>()
+const app: AppAPI = new OpenAPIHono({
+  defaultHook: (result, c) => {
+    if (!result.success) {
+      logger.withMetadata({ errors: result.error }).warn('Validation failed')
+      return c.json(
+        {
+          message: 'Validation failed',
+          errors: formatZodErrors(result.error),
+        },
+        422,
+      )
+    }
+  },
+})
+
+app.use(requestId())
+
+app.openAPIRegistry.registerComponent(
+  'schemas',
+  'ValidationError',
+  z.toJSONSchema(ValidationErrorSchema) as SchemaObject,
+)
+
+app.openAPIRegistry.registerComponent('responses', 'ValidationError', {
+  description: 'Validation error',
+  content: {
+    'application/json': {
+      schema: {
+        $ref: '#/components/schemas/ValidationError',
+      },
+    },
+  },
+})
+
+app.openAPIRegistry.registerComponent(
+  'schemas',
+  'UnauthorizedError',
+  z.toJSONSchema(MessageSchema) as SchemaObject,
+)
+app.openAPIRegistry.registerComponent('responses', 'UnauthorizedError', {
+  description: 'Unauthorized Error',
+  content: {
+    'application/json': {
+      schema: {
+        $ref: '#/components/schemas/UnauthorizedError',
+      },
+    },
+  },
+})
 
 app.openAPIRegistry.registerComponent('securitySchemes', 'ApiKeyAuth', {
   type: 'apiKey',
   in: 'header',
-  name: 'X-API-Key',
-  description: 'API key required in the X-API-Key header.',
+  name: 'x-api-key',
+  description: 'API key required in the x-api-key header.',
+})
+
+app.openAPIRegistry.registerComponent('securitySchemes', 'BearerToken', {
+  type: 'http',
+  scheme: 'bearer',
+  bearerFormat: 'JWT', // optional, e.g. 'JWT'
 })
 
 app.use('*', cors())
 
-app.get('/healthz', (c) => c.json({ status: 'oks' }))
+app.get('/healthz', (c) => c.json({ status: 'ok' }))
 
-registerEventRoutes(app, eventStore)
+authRoutes(app)
+eventRoutes(app)
+usersRoutes(app)
 
-app.doc('/openapi.json', {
+app.doc31('/doc', {
   openapi: '3.1.0',
   info: {
     title: 'Event API',
     version: '1.0.0',
   },
+  security: [{ ApiKeyAuth: [] }],
 })
 
 app.get(
-  '/doc',
-  apiReference({
-    spec: { url: '/openapi.json' },
-    layout: 'classic',
+  '/scalar',
+  Scalar(() => ({
+    url: '/doc',
     theme: 'kepler',
-  }),
+    pageTitle: 'Dt65 Events API Reference',
+    authentication: {
+      // Make your API key scheme the default selection
+      preferredSecurityScheme: 'ApiKeyAuth',
+      securitySchemes: {
+        ApiKeyAuth: {
+          name: 'x-api-key', // header name in your security scheme
+          in: 'header',
+          value: 'dev-api-key-change-in-production', // provide a default value for easy testing
+        },
+      },
+    },
+  })),
 )
 
 // Export for Cloudflare Workers
