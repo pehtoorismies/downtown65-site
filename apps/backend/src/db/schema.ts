@@ -43,7 +43,7 @@ export const usersToEvent = sqliteTable(
     eventId: t
       .integer()
       .notNull()
-      .references(() => events.id),
+      .references(() => events.id, { onDelete: 'cascade' }),
     createdAt: t.text().notNull().default(sql`CURRENT_TIMESTAMP`),
   }),
   (table) => [primaryKey({ columns: [table.userId, table.eventId] })],
