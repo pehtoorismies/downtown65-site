@@ -22,17 +22,26 @@ export const action = async ({
   params,
 }: Route.ActionArgs) => {
   const logger = createLogger({
-    appContext: 'Frontend: Event Participation POST or DELETE',
+    appContext:
+      new URL(import.meta.url).pathname.split('/').slice(-2).join(' > ') ||
+      'Event Participation',
   })
-  logger.debug(`Event participation action invoked. Method=${request.method}`)
   const eventID = stringToID.decode(params.id)
+  logger.withContext({ eventID, method: request.method })
 
   const authContext = context.get(AuthContext)
   if (!authContext) {
+    logger.warn('Unauthorized access to event participation action')
     throw new Error('Unauthorized')
   }
 
   const client = getApiRequest(request.method)
+  logger.withContext({
+    eventID,
+    method: request.method,
+    user: authContext.user,
+  })
+  logger.info(`User ${authContext.user.nickname} is modifying participation.`)
 
   const { accessToken } = authContext
 

@@ -1,6 +1,7 @@
 import type { Event } from '@downtown65/schema'
 import { Button, Grid, Group, Text } from '@mantine/core'
 import { IconArrowNarrowRight, IconMedal } from '@tabler/icons-react'
+import type { PropsWithChildren } from 'react'
 import { Link } from 'react-router'
 import { getEventTypeData } from '~/components/event/get-event-type-data'
 import { useParticipants } from '~/components/participants/use-participants'
@@ -11,7 +12,11 @@ interface Props {
   me: { id: number }
 }
 
-export const ListEventCard = ({ event, me }: Props) => {
+export const ListEventCard = ({
+  event,
+  me,
+  children,
+}: PropsWithChildren<Props>) => {
   const {
     eventULID,
     title,
@@ -57,9 +62,7 @@ export const ListEventCard = ({ event, me }: Props) => {
             </Text>
           </Grid.Col>
           <Grid.Col span={5}>
-            <Group justify="end">
-              <Button>TODO</Button>
-            </Group>
+            <Group justify="end">{children}</Group>
           </Grid.Col>
         </Grid>
         <Button

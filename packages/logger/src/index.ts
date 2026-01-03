@@ -6,6 +6,7 @@ interface LoggerOptions {
 
 export const createLogger = (options?: LoggerOptions) => {
   const logger = new LogLayer({
+    contextFieldName: 'context',
     transport: [
       new ConsoleTransport({
         logger: console,

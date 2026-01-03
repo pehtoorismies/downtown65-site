@@ -13,6 +13,7 @@ import { Link, redirect } from 'react-router'
 import { apiClient } from '~/api/api-client'
 import { AuthContext } from '~/context/context'
 import { authMiddleware } from '~/middleware/auth-middleware'
+import { EventButtonContainer } from '../events.$eventULID/EventButtonContainer'
 import type { Route } from './+types/route'
 import { ListEventCard } from './ListEventCard'
 
@@ -85,7 +86,15 @@ export default function EventsList({ loaderData }: Route.ComponentProps) {
         verticalSpacing={{ base: 'sm', md: 'xl' }}
       >
         {events.map((x) => {
-          return <ListEventCard key={x.id} event={x} me={user} />
+          return (
+            <ListEventCard key={x.id} event={x} me={user}>
+              <EventButtonContainer
+                participants={x.participants}
+                me={user}
+                eventId={x.id}
+              />
+            </ListEventCard>
+          )
         })}
       </SimpleGrid>
     </Layout>
