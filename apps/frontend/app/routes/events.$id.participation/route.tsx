@@ -2,15 +2,20 @@ import { createLogger } from '@downtown65/logger'
 import { stringToID } from '@downtown65/schema'
 import { apiClient } from '~/api/api-client'
 import { AuthContext } from '~/context/context'
+import { authMiddleware } from '~/middleware/auth-middleware'
 import type { Route } from './+types/route'
 
-const getApiRequest = (method: 'POST' | 'DELETE') => {
+const getApiRequest = (method: string) => {
   if (method === 'POST') {
     return apiClient.POST
-  } else {
+  } else if (method === 'DELETE') {
     return apiClient.DELETE
   }
+  throw new Error(`Unsupported request method ${method}`)
 }
+
+export const middleware = [authMiddleware()]
+
 export const action = async ({
   request,
   context,
@@ -19,15 +24,12 @@ export const action = async ({
   const logger = createLogger({
     appContext: 'Frontend: Event Participation POST or DELETE',
   })
-
+  logger.debug(`Event participation action invoked. Method=${request.method}`)
   const eventID = stringToID.decode(params.id)
 
   const authContext = context.get(AuthContext)
   if (!authContext) {
     throw new Error('Unauthorized')
-  }
-  if (request.method !== 'POST' && request.method !== 'DELETE') {
-    throw new Error(`Unsupported request method ${request.method}`)
   }
 
   const client = getApiRequest(request.method)
