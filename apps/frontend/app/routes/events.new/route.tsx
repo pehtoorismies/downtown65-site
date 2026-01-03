@@ -23,11 +23,9 @@ export const action = async ({ context, request }: Route.ActionArgs) => {
   }
 
   const formData = await request.formData()
-  console.warn('Form Data:', Object.fromEntries(formData))
   const parsed = EventFormSchema.safeParse(Object.fromEntries(formData))
-  console.warn('Form Data PArsed:', parsed)
+
   if (parsed.success === false) {
-    console.error('Form Data Parsing Error:', parsed.error)
     return { errorMessage: 'Invalid form data' }
   }
 

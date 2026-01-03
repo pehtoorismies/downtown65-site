@@ -1,3 +1,4 @@
+import { createLogger } from '@downtown65/logger'
 import { EventSchema, type ISOTime } from '@downtown65/schema'
 import { Alert, Button, Center, Title } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
@@ -10,30 +11,38 @@ import { CancelModal } from '~/components/event/edit-or-create/CancelModal'
 import { CreateEventContainer } from '~/components/event/edit-or-create/CreateEventContainer'
 import { EventFormSchema } from '~/components/event/edit-or-create/event-form-schema'
 import { ModificationDivider } from '~/components/event/edit-or-create/ModificationDivider'
+import { ActiveStep, reducer } from '~/components/event/edit-or-create/reducer'
 import { AuthContext } from '~/context/context'
 import { authMiddleware } from '~/middleware/auth-middleware'
-import {
-  ActiveStep,
-  reducer,
-} from '../../components/event/edit-or-create/reducer'
 import type { Route } from './+types/route'
 
 export const middleware = [authMiddleware()]
 
-export const action = async ({ context, request }: Route.ActionArgs) => {
+export const action = async ({
+  context,
+  request,
+  params,
+}: Route.ActionArgs) => {
+  const logger = createLogger({
+    appContext: 'Frontend: events.$id.edit action',
+  })
   const authContext = context.get(AuthContext)
   if (!authContext) {
     return redirect('/login')
   }
 
   const formData = await request.formData()
-
+  logger.withContext({ formData }).debug('Processing form data for event edit')
   const parsed = EventFormSchema.safeParse(Object.fromEntries(formData))
+  logger.withContext({ parsed }).debug('Parsed form data')
   if (parsed.success === false) {
     return { errorMessage: 'Invalid form data' }
   }
 
-  const { error, data } = await apiClient.POST('/events', {
+  const { error } = await apiClient.PUT('/events/{id}', {
+    params: {
+      path: { id: params.id },
+    },
     body: parsed.data,
     headers: {
       'Content-Type': 'application/json',
@@ -47,7 +56,7 @@ export const action = async ({ context, request }: Route.ActionArgs) => {
     return { errorMessage: 'Error creating event' }
   }
 
-  return redirect(`/events/${data.eventULID}`)
+  return redirect(`/events/${params.id}`)
 }
 
 export async function loader({ context, params }: Route.LoaderArgs) {

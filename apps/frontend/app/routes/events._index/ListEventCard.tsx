@@ -3,6 +3,7 @@ import { Button, Grid, Group, Text } from '@mantine/core'
 import { IconArrowNarrowRight, IconMedal } from '@tabler/icons-react'
 import type { PropsWithChildren } from 'react'
 import { Link } from 'react-router'
+import { DateFormat } from '~/components/event/DateFormat'
 import { getEventTypeData } from '~/components/event/get-event-type-data'
 import { useParticipants } from '~/components/participants/use-participants'
 import { Voucher } from '~/components/voucher/Voucher'
@@ -55,7 +56,7 @@ export const ListEventCard = ({
               {subtitle}
             </Text>
             <Text size="sm" fw={500} data-testid="event-date">
-              {dateStart} {time}
+              <DateFormat isoDate={dateStart} format="d.M.yyyy" /> {time}
             </Text>
             <Text size="sm" c="dimmed" fw={400} data-testid="event-location">
               {location}

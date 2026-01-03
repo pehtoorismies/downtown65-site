@@ -15,6 +15,10 @@ export const getEvents = async (config: Config): Promise<EventList> => {
       createdBy: true,
       participants: true,
     },
+    orderBy: (events, { asc }) => [
+      asc(events.dateStart),
+      asc(events.timeStart),
+    ],
   })
 
   const withJoinedAt = result.map((event) => {

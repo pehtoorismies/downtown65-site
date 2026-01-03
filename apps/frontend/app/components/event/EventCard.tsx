@@ -4,6 +4,7 @@ import { IconMedal } from '@tabler/icons-react'
 import type { PropsWithChildren } from 'react'
 import { useParticipants } from '../participants/use-participants'
 import { Voucher } from '../voucher/Voucher'
+import { DateFormat } from './DateFormat'
 import { getEventTypeData } from './get-event-type-data'
 import { Participants } from './Participants'
 
@@ -41,8 +42,6 @@ export const EventCard = ({
   const time = timeStart ? `klo ${timeStart}` : ''
   const descriptionText = getDescription(description)
 
-  const formattedDate = time.length === 0 ? dateStart : `${dateStart} ${time}`
-
   const { eventText, imageUrl } = getEventTypeData(eventType)
 
   return (
@@ -64,7 +63,7 @@ export const EventCard = ({
               {subtitle}
             </Text>
             <Text size="sm" fw={500} data-testid="event-date">
-              {formattedDate}
+              <DateFormat isoDate={dateStart} format="d.M.yyyy" /> {time}
             </Text>
             <Text size="sm" c="dimmed" fw={400} data-testid="event-location">
               {location}
