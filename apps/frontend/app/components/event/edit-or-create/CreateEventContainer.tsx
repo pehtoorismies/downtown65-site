@@ -26,7 +26,6 @@ interface Props {
   state: EventState
   dispatch: Dispatch<EventAction>
   me: User
-  cancelRedirectPath: string
 }
 
 export const CreateEventContainer: FC<Props> = ({ state, me, dispatch }) => {

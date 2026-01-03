@@ -1,20 +1,18 @@
-import { Alert, Box, Button, Center, Divider, Title } from '@mantine/core'
+import { ISODateTimeSchema } from '@downtown65/schema'
+import { Alert, Button, Center, Title } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import {
-  IconAlertCircle,
-  IconAlertTriangleFilled,
-  IconCircleOff,
-} from '@tabler/icons-react'
+import { IconAlertCircle, IconCircleOff } from '@tabler/icons-react'
 import { useReducer } from 'react'
 import { redirect } from 'react-router'
 import { apiClient } from '~/api/api-client'
+import { CreateEventContainer } from '~/components/event/edit-or-create/CreateEventContainer'
+import { EventFormSchema } from '~/components/event/edit-or-create/event-form-schema'
+import { ModificationDivider } from '~/components/event/edit-or-create/ModificationDivider'
+import { ActiveStep, reducer } from '~/components/event/edit-or-create/reducer'
 import { AuthContext } from '~/context/context'
 import { authMiddleware } from '~/middleware/auth-middleware'
+import { CancelModal } from '../../components/event/edit-or-create/CancelModal'
 import type { Route } from './+types/route'
-import { CancelModal } from './CancelModal'
-import { CreateEventContainer } from './CreateEventContainer'
-import { EventFormSchema } from './event-form-schema'
-import { ActiveStep, reducer } from './reducer'
 
 export const middleware = [authMiddleware()]
 
@@ -25,9 +23,11 @@ export const action = async ({ context, request }: Route.ActionArgs) => {
   }
 
   const formData = await request.formData()
-
+  console.warn('Form Data:', Object.fromEntries(formData))
   const parsed = EventFormSchema.safeParse(Object.fromEntries(formData))
+  console.warn('Form Data PArsed:', parsed)
   if (parsed.success === false) {
+    console.error('Form Data Parsing Error:', parsed.error)
     return { errorMessage: 'Invalid form data' }
   }
 
@@ -65,6 +65,11 @@ export default function CreateEvent({
 }: Route.ComponentProps) {
   const { me } = loaderData
 
+  const meParticipant = {
+    ...me,
+    joinedAt: ISODateTimeSchema.parse(new Date().toISOString()),
+  }
+
   const [opened, handlers] = useDisclosure(false)
   const [eventState, dispatch] = useReducer(reducer, {
     activeStep: ActiveStep.STEP_EVENT_TYPE,
@@ -72,7 +77,7 @@ export default function CreateEvent({
     description: '',
     isRace: false,
     location: '',
-    participants: [],
+    participants: [meParticipant],
     submitEvent: false,
     subtitle: '',
     time: {},
@@ -82,7 +87,15 @@ export default function CreateEvent({
 
   return (
     <>
-      <CancelModal opened={opened} onClose={handlers.close} />
+      <Title order={1} size="h5">
+        {actionData?.errorMessage}
+      </Title>
+      <CancelModal
+        opened={opened}
+        onClose={handlers.close}
+        title="Keskeytä tapahtuman luonti"
+        navigationPath="/events"
+      />
       {actionData?.errorMessage && (
         <Alert
           icon={<IconAlertCircle size={16} />}
@@ -96,24 +109,8 @@ export default function CreateEvent({
       <Title order={1} size="h5">
         Uusi tapahtuma: {eventState.title || 'ei nimeä'}
       </Title>
-      <CreateEventContainer
-        state={eventState}
-        dispatch={dispatch}
-        me={me}
-        cancelRedirectPath="koira"
-      />
-      <Divider
-        mt="xl"
-        size="sm"
-        variant="dashed"
-        labelPosition="center"
-        label={
-          <>
-            <IconAlertTriangleFilled size={12} />
-            <Box ml={5}>Modification zone</Box>
-          </>
-        }
-      />
+      <CreateEventContainer state={eventState} dispatch={dispatch} me={me} />
+      <ModificationDivider />
       <Center>
         <Button
           my="md"

@@ -7,13 +7,13 @@ import { events, usersToEvent } from '~/db/schema'
 export const createEvent = async (
   config: Config,
   input: EventCreateInput,
-  creator: { auth0Sub: Auth0Sub; includeInEvent: boolean },
+  creatorAuth0Sub: Auth0Sub,
 ): Promise<ULID> => {
   const db = getDb(config.D1_DB)
 
   const localUser = await db.query.users.findFirst({
     where: {
-      auth0Sub: creator.auth0Sub,
+      auth0Sub: creatorAuth0Sub,
     },
   })
 
@@ -36,7 +36,7 @@ export const createEvent = async (
     throw new Error('Failed to create event')
   }
 
-  if (creator.includeInEvent) {
+  if (input.includeEventCreator) {
     await db.insert(usersToEvent).values({
       userId: localUser.id,
       eventId: createdEvent[0].id,

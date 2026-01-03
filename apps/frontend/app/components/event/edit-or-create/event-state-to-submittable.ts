@@ -1,6 +1,6 @@
-import { ISODateSchema, ISOTimeSchema } from '@downtown65/schema'
+import { ISODateSchema, type ISOTime, ISOTimeSchema } from '@downtown65/schema'
 import z from 'zod'
-import type { EventForm } from './event-form-schema'
+import { EventFormSchema } from './event-form-schema'
 import type { EventState } from './event-state'
 
 const DateToISODateSchema = z
@@ -16,7 +16,7 @@ const DateToISODateSchema = z
 const toTimeFormat = (hours: number, minutes: number) =>
   `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
 
-const getAsISOTime = (time: EventState['time']) => {
+const getAsISOTime = (time: EventState['time']): ISOTime | null => {
   if (time.minutes === undefined || time.hours === undefined) {
     return null
   }
@@ -28,20 +28,20 @@ const getAsISOTime = (time: EventState['time']) => {
   return result.success ? result.data : null
 }
 
-export const toSubmittable = (eventState: EventState): EventForm => {
+export const toSubmittable = (eventState: EventState) => {
   if (eventState.eventType === undefined) {
     throw new Error('Cannot submit undefined eventType')
   }
 
-  const dateResult = DateToISODateSchema.safeParse(eventState.date)
-  if (!dateResult.success) {
+  const isoDateResult = DateToISODateSchema.safeParse(eventState.date)
+  if (!isoDateResult.success) {
     throw new Error('Date format is incorrect')
   }
 
   const timeValue = getAsISOTime(eventState.time)
 
-  return {
-    dateStart: dateResult.data,
+  return EventFormSchema.encode({
+    dateStart: isoDateResult.data,
     description: eventState.description,
     eventType: eventState.eventType,
     race: eventState.isRace,
@@ -50,5 +50,5 @@ export const toSubmittable = (eventState: EventState): EventForm => {
     subtitle: eventState.subtitle,
     title: eventState.title,
     timeStart: timeValue,
-  }
+  })
 }

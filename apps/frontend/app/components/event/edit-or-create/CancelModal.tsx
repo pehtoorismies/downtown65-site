@@ -5,15 +5,22 @@ import { Form } from 'react-router'
 interface Props {
   opened: boolean
   onClose: () => void
+  title: string
+  navigationPath: string
 }
 
-export const CancelModal = ({ opened, onClose }: Props) => {
+export const CancelModal = ({
+  opened,
+  onClose,
+  title,
+  navigationPath,
+}: Props) => {
   return (
     <Modal
       zIndex={2000}
       opened={opened}
       onClose={onClose}
-      title="Keskeytä tapahtuman luonti"
+      title={title}
       closeButtonProps={{ 'aria-label': 'Close' }}
     >
       <Group
@@ -28,7 +35,7 @@ export const CancelModal = ({ opened, onClose }: Props) => {
         >
           Sulje
         </Button>
-        <Form method="GET" action="/events">
+        <Form method="GET" action={navigationPath}>
           <Button
             type="submit"
             color="red"
