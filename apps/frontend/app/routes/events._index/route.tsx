@@ -78,8 +78,7 @@ export default function EventsList({ loaderData }: Route.ComponentProps) {
 
   return (
     <Layout>
-      <Title>Tapahtumat</Title>
-      <Text>Tulevat tapahtumat:</Text>
+      <Title>Tulevat tapahtumat</Title>
       <SimpleGrid
         cols={{ base: 1, sm: 2 }}
         spacing={{ base: 'sm', md: 'xl' }}
