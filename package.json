@@ -16,7 +16,7 @@
     "sherif": "sherif"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.8",
+    "@biomejs/biome": "2.3.11",
     "sherif": "1.9.0"
   }
 }
