@@ -71,9 +71,6 @@ type LeaveEventAction = {
   kind: 'leaveEvent'
   me: User
 }
-export type ToPreviewAction = {
-  kind: 'toPreview'
-}
 
 export type EventAction =
   | DateAction
@@ -86,7 +83,6 @@ export type EventAction =
   | RaceAction
   | StepAction
   | TimeAction
-  | ToPreviewAction
   | TypeAction
 
 export interface ReducerProps {
@@ -170,12 +166,6 @@ export const reducer = (state: EventState, action: EventAction): EventState => {
       return {
         ...state,
         participants: state.participants.filter((x) => x.id !== action.me.id),
-      }
-    }
-    case 'toPreview': {
-      return {
-        ...state,
-        activeStep: ActiveStep.STEP_PREVIEW,
       }
     }
   }

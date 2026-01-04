@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  "entry": ["app/root.tsx", "app/entry.server.tsx", "app/routes/**/*.tsx"],
+  "entry": ["app/routes/**/*.tsx"],
   "project": ["app/**/*.{ts,tsx}"],
   "paths": {
     "~/*": ["app/*"]

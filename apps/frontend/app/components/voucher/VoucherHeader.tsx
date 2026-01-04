@@ -25,7 +25,7 @@ export const VoucherHeader = ({
   )
 }
 
-export interface StringChildProps {
+interface StringChildProps {
   children: string
 }
 
