@@ -9,11 +9,11 @@
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
-    "find-unused": "pnpm -r find-unused",
+    "knip": "pnpm -r knip",
     "ci:lint": "pnpm -r ci:lint",
     "format": "pnpm -r format",
     "typecheck": "pnpm -r typecheck",
-    "lint-package-versions": "sherif"
+    "sherif": "sherif"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.8",

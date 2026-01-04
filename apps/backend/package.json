@@ -14,7 +14,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "cf-typegen": "wrangler types",
     "deploy": "wrangler deploy",
-    "find-unused": "knip"
+    "knip": "knip"
   },
   "dependencies": {
     "@downtown65/logger": "workspace:*",

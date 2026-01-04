@@ -12,12 +12,12 @@
     "postinstall": "pnpm run generate:react-router-types && pnpm run generate:cloudflare-types",
     "preview": "pnpm run build && vite preview",
     "test": "vitest",
-    "typecheck": "pnpm run generate:cloudflare-types && pnpm run generate:react-router-types && tsc -b",
+    "typecheck": "tsc -b",
     "generate:all": "pnpm run generate:react-router-types && pnpm run generate:cloudflare-types && pnpm run generate:api-types",
     "generate:api-types": "openapi-typescript http://localhost:3002/doc -o ./.generated/types/app/api/+types/api.d.ts",
     "generate:react-router-types": "react-router typegen",
     "generate:cloudflare-types": "wrangler types",
-    "find-unused": "knip"
+    "knip": "knip"
   },
   "dependencies": {
     "@downtown65/logger": "workspace:*",
