@@ -24,3 +24,5 @@ export const EventFormSchema = z.object({
     encode: (b) => (b ? 'true' : 'false'),
   }),
 })
+
+export type EventForm = z.infer<typeof EventFormSchema>

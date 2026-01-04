@@ -22,7 +22,6 @@ const getAsISOTime = (time: EventState['time']): ISOTime | null => {
   }
 
   const t = toTimeFormat(time.hours, time.minutes)
-  ISOTimeSchema.safeParse(t)
   const result = ISOTimeSchema.safeParse(t)
 
   return result.success ? result.data : null
@@ -33,15 +32,8 @@ export const toSubmittable = (eventState: EventState) => {
     throw new Error('Cannot submit undefined eventType')
   }
 
-  const isoDateResult = DateToISODateSchema.safeParse(eventState.date)
-  if (!isoDateResult.success) {
-    throw new Error('Date format is incorrect')
-  }
-
-  const timeValue = getAsISOTime(eventState.time)
-
   return EventFormSchema.encode({
-    dateStart: isoDateResult.data,
+    dateStart: DateToISODateSchema.parse(eventState.date),
     description: eventState.description,
     eventType: eventState.eventType,
     race: eventState.isRace,
@@ -49,6 +41,6 @@ export const toSubmittable = (eventState: EventState) => {
     includeEventCreator: eventState.participants.length > 0,
     subtitle: eventState.subtitle,
     title: eventState.title,
-    timeStart: timeValue,
+    timeStart: getAsISOTime(eventState.time),
   })
 }
