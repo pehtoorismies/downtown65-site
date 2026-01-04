@@ -5,7 +5,7 @@
   "paths": {
     "~/*": ["app/*"]
   },
-  "ignoreDependencies": ["@downtown65/schema"],
+  "ignoreDependencies": ["@downtown65/schema", "@downtown65/logger"],
   "rules": {
     "unresolved": "off"
   }

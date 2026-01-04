@@ -3,5 +3,5 @@
   "entry": ["src/server.ts"],
   "project": ["src/**/*.ts"],
   "ignore": ["**/*.test.ts", "**/*.spec.ts", "**/*.d.ts", "src/common/test/**"],
-  "ignoreDependencies": ["@downtown65/schema"]
+  "ignoreDependencies": ["@downtown65/schema", "@downtown65/logger"]
 }
