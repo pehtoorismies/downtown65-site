@@ -38,7 +38,7 @@ describe.each(apiKeyProtectedRoutes)('API Key Only: $method $path', async ({
   it('returns 401 without correct API key', async () => {
     const res = await app.request(path, { method, headers }, env)
     expect(res.status).toBe(401)
-    expect(await res.json()).toEqual({ error: 'Invalid API key' })
+    expect(await res.json()).toEqual({ error: 'Invalid x-api-key key' })
   })
 })
 
