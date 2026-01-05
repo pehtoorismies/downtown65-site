@@ -8,7 +8,7 @@ import {
   ThemeIcon,
 } from '@mantine/core'
 import { IconUsers } from '@tabler/icons-react'
-import type { PropsWithChildren } from 'react'
+import type { PropsWithChildren, ReactNode } from 'react'
 import { Gradient } from '../colors'
 import classes from './voucher.module.css'
 
@@ -24,14 +24,22 @@ export const VoucherHeader = ({
     </Card.Section>
   )
 }
-
-interface StringChildProps {
+interface TextContentProps {
   children: string
+}
+
+interface IconProps {
+  icon: ReactNode
+}
+
+interface ParticipantCountProps {
+  count: number
+  highlighted: boolean
 }
 
 VoucherHeader.displayName = 'VoucherHeader'
 
-const Title = ({ children }: StringChildProps) => {
+const Title = ({ children }: TextContentProps) => {
   return (
     <Box className={classes.areaTitle}>
       <Text className={classes.title} data-testid="event-title">
@@ -42,7 +50,7 @@ const Title = ({ children }: StringChildProps) => {
 }
 Title.displayName = 'VoucherTitle'
 
-const Type = ({ children }: StringChildProps) => {
+const Type = ({ children }: TextContentProps) => {
   return (
     <Badge
       className={classes.type}
@@ -57,7 +65,7 @@ const Type = ({ children }: StringChildProps) => {
 }
 Type.displayName = 'VoucherType'
 
-const Creator = ({ children }: StringChildProps) => {
+const Creator = ({ children }: TextContentProps) => {
   return (
     <Badge
       className={classes.areaCreator}
@@ -73,7 +81,7 @@ const Creator = ({ children }: StringChildProps) => {
 }
 Creator.displayName = 'VoucherCreator'
 
-const Icon = ({ icon }: { icon: React.ReactNode }) => {
+const Icon = ({ icon }: IconProps) => {
   return (
     <ThemeIcon
       data-testid="event-race"
@@ -88,13 +96,7 @@ const Icon = ({ icon }: { icon: React.ReactNode }) => {
 }
 Icon.displayName = 'VoucherIcon'
 
-const ParticipantCount = ({
-  count,
-  highlighted,
-}: {
-  count: number
-  highlighted: boolean
-}) => {
+const ParticipantCount = ({ count, highlighted }: ParticipantCountProps) => {
   return (
     <Badge
       data-testid="event-participant-count"
