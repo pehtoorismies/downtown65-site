@@ -1,12 +1,15 @@
 import type { Event } from '@downtown65/schema'
-import { Button, Grid, Group, Text } from '@mantine/core'
-import { IconArrowNarrowRight, IconMedal } from '@tabler/icons-react'
+import { Button } from '@mantine/core'
+import { IconArrowNarrowRight } from '@tabler/icons-react'
 import type { PropsWithChildren } from 'react'
 import { Link } from 'react-router'
-import { DateFormat } from '~/components/event/DateFormat'
+import { EventDetails } from '~/components/event/EventDetails'
+import { EventHeader } from '~/components/event/EventHeader'
 import { getEventTypeData } from '~/components/event/get-event-type-data'
 import { useParticipants } from '~/components/participants/use-participants'
 import { Voucher } from '~/components/voucher/Voucher'
+
+const VIEW_MORE_TEXT = 'Näytä lisää'
 
 interface Props {
   event: Event
@@ -19,7 +22,7 @@ export const ListEventCard = ({
   children,
 }: PropsWithChildren<Props>) => {
   const {
-    eventULID,
+    id,
     title,
     race,
     subtitle,
@@ -32,50 +35,38 @@ export const ListEventCard = ({
   } = event
 
   const { meAttending, count } = useParticipants(participants, me)
-
-  const time = timeStart ? `klo ${timeStart}` : ''
+  const { eventText, imageUrl } = getEventTypeData(eventType)
 
   return (
     <Voucher>
-      <Voucher.Header bgImageUrl={getEventTypeData(eventType).imageUrl}>
-        <Voucher.Header.Title>{title}</Voucher.Header.Title>
-        <Voucher.Header.ParticipantCount
-          count={count}
-          highlighted={meAttending}
-        />
-        <Voucher.Header.Creator>{createdBy.nickname}</Voucher.Header.Creator>
-        <Voucher.Header.Type>
-          {getEventTypeData(eventType).eventText}
-        </Voucher.Header.Type>
-        {race && <Voucher.Header.Icon icon={<IconMedal color="white" />} />}
-      </Voucher.Header>
+      <EventHeader
+        title={title}
+        eventText={eventText}
+        imageUrl={imageUrl}
+        creatorNickname={createdBy.nickname}
+        count={count}
+        meAttending={meAttending}
+        race={race}
+      />
       <Voucher.Content>
-        <Grid align="center" my={2} gutter="xs">
-          <Grid.Col span={7}>
-            <Text fw={700} mt={2} data-testid="event-subtitle">
-              {subtitle}
-            </Text>
-            <Text size="sm" fw={500} data-testid="event-date">
-              <DateFormat isoDate={dateStart} format="d.M.yyyy" /> {time}
-            </Text>
-            <Text size="sm" c="dimmed" fw={400} data-testid="event-location">
-              {location}
-            </Text>
-          </Grid.Col>
-          <Grid.Col span={5}>
-            <Group justify="end">{children}</Group>
-          </Grid.Col>
-        </Grid>
+        <EventDetails
+          location={location}
+          subtitle={subtitle}
+          dateStart={dateStart}
+          timeStart={timeStart}
+        >
+          {children}
+        </EventDetails>
         <Button
           component={Link}
-          to={`/events/${eventULID}`}
+          to={`/events/${id}`}
           fullWidth
           my="xs"
           size="compact-sm"
           rightSection={<IconArrowNarrowRight size={18} />}
           variant="subtle"
         >
-          Näytä lisää
+          {VIEW_MORE_TEXT}
         </Button>
       </Voucher.Content>
     </Voucher>

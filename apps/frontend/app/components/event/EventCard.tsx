@@ -1,12 +1,12 @@
 import type { Event, ID } from '@downtown65/schema'
 import { Divider } from '@mantine/core'
-import { IconMedal } from '@tabler/icons-react'
 import type { PropsWithChildren } from 'react'
 import { useParticipants } from '../participants/use-participants'
 import { Voucher } from '../voucher/Voucher'
 import { EVENT_CARD_LABELS } from './EventCard.constants'
 import { EventDescription } from './EventDescription'
 import { EventDetails } from './EventDetails'
+import { EventHeader } from './EventHeader'
 import { getEventTypeData } from './get-event-type-data'
 import { Participants } from './Participants'
 
@@ -38,16 +38,15 @@ export const EventCard = ({
 
   return (
     <Voucher>
-      <Voucher.Header bgImageUrl={imageUrl}>
-        <Voucher.Header.Title>{title}</Voucher.Header.Title>
-        <Voucher.Header.ParticipantCount
-          count={count}
-          highlighted={meAttending}
-        />
-        <Voucher.Header.Type>{eventText}</Voucher.Header.Type>
-        <Voucher.Header.Creator>{createdBy.nickname}</Voucher.Header.Creator>
-        {race && <Voucher.Header.Icon icon={<IconMedal color="white" />} />}
-      </Voucher.Header>
+      <EventHeader
+        title={title}
+        eventText={eventText}
+        imageUrl={imageUrl}
+        creatorNickname={createdBy.nickname}
+        count={count}
+        meAttending={meAttending}
+        race={race}
+      />
       <Voucher.Content>
         <EventDetails
           subtitle={subtitle}
