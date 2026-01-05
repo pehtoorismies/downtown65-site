@@ -1,19 +1,13 @@
 import { Avatar, Paper, Text } from '@mantine/core'
-import type { FC, PropsWithChildren } from 'react'
 
-type Properties = PropsWithChildren<{
+type Properties = {
   picture: string
   nickname: string
   name: string
   email: string
-}>
+}
 
-export const ProfileBox: FC<Properties> = ({
-  picture,
-  name,
-  nickname,
-  email,
-}: Properties) => {
+export const ProfileBox = ({ picture, name, nickname, email }: Properties) => {
   return (
     <Paper p="sm">
       <Avatar src={picture} size={120} radius={120} mx="auto" />
