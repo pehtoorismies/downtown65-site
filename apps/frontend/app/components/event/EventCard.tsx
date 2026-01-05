@@ -1,29 +1,25 @@
 import type { Event, ID } from '@downtown65/schema'
-import { Divider, Grid, Group, Text, Typography } from '@mantine/core'
+import { Divider } from '@mantine/core'
 import { IconMedal } from '@tabler/icons-react'
 import type { PropsWithChildren } from 'react'
 import { useParticipants } from '../participants/use-participants'
 import { Voucher } from '../voucher/Voucher'
-import { DateFormat } from './DateFormat'
+import { EVENT_CARD_LABELS } from './EventCard.constants'
+import { EventDescription } from './EventDescription'
+import { EventDetails } from './EventDetails'
 import { getEventTypeData } from './get-event-type-data'
 import { Participants } from './Participants'
 
-interface Props {
+interface EventCardProps {
   event: Omit<Event, 'id' | 'eventULID'>
   me: { id: ID } | null
-}
-
-const getDescription = (description: string | null) => {
-  if (description && description.trim().length > 0) {
-    return description.trim()
-  }
 }
 
 export const EventCard = ({
   event,
   me,
   children,
-}: PropsWithChildren<Props>) => {
+}: PropsWithChildren<EventCardProps>) => {
   const {
     title,
     race,
@@ -38,10 +34,6 @@ export const EventCard = ({
   } = event
 
   const { count, meAttending } = useParticipants(participants, me)
-
-  const time = timeStart ? `klo ${timeStart}` : ''
-  const descriptionText = getDescription(description)
-
   const { eventText, imageUrl } = getEventTypeData(eventType)
 
   return (
@@ -57,35 +49,21 @@ export const EventCard = ({
         {race && <Voucher.Header.Icon icon={<IconMedal color="white" />} />}
       </Voucher.Header>
       <Voucher.Content>
-        <Grid align="center" my={2} gutter="xs">
-          <Grid.Col span={7}>
-            <Text fw={700} mt={2} data-testid="event-subtitle">
-              {subtitle}
-            </Text>
-            <Text size="sm" fw={500} data-testid="event-date">
-              <DateFormat isoDate={dateStart} format="d.M.yyyy" /> {time}
-            </Text>
-            <Text size="sm" c="dimmed" fw={400} data-testid="event-location">
-              {location}
-            </Text>
-          </Grid.Col>
-          <Grid.Col span={5}>
-            <Group justify="end">{children}</Group>
-          </Grid.Col>
-        </Grid>
-        <Divider my="xs" label="Osallistujat" labelPosition="center" />
+        <EventDetails
+          subtitle={subtitle}
+          dateStart={dateStart}
+          timeStart={timeStart}
+          location={location}
+        >
+          {children}
+        </EventDetails>
+        <Divider
+          my="xs"
+          label={EVENT_CARD_LABELS.participants}
+          labelPosition="center"
+        />
         <Participants participants={participants} me={me} />
-        <Divider my="xs" label="Lisätiedot" labelPosition="center" />
-        {descriptionText ? (
-          <Typography p={0} mt="sm">
-            {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Fix later */}
-            <div dangerouslySetInnerHTML={{ __html: descriptionText }} />
-          </Typography>
-        ) : (
-          <Text ta="center" p="sm" c="dimmed" fw={400}>
-            ei tarkempaa tapahtuman kuvausta
-          </Text>
-        )}
+        <EventDescription description={description} />
       </Voucher.Content>
     </Voucher>
   )
