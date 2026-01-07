@@ -16,7 +16,8 @@
     "deploy": "wrangler deploy",
     "knip": "knip",
     "generate:openapi": "tsx scripts/generate-openapi.ts",
-    "generate:cf": "wrangler types"
+    "generate:cf": "wrangler types",
+    "clean": "rimraf node_modules"
   },
   "dependencies": {
     "@downtown65/logger": "workspace:*",
@@ -39,6 +40,7 @@
     "dotenv": "17.2.3",
     "drizzle-kit": "1.0.0-beta.4-4605abe",
     "knip": "5.79.0",
+    "rimraf": "6.0.1",
     "tsx": "4.21.0",
     "typescript": "5.9.3",
     "vitest": "3.2.0",
