@@ -14,3 +14,5 @@
 .dev.vars*
 
 db.sqlite
+
+.generated/

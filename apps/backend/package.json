@@ -9,12 +9,14 @@
     "test": "vitest",
     "lint": "biome check",
     "ci:lint": "biome ci",
-    "postinstall": "pnpm run cf-typegen",
+    "postinstall": "pnpm run generate:cf && pnpm run generate:openapi",
     "format": "biome format",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "cf-typegen": "wrangler types",
     "deploy": "wrangler deploy",
-    "knip": "knip"
+    "knip": "knip",
+    "generate:openapi": "tsx scripts/generate-openapi.ts",
+    "generate:cf": "wrangler types"
   },
   "dependencies": {
     "@downtown65/logger": "workspace:*",
@@ -37,6 +39,7 @@
     "dotenv": "17.2.3",
     "drizzle-kit": "1.0.0-beta.4-4605abe",
     "knip": "5.79.0",
+    "tsx": "4.21.0",
     "typescript": "5.9.3",
     "vitest": "3.2.0",
     "wrangler": "4.54.0"
