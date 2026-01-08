@@ -11,8 +11,8 @@ on:
 concurrency:
   group: merge-${{ github.ref }}
 
-# env:
-#   CLOUDFLARE_ENV : pr-${{ github.ref }}
+env:
+  PR_NUM: "${{ github.event.pull_request.number }}"
 
 jobs:
   ci:
@@ -39,7 +39,7 @@ jobs:
       - name: Check if DB exists and create if needed
         id: db-setup
         run: |
-          DB_NAME="pr-${{ github.event.pull_request.number }}-dt65-backend"
+          DB_NAME="pr-${PR_NUM}-dt65-backend"
           EXISTING_DB=$(echo '${{ steps.list-db.outputs.command-output }}' | jq -r --arg name "$DB_NAME" '.[] | select(.name == $name) | .uuid')
           
           if [ -n "$EXISTING_DB" ]; then
@@ -59,13 +59,44 @@ jobs:
       - name: Display Database ID
         run: |
           echo "Using Database ID: ${{ steps.db-setup.outputs.database_id }}"
+      - name: Create temporary wrangler config for PR
+        id: create-config
+        run: |
+          DB_ID="${{ steps.db-setup.outputs.database_id }}"
+          
+          cat > apps/backend/wrangler.pr.jsonc << EOF
+          {
+            "\$schema": "node_modules/wrangler/config-schema.json",
+            "name": "dt65-backend-pr-${PR_NUM}",
+            "compatibility_date": "2025-04-04",
+            "main": "./src/server.ts",
+            "compatibility_flags": ["nodejs_compat"],
+            "workers_dev": true,
+            "vars": {
+              "AUTH_CLIENT_ID": "JaoAht7ggce7f5R8DCBGUyjUJeMQEDtz",
+              "AUTH_DOMAIN": "dev-dt65.eu.auth0.com",
+              "AUTH_AUDIENCE": "https://graphql-dev.downtown65.com"
+            },
+            "d1_databases": [
+              {
+                "binding": "D1_DB",
+                "database_name": "pr-${PR_NUM}-dt65-backend",
+                "database_id": "${DB_ID}",
+                "migrations_dir": "drizzle_flat"
+              }
+            ]
+          }
+          EOF
+          
+          echo "Created wrangler.pr.jsonc"
+          cat apps/backend/wrangler.pr.jsonc      
       - name: Run Migrations
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          preCommands: echo "*** pre command ***"
-          command: d1 migrations apply dt65-backend-pr-${{ github.event.pull_request.number }} --remote
+          preCommands: ./scripts/drizzle_flatten.sh
+          command: d1 migrations apply pr-${{ github.event.pull_request.number }}-dt65-backend --remote --config wrangler.pr.jsonc
           workingDirectory: apps/backend
     
       # - name: Set Cloudflare environment backend
