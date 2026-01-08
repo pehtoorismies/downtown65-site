@@ -56,19 +56,18 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Extract Database ID
-        id: db-id
+      - name: Display Database ID
         run: |
-          OUTPUT='${{ steps.create-db.outputs.command-output }}'
-          # Extract the JSON block and parse it
-          DB_ID=$(echo "$OUTPUT" | sed -n '/d1_databases/,/}/p' | grep -oP '"database_id":\s*"\K[^"]+')
-          if [ -z "$DB_ID" ]; then
-            echo "Failed to extract database ID"
-            exit 1
-          fi
-          echo "database_id=$DB_ID" >> $GITHUB_OUTPUT
-          echo "Database ID: $DB_ID"
+          echo "Using Database ID: ${{ steps.db-setup.outputs.database_id }}"
+      - name: Run Migrations
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          preCommands: echo "*** pre command ***"
+          command: d1 migrations apply dt65-backend-pr-${{ github.event.pull_request.number }} --remote
+          workingDirectory: apps/backend
+    
       # - name: Set Cloudflare environment backend
       #   working-directory: apps/backend
       #   run: |
