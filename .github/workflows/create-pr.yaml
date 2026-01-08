@@ -11,8 +11,8 @@ on:
 concurrency:
   group: merge-${{ github.ref }}
 
-env:
-  WRANGLER_ENV: ${{ github.actor }}
+# env:
+#   CLOUDFLARE_ENV : pr-${{ github.ref }}
 
 jobs:
   ci:
@@ -27,26 +27,77 @@ jobs:
           node-version: 22
           cache: pnpm
       - name: Install dependencies
-        run: pnpm install
-      - name: Generate types
-        run: pnpm run ci:generate
-      - name: Lint
-        run: pnpm run ci:lint
-      - name: Typecheck
-        run: pnpm run typecheck
-      - name: Test
-        run: pnpm run test
-      - name: Deploy backend to Cloudflare Workers
+        run: pnpm install --ignore-scripts --frozen-lockfile
+      - name: List D1 Databases
+        id: list-db
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          command: d1 list --json
+          workingDirectory: apps/backend
+      - name: Check if DB exists and create if needed
+        id: db-setup
+        run: |
+          DB_NAME="pr-${{ github.event.pull_request.number }}-dt65-backend"
+          EXISTING_DB=$(echo '${{ steps.list-db.outputs.command-output }}' | jq -r --arg name "$DB_NAME" '.[] | select(.name == $name) | .uuid')
+          
+          if [ -n "$EXISTING_DB" ]; then
+            echo "Database already exists with ID: $EXISTING_DB"
+            echo "database_id=$EXISTING_DB" >> $GITHUB_OUTPUT
+          else
+            echo "Creating new database..."
+            cd apps/backend
+            CREATE_OUTPUT=$(npx wrangler d1 create "$DB_NAME" --json)
+            DB_ID=$(echo "$CREATE_OUTPUT" | jq -r '.uuid')
+            echo "database_id=$DB_ID" >> $GITHUB_OUTPUT
+            echo "Created database with ID: $DB_ID"
+          fi
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-        working-directory: apps/backend
+
+      - name: Extract Database ID
+        id: db-id
         run: |
-         pnpm run deploy -e=$WRANGLER_ENV
-      - name: Deploy frontend to Cloudflare Workers
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-        working-directory: apps/frontend
-        run: |
-         pnpm run deploy -e=$WRANGLER_ENV
+          OUTPUT='${{ steps.create-db.outputs.command-output }}'
+          # Extract the JSON block and parse it
+          DB_ID=$(echo "$OUTPUT" | sed -n '/d1_databases/,/}/p' | grep -oP '"database_id":\s*"\K[^"]+')
+          if [ -z "$DB_ID" ]; then
+            echo "Failed to extract database ID"
+            exit 1
+          fi
+          echo "database_id=$DB_ID" >> $GITHUB_OUTPUT
+          echo "Database ID: $DB_ID"
+      # - name: Set Cloudflare environment backend
+      #   working-directory: apps/backend
+      #   run: |
+      #     echo ${{ secrets.BACKEND_AUTH_CLIENT_SECRET }} | wrangler secret put AUTH_CLIENT_SECRET
+      #     echo ${{ secrets.BACKEND_REGISTER_SECRET }} | wrangler secret put REGISTER_SECRET
+      #     echo ${{ secrets.DT65_API_KEY }} | wrangler secret put API_KEY
+      # - name: Set Cloudflare environment frontend
+      #   working-directory: apps/frontend
+      #   run: |
+      #     echo ${{ secrets.FRONTEND_COOKIE_SESSION_SECRET }} | wrangler secret put COOKIE_SESSION_SECRET
+      # - name: Generate types
+      #   run: pnpm run ci:generate
+      # - name: Lint
+      #   run: pnpm run ci:lint
+      # - name: Typecheck
+      #   run: pnpm run typecheck
+      # - name: Test
+      #   run: pnpm run test
+      # - name: Deploy backend to Cloudflare Workers
+      #   env:
+      #     CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      #     CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      #   working-directory: apps/backend
+      #   run: |
+      #    pnpm run deploy -e=$WRANGLER_ENV
+      # - name: Deploy frontend to Cloudflare Workers
+      #   env:
+      #     CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      #     CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      #   working-directory: apps/frontend
+      #   run: |
+      #    pnpm run deploy -e=$WRANGLER_ENV

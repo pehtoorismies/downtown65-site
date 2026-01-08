@@ -12,8 +12,8 @@
     }
   ],
   "vars": {
-    "API_HOST": "define in envs below",
-    "API_KEY": "define in envs below"
+    // "API_HOST": "define in envs below",
+    // "API_KEY": "define in envs below"
   },
   "env": {
     // Developer environments

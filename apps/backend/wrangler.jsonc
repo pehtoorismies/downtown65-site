@@ -9,9 +9,9 @@
     "AUTH_CLIENT_ID": "JaoAht7ggce7f5R8DCBGUyjUJeMQEDtz",
     "AUTH_DOMAIN": "dev-dt65.eu.auth0.com",
     "AUTH_AUDIENCE": "https://graphql-dev.downtown65.com",
-    "API_KEY": "get from secrets",
-    "REGISTER_SECRET": "get from secrets",
-    "AUTH_CLIENT_SECRET": "get from secrets"
+    // "API_KEY": "get from secrets",
+    // "REGISTER_SECRET": "get from secrets",
+    // "AUTH_CLIENT_SECRET": "get from secrets"
   },
   "routes": [
     {
