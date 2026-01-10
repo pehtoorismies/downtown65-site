@@ -67,24 +67,29 @@ jobs:
           cat > apps/backend/wrangler.pr.jsonc << EOF
           {
             "\$schema": "node_modules/wrangler/config-schema.json",
-            "name": "dt65-backend-pr-${PR_NUM}",
+            "name": "dt65-backend-default",
             "compatibility_date": "2025-04-04",
             "main": "./src/server.ts",
             "compatibility_flags": ["nodejs_compat"],
             "workers_dev": true,
-            "vars": {
-              "AUTH_CLIENT_ID": "JaoAht7ggce7f5R8DCBGUyjUJeMQEDtz",
-              "AUTH_DOMAIN": "dev-dt65.eu.auth0.com",
-              "AUTH_AUDIENCE": "https://graphql-dev.downtown65.com"
-            },
-            "d1_databases": [
-              {
-                "binding": "D1_DB",
-                "database_name": "pr-${PR_NUM}-dt65-backend",
-                "database_id": "${DB_ID}",
-                "migrations_dir": "drizzle_flat"
+            "env": {
+              "pull-request": {
+                "name": "dt65-backend-pr-${PR_NUM}",
+                "vars": {
+                  "AUTH_CLIENT_ID": "JaoAht7ggce7f5R8DCBGUyjUJeMQEDtz",
+                  "AUTH_DOMAIN": "dev-dt65.eu.auth0.com",
+                  "AUTH_AUDIENCE": "https://graphql-dev.downtown65.com"
+                },
+                "d1_databases": [
+                  {
+                    "binding": "D1_DB",
+                    "database_name": "pr-${PR_NUM}-dt65-backend",
+                    "database_id": "${DB_ID}",
+                    "migrations_dir": "drizzle_flat"
+                  }
+                ]
               }
-            ]
+            }
           }
           EOF
           
@@ -96,14 +101,14 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           preCommands: ./scripts/drizzle_flatten.sh
-          command: d1 migrations apply pr-${{ github.event.pull_request.number }}-dt65-backend --remote --config wrangler.pr.jsonc
+          command: d1 migrations apply pr-${{ github.event.pull_request.number }}-dt65-backend --remote --config wrangler.pr.jsonc --env pull-request
           workingDirectory: apps/backend
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --config wrangler.pr.jsonc --name dt65-backend-pr-${{ github.event.pull_request.number }}
+          command: deploy --config wrangler.pr.jsonc --env pull-request
           workingDirectory: apps/backend
           secrets: |
             API_KEY
