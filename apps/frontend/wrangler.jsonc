@@ -25,6 +25,18 @@
         "API_HOST": "dt65-events-backend.pehtoorismies.workers.dev"
       }
     },
+    "pull-request": {
+      "name": "{{VAR_WORKER_NAME}}",
+      "preview_urls": false,
+      "workers_dev": true,
+      "routes": [],
+      "observability": {
+        "enabled": true
+      },
+      "vars": {
+        "API_HOST": "{{VAR_API_HOST}}"
+      }
+    },
     // Production and staging environments
     "staging": {
       "routes": [

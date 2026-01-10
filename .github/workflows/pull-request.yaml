@@ -10,17 +10,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-#   quality-checks:
-#     uses: ./.github/workflows/quality-checks.yaml
-#     secrets: inherit
+ 
 
-  deploy-preview:
-    uses: ./.github/workflows/deploy-preview.yaml
+  # deploy-backend:
+  #   uses: ./.github/workflows/deploy-backend.yaml
+  #   with:
+  #     pr-number: ${{ github.event.pull_request.number }}
+  #   secrets: inherit
+  # deploy-frontend:
+  #   uses: ./.github/workflows/deploy-frontend.yaml
+  #   with:
+  #     pr-number: ${{ github.event.pull_request.number }}
+  #   secrets: inherit
+
+  quality-checks:
+    uses: ./.github/workflows/quality-checks.yaml
     with:
-      pr-number: ${{ github.event.pull_request.number }}
+      cloudflare-environment: pull-request
     secrets: inherit
-
-
 #   comment-pr:
 #     needs: [deploy-preview, quality-checks]
 #     runs-on: ubuntu-22.04

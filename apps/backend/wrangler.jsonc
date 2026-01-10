@@ -49,15 +49,16 @@
     },
     "pull-request": {
       "name": "{{VAR_WORKER_NAME}}",
+      "preview_urls": false,
       "workers_dev": true,
       "routes": [],
       "observability": {
         "enabled": true
       },
       "vars": {
-        "AUTH_CLIENT_ID": "{{VAR_AUTH_CLIENT_ID}}",
-        "AUTH_DOMAIN": "{{VAR_AUTH_DOMAIN}}",
-        "AUTH_AUDIENCE": "{{VAR_AUTH_AUDIENCE}}"
+        "AUTH_CLIENT_ID": "JaoAht7ggce7f5R8DCBGUyjUJeMQEDtz",
+        "AUTH_DOMAIN": "dev-dt65.eu.auth0.com",
+        "AUTH_AUDIENCE": "https://graphql-dev.downtown65.com"
       },
       "d1_databases": [
         {

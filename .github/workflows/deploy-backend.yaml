@@ -1,4 +1,4 @@
-name: Deploy Preview Environment
+name: Deploy Preview Backend
 
 on:
   workflow_call:
@@ -45,9 +45,6 @@ jobs:
           sed -i "s/{{VAR_WORKER_NAME}}/${{ env.WORKER_NAME }}/g" apps/backend/wrangler.jsonc
           sed -i "s/{{VAR_DATABASE_NAME}}/${{ env.DATABASE_NAME }}/g" apps/backend/wrangler.jsonc
           sed -i "s/{{VAR_DATABASE_ID}}/${{ steps.db-setup.outputs.database-id }}/g" apps/backend/wrangler.jsonc
-          sed -i "s/{{VAR_AUTH_CLIENT_ID}}/JaoAht7ggce7f5R8DCBGUyjUJeMQEDtz/g" apps/backend/wrangler.jsonc
-          sed -i "s/{{VAR_AUTH_DOMAIN}}/dev-dt65.eu.auth0.com/g" apps/backend/wrangler.jsonc
-          sed -i "s|{{VAR_AUTH_AUDIENCE}}|https://graphql-dev.downtown65.com|g" apps/backend/wrangler.jsonc
       
       - name: Run Migrations
         uses: cloudflare/wrangler-action@v3
