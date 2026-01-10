@@ -51,6 +51,9 @@
       "name": "{{VAR_WORKER_NAME}}",
       "workers_dev": true,
       "routes": [],
+      "observability": {
+        "enabled": true
+      },
       "vars": {
         "AUTH_CLIENT_ID": "{{VAR_AUTH_CLIENT_ID}}",
         "AUTH_DOMAIN": "{{VAR_AUTH_DOMAIN}}",
