@@ -33,22 +33,23 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --ignore-scripts --frozen-lockfile
-      
       - name: Configure Wrangler
         run: |
           sed -i "s|{{VAR_WORKER_NAME}}|${{ env.WORKER_NAME }}|g" apps/frontend/wrangler.jsonc
           sed -i "s|{{VAR_API_HOST}}|${{ inputs.api-url }}|g" apps/frontend/wrangler.jsonc
       
-      - name: Build Frontend
-        working-directory: apps/frontend
-        run: pnpm run build
+          echo "Show modified json"
+          cat apps/frontend/wrangler.jsonc
+
       - name: Deploy Frontend
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          environment: pull-request
           workingDirectory: apps/frontend
+          environment: pull-request
+          preCommands: |
+            CLOUDFLARE_ENV=pull-request pnpm run build
           secrets: |
             API_KEY
             COOKIE_SESSION_SECRET

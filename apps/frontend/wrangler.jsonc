@@ -5,16 +5,6 @@
   "main": "./workers/app.ts",
   "workers_dev": true,
   "compatibility_flags": ["nodejs_compat"],
-  "routes": [
-    {
-      "pattern": "downtown65.site",
-      "custom_domain": true
-    }
-  ],
-  "vars": {
-    // "API_HOST": "define in envs below",
-    // "API_KEY": "define in envs below"
-  },
   "env": {
     // Developer environments
     // To add a new developer environment, copy this block and
@@ -29,7 +19,6 @@
       "name": "{{VAR_WORKER_NAME}}",
       "preview_urls": false,
       "workers_dev": true,
-      "routes": [],
       "observability": {
         "enabled": true
       },

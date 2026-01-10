@@ -53,7 +53,7 @@ export const syncUsers = async (config: Config) => {
         .returning({ id: usersTable.id })
       createdUsers.push({ createdUser })
     } else {
-      logger.withMetadata({ data: user }).info(`User exists already`)
+      logger.withMetadata({ data: user }).debug(`User exists already`)
       existingUsers.push({ existingUser: existing[0] })
     }
   }
