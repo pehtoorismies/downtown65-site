@@ -10,19 +10,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
- 
-
-  # deploy-backend:
-  #   uses: ./.github/workflows/deploy-backend.yaml
-  #   with:
-  #     pr-number: ${{ github.event.pull_request.number }}
-  #   secrets: inherit
-  # deploy-frontend:
-  #   uses: ./.github/workflows/deploy-frontend.yaml
-  #   with:
-  #     pr-number: ${{ github.event.pull_request.number }}
-  #   secrets: inherit
-
+  deploy-backend:
+    uses: ./.github/workflows/deploy-backend.yaml
+    with:
+      pr-number: ${{ github.event.pull_request.number }}
+    secrets: inherit
+  deploy-frontend:
+    name: Deploy Preview Frontend
+    needs: deploy-backend
+    uses: ./.github/workflows/deploy-frontend.yaml
+    with:
+      api-url: ${{ needs.deploy-backend.outputs.backend-url }}
+      pr-number: ${{ github.event.pull_request.number }}
+    secrets: inherit
   quality-checks:
     uses: ./.github/workflows/quality-checks.yaml
     with:
