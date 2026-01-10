@@ -1,0 +1,32 @@
+name: Quality Checks
+
+on:
+  workflow_call:
+
+jobs:
+  checks:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Generate API types
+        working-directory: apps/frontend
+        run: pnpm run generate:api-types:file
+      
+      - name: Generate all types
+        run: pnpm -r run generate:all
+      
+      - name: Lint
+        run: pnpm run ci:lint
+      
+      - name: Typecheck
+        run: pnpm run typecheck
+      

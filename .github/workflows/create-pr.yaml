@@ -2,7 +2,7 @@ name: Pull Request
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: [ "not_active" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -12,7 +12,7 @@ concurrency:
   group: merge-${{ github.ref }}
 
 env:
-  DATABASE_NAME: "pr-${{ github.event.pull_request.number }}-dt65-backend"
+  DATABASE_NAME: "pr-${{ github.event.pull_request.number }}-dt65-events-backend"
   WORKER_NAME: "pr-${{ github.event.pull_request.number }}-dt65-events-backend"
 
 jobs:
@@ -29,6 +29,7 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --ignore-scripts --frozen-lockfile
+      
       - name: List D1 Databases
         id: list-db
         uses: cloudflare/wrangler-action@v3
