@@ -26,11 +26,8 @@ export const syncUsers = async (config: Config) => {
 
   const userList = Auth0UserListSchema.parse(users)
 
-  const nicknames = userList.map((u) => `${u.nickname}: ${u.email}`)
-  logger.withMetadata(nicknames).info('Nicknames to sync')
-
   const createdUsers = []
-  const updatedUsers = []
+  const existingUsers = []
 
   // create async for loop to process users in sequence
   for (const user of userList) {
@@ -42,23 +39,27 @@ export const syncUsers = async (config: Config) => {
 
     const isNew = existing.length === 0
 
-    logger.withMetadata({ data: user }).info(`Syncing user ${user.nickname}`)
-    const upsertedUser = await db
-      .insert(usersTable)
-      .values({
-        auth0Sub: user.auth0Sub,
-        nickname: user.nickname,
-        picture: user.picture,
-      })
-      .returning({ id: usersTable.id })
-
-    logger.info(`${isNew ? 'Created' : 'Updated'} user ${user.email}`)
     if (isNew) {
-      createdUsers.push({ ...user, id: upsertedUser[0].id })
+      logger
+        .withMetadata({ data: user })
+        .info(`Creating new user ${user.nickname}`)
+      const createdUser = await db
+        .insert(usersTable)
+        .values({
+          auth0Sub: user.auth0Sub,
+          nickname: user.nickname,
+          picture: user.picture,
+        })
+        .returning({ id: usersTable.id })
+      createdUsers.push({ createdUser })
     } else {
-      updatedUsers.push({ ...user, id: upsertedUser[0].id })
+      logger.withMetadata({ data: user }).info(`User exists already`)
+      existingUsers.push({ existingUser: existing[0] })
     }
   }
 
-  return { createdUsers, updatedUsers }
+  return {
+    createdUsers: createdUsers.length,
+    existingUsers: existingUsers.length,
+  }
 }
