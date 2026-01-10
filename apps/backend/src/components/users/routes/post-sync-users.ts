@@ -4,7 +4,6 @@ import type { AppAPI } from '~/app-api'
 import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { syncUsers } from '../db/sync-users'
-import { SyncedUsersResponseSchema } from './api-schema'
 
 const route = createRoute({
   method: 'post',
@@ -18,8 +17,8 @@ const route = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            createdUsers: SyncedUsersResponseSchema,
-            updatedUsers: SyncedUsersResponseSchema,
+            createdUsers: z.int(),
+            existingUsers: z.int(),
           }),
         },
       },
