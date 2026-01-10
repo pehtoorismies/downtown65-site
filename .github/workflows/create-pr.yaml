@@ -59,56 +59,36 @@ jobs:
       - name: Display Database ID
         run: |
           echo "Using Database ID: ${{ steps.db-setup.outputs.database_id }}"
-      - name: Create temporary wrangler config for PR
+      - name: Create wrangler config from template
         id: create-config
         run: |
           DB_ID="${{ steps.db-setup.outputs.database_id }}"
+          DB_NAME="pr-${PR_NUM}-dt65-backend"
+          WORKER_NAME="pr-${PR_NUM}"
+
+          sed -i "s/{{VAR_WORKER_NAME}}/${WORKER_NAME}/g" apps/backend/wrangler.jsonc
+          sed -i "s/{{VAR_DATABASE_NAME}}/${DB_NAME}/g" apps/backend/wrangler.jsonc
+          sed -i "s/{{VAR_DATABASE_ID}}/${DB_ID}/g" apps/backend/wrangler.jsonc
+          sed -i "s/{{VAR_AUTH_CLIENT_ID}}/JaoAht7ggce7f5R8DCBGUyjUJeMQEDtz/g" apps/backend/wrangler.jsonc
+          sed -i "s/{{VAR_AUTH_DOMAIN}}/dev-dt65.eu.auth0.com/g" apps/backend/wrangler.jsonc
+          sed -i "s|{{VAR_AUTH_AUDIENCE}}|https://graphql-dev.downtown65.com|g" apps/backend/wrangler.jsonc
           
-          cat > apps/backend/wrangler.pr.jsonc << EOF
-          {
-            "\$schema": "node_modules/wrangler/config-schema.json",
-            "name": "dt65-backend-default",
-            "compatibility_date": "2025-04-04",
-            "main": "./src/server.ts",
-            "compatibility_flags": ["nodejs_compat"],
-            "workers_dev": true,
-            "env": {
-              "pull-request": {
-                "name": "dt65-backend-pr-${PR_NUM}",
-                "vars": {
-                  "AUTH_CLIENT_ID": "JaoAht7ggce7f5R8DCBGUyjUJeMQEDtz",
-                  "AUTH_DOMAIN": "dev-dt65.eu.auth0.com",
-                  "AUTH_AUDIENCE": "https://graphql-dev.downtown65.com"
-                },
-                "d1_databases": [
-                  {
-                    "binding": "D1_DB",
-                    "database_name": "pr-${PR_NUM}-dt65-backend",
-                    "database_id": "${DB_ID}",
-                    "migrations_dir": "drizzle_flat"
-                  }
-                ]
-              }
-            }
-          }
-          EOF
-          
-          echo "Created wrangler.pr.jsonc"
-          cat apps/backend/wrangler.pr.jsonc      
+          cat apps/backend/wrangler.jsonc      
       - name: Run Migrations
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          environment: pull-request
           preCommands: ./scripts/drizzle_flatten.sh
-          command: d1 migrations apply pr-${{ github.event.pull_request.number }}-dt65-backend --remote --config wrangler.pr.jsonc --env pull-request
+          command: d1 migrations apply pr-${{ github.event.pull_request.number }}-dt65-backend --remote
           workingDirectory: apps/backend
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --config wrangler.pr.jsonc --env pull-request
+          environment: pull-request
           workingDirectory: apps/backend
           secrets: |
             API_KEY

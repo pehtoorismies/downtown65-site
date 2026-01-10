@@ -4,7 +4,7 @@
   "compatibility_date": "2025-04-04",
   "main": "./src/server.ts",
   "compatibility_flags": ["nodejs_compat"],
-  "workers_dev": true,
+  // "workers_dev": true,
   "vars": {
     "AUTH_CLIENT_ID": "JaoAht7ggce7f5R8DCBGUyjUJeMQEDtz",
     "AUTH_DOMAIN": "dev-dt65.eu.auth0.com",
@@ -13,12 +13,12 @@
     // "REGISTER_SECRET": "get from secrets",
     // "AUTH_CLIENT_SECRET": "get from secrets"
   },
-  "routes": [
-    {
-      "pattern": "api.downtown65.site",
-      "custom_domain": true
-    }
-  ],
+  // "routes": [
+  //   {
+  //     "pattern": "api.downtown65.site",
+  //     "custom_domain": true
+  //   }
+  // ],
   "d1_databases": [
     {
       "binding": "D1_DB",
@@ -44,6 +44,23 @@
           "database_name": "pehtoorismies-development",
           "database_id": "1f425fbb-7dec-49f0-b158-0d0963a27ad2",
           "migrations_dir": "drizzle"
+        }
+      ]
+    },
+    "pull-request": {
+      "workers_dev": true,
+      "routes": [],
+      "vars": {
+        "AUTH_CLIENT_ID": "{{VAR_AUTH_CLIENT_ID}}",
+        "AUTH_DOMAIN": "{{VAR_AUTH_DOMAIN}}",
+        "AUTH_AUDIENCE": "{{VAR_AUTH_AUDIENCE}}"
+      },
+      "d1_databases": [
+        {
+          "binding": "D1_DB",
+          "database_name": "{{VAR_DATABASE_NAME}}",
+          "database_id": "{{VAR_DATABASE_ID}}",
+          "migrations_dir": "drizzle_flat"
         }
       ]
     },
