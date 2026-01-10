@@ -3,7 +3,6 @@ import z from 'zod'
 import type { AppAPI } from '~/app-api'
 import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
-import { jwtToken } from '~/common/middleware/jwt'
 import { syncUsers } from '../db/sync-users'
 import { SyncedUsersResponseSchema } from './api-schema'
 
@@ -11,8 +10,8 @@ const route = createRoute({
   method: 'post',
   path: '/sync/users',
   description: 'Sync all users with external auth provider',
-  security: [{ ApiKeyAuth: [], BearerToken: [] }],
-  middleware: [apiKeyAuth, jwtToken()],
+  security: [{ ApiKeyAuth: [] }],
+  middleware: [apiKeyAuth],
   responses: {
     200: {
       description: 'User updated successfully',

@@ -99,6 +99,13 @@ jobs:
           API_KEY: ${{ secrets.DT65_API_KEY }}
           REGISTER_SECRET: ${{ secrets.BACKEND_REGISTER_SECRET }}
           AUTH_CLIENT_SECRET: ${{ secrets.BACKEND_AUTH_CLIENT_SECRET }}
+      
+      - name: Sync users table to new database
+        run: |
+          curl -X POST "https://${{ env.WORKER_NAME }}.dt65.workers.dev/sync/users" \
+            --request POST \
+            --header 'x-api-key: ${{ secrets.DT65_API_KEY }}' \
+      
       # - name: Set Cloudflare environment backend
       #   working-directory: apps/backend
       #   run: |
