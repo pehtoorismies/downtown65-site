@@ -15,14 +15,15 @@ jobs:
           node-version: 22
           cache: pnpm
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      
-      - name: Generate API types
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Generate Backend types
+        working-directory: apps/backend
+        run: pnpm run ci:generate
+
+      - name: Generate Frontend types
         working-directory: apps/frontend
-        run: pnpm run generate:api-types:file
-      
-      - name: Generate all types
-        run: pnpm -r run generate:all
+        run: pnpm run ci:generate
       
       - name: Lint
         run: pnpm run ci:lint

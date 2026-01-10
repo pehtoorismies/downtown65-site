@@ -17,6 +17,7 @@
     "knip": "knip",
     "generate:openapi": "tsx scripts/generate-openapi.ts",
     "generate:cf": "wrangler types",
+    "ci:generate": "pnpm run generate:cf && pnpm run generate:openapi",
     "clean": "rimraf node_modules"
   },
   "dependencies": {

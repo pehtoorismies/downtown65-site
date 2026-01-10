@@ -34,7 +34,7 @@ jobs:
       
       - name: Setup Database
         id: db-setup
-        uses: ./.github/actions/setup-d1-database
+        uses: ./.github/actions/setup-d1-database.yaml
         with:
           database-name: ${{ env.DATABASE_NAME }}
           cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}

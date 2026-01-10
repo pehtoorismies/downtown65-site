@@ -1,17 +1,15 @@
 name: Setup D1 Database
 
-on:
-  workflow_call:
-    inputs:
-      database-name:
-        required: true
-        type: string
-      cloudflare-api-token:
-        required: true
-        type: string
-      cloudflare-account-id:
-        required: true
-        type: string
+inputs:
+  database-name:
+    required: true
+    type: string
+  cloudflare-api-token:
+    required: true
+    type: string
+  cloudflare-account-id:
+    required: true
+    type: string
      
 jobs: 
   setup-database:

@@ -13,11 +13,12 @@
     "preview": "pnpm run build && vite preview",
     "test": "vitest",
     "typecheck": "tsc -b --noEmit",
-    "generate:all": "pnpm run generate:react-router-types && pnpm run generate:cf && pnpm run generate:api-types",
+    "generate:all": "pnpm run generate:react-router-types && pnpm run generate:cf && pnpm run generate:api-types:server",
     "generate:api-types:server": "openapi-typescript http://localhost:3002/doc -o ./.generated/types/app/api/+types/api.d.ts",
     "generate:api-types:file": "openapi-typescript ../backend/.generated/openapi.json  -o ./.generated/types/app/api/+types/api.d.ts",
     "generate:react-router-types": "react-router typegen",
     "generate:cf": "wrangler types",
+    "ci:generate": "pnpm run generate:react-router-types && pnpm run generate:cf && pnpm run generate:api-types:file",
     "knip": "knip",
     "clean": "rimraf node_modules"
   },

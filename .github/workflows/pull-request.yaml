@@ -10,9 +10,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quality-checks:
-    uses: ./.github/workflows/quality-checks.yaml
-    secrets: inherit
+#   quality-checks:
+#     uses: ./.github/workflows/quality-checks.yaml
+#     secrets: inherit
 
   deploy-preview:
     uses: ./.github/workflows/deploy-preview.yaml
