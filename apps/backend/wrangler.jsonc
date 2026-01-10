@@ -48,6 +48,7 @@
       ]
     },
     "pull-request": {
+      "name": "{{VAR_WORKER_NAME}}",
       "workers_dev": true,
       "routes": [],
       "vars": {
