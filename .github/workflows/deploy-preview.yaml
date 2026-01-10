@@ -11,7 +11,7 @@ on:
         value: ${{ jobs.deploy.outputs.backend-url }}
 
 env:
-  DATABASE_NAME: "pr-${{ inputs.pr-number }}-dt65-events-backend"
+  DATABASE_NAME: "pr-${{ inputs.pr-number }}-dt65-events"
   WORKER_NAME: "pr-${{ inputs.pr-number }}-dt65-events-backend"
 
 jobs:
@@ -34,7 +34,7 @@ jobs:
       
       - name: Setup Database
         id: db-setup
-        uses: ./.github/actions/setup-d1-database.yaml
+        uses: ./.github/actions/setup-d1-database
         with:
           database-name: ${{ env.DATABASE_NAME }}
           cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}

@@ -1,0 +1,106 @@
+name: Setup D1 Database
+description: "An action to set up a Cloudflare D1 database if it does not already exist."
+
+inputs:
+  database-name:
+    description: "The name of the D1 database to set up."
+    required: true
+    
+  cloudflare-api-token:
+    description: "The Cloudflare API token with permissions to manage D1 databases."  
+    required: true
+    
+  cloudflare-account-id:
+    description: "The Cloudflare account ID associated with the D1 database."
+    required: true
+
+outputs:
+  database-id:
+    description: "The ID of the D1 database"
+    value: ${{ steps.db-setup.outputs.database-id }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: List D1 Databases
+      id: list-db
+      uses: cloudflare/wrangler-action@v3
+      with:
+        apiToken: ${{ inputs.cloudflare-api-token }}
+        accountId: ${{ inputs.cloudflare-account-id }}
+        command: d1 list --json
+        workingDirectory: apps/backend
+    - name: Check if DB exists and create if needed
+      shell: bash
+      id: db-setup
+      run: |
+        DB_NAME="${{ inputs.database-name }}"
+        EXISTING_DB=$(echo '${{ steps.list-db.outputs.command-output }}' | jq -r --arg name "$DB_NAME" '.[] | select(.name == $name) | .uuid')
+        
+        if [ -n "$EXISTING_DB" ]; then
+          echo "Database already exists with ID: $EXISTING_DB"
+          echo "database-id=$EXISTING_DB" >> $GITHUB_OUTPUT
+        else
+          echo "Creating new database..."
+          cd apps/backend
+          CREATE_OUTPUT=$(npx wrangler d1 create "$DB_NAME")
+          echo "$CREATE_OUTPUT"
+          # Extract database_id from the JSON snippet in the output
+          DB_ID=$(echo "$CREATE_OUTPUT" | grep -oP '"database_id":\s*"\K[^"]+')
+          
+          if [ -z "$DB_ID" ]; then
+            echo "Failed to extract database ID from output"
+            exit 1
+          fi
+          
+          echo "database-id=$DB_ID" >> $GITHUB_OUTPUT
+          echo "Created database with ID: $DB_ID"
+        fi
+      env:
+        CLOUDFLARE_API_TOKEN: ${{ inputs.cloudflare-api-token }}
+        CLOUDFLARE_ACCOUNT_ID: ${{ inputs.cloudflare-account-id }}
+
+# jobs: 
+#   setup-database:
+#     runs-on: ubuntu-22.04
+#     outputs:
+#       database-id: ${{ steps.db-setup.outputs.database-id }}
+#     steps:
+#       - uses: actions/checkout@v6
+#       - name: Install pnpm
+#         uses: pnpm/action-setup@v4
+#       - uses: actions/setup-node@v6
+#         with:
+#           node-version: 22
+#           cache: pnpm
+#       - name: Install dependencies
+#         run: pnpm install --ignore-scripts --frozen-lockfile
+      
+#       - name: List D1 Databases
+#         id: list-db
+#         uses: cloudflare/wrangler-action@v3
+#         with:
+#           apiToken: ${{ inputs.cloudflare-api-token }}
+#           accountId: ${{ inputs.cloudflare-account-id }}
+#           command: d1 list --json
+#           workingDirectory: apps/backend
+#       - name: Check if DB exists and create if needed
+#         id: db-setup
+#         run: |
+#           DB_NAME="${{ inputs.database-name }}"
+#           EXISTING_DB=$(echo '${{ steps.list-db.outputs.command-output }}' | jq -r --arg name "$DB_NAME" '.[] | select(.name == $name) | .uuid')
+          
+#           if [ -n "$EXISTING_DB" ]; then
+#             echo "Database already exists with ID: $EXISTING_DB"
+#             echo "database-id=$EXISTING_DB" >> $GITHUB_OUTPUT
+#           else
+#             echo "Creating new database..."
+#             cd apps/backend
+#             CREATE_OUTPUT=$(npx wrangler d1 create "$DB_NAME" --json)
+#             DB_ID=$(echo "$CREATE_OUTPUT" | jq -r '.uuid')
+#             echo "database-id=$DB_ID" >> $GITHUB_OUTPUT
+#             echo "Created database with ID: $DB_ID"
+#           fi
+#         env:
+#           CLOUDFLARE_API_TOKEN: ${{ inputs.cloudflare-api-token }}
+#           CLOUDFLARE_ACCOUNT_ID: ${{ inputs.cloudflare-account-id }}
