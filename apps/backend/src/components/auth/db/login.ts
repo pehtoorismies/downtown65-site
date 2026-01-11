@@ -25,33 +25,43 @@ export const login = async (
   config: Config,
   input: LoginInput,
 ): Promise<LoginResponse> => {
-  const logger = createLogger()
+  const logger = createLogger({ appContext: 'Login DB' })
 
-  const auth0 = await auth0Login(config, input)
+  try {
+    const auth0 = await auth0Login(config, input)
 
-  if (auth0.type !== 'Success') {
-    return auth0
-  }
+    if (auth0.type !== 'Success') {
+      return auth0
+    }
 
-  const { auth0Sub } = Auth0UserSchema.parse(jwtDecode(auth0.tokens.idToken))
+    const { auth0Sub } = Auth0UserSchema.parse(jwtDecode(auth0.tokens.idToken))
 
-  const db = getDb(config.D1_DB)
-  const localUser = await db.query.users.findFirst({
-    where: {
-      auth0Sub,
-    },
-  })
+    const db = getDb(config.D1_DB)
+    const localUser = await db.query.users.findFirst({
+      where: {
+        auth0Sub,
+      },
+    })
 
-  if (!localUser) {
-    // TODO: insert if not found
-    logger.fatal(
-      `User not found locally after successful authentication: ${auth0Sub}`,
-    )
-    throw new Error('User not found locally after successful authentication')
-  }
-  return {
-    type: 'Success',
-    tokens: auth0.tokens,
-    user: localUser,
+    if (!localUser) {
+      // TODO: insert if not found
+      logger.fatal(
+        `User not found locally after successful authentication: ${auth0Sub}`,
+      )
+      throw new Error('User not found locally after successful authentication')
+    }
+
+    return {
+      type: 'Success',
+      tokens: auth0.tokens,
+      user: localUser,
+    }
+  } catch (error) {
+    logger.withError(error).error('Unknown error during login')
+
+    return {
+      type: 'UnknownError',
+      error: error instanceof Error ? error.message : String(error),
+    }
   }
 }

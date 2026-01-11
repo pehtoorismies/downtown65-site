@@ -51,10 +51,8 @@ export async function action({ request, context }: Route.ActionArgs) {
   })
 
   if (error) {
-    if (error.code >= 500) {
-      logger.withError(error).error('Server error during login')
-    }
-    return { errorGeneral: error.message, code: error.code }
+    logger.withError(error).error('Server error during login')
+    return { errorGeneral: error.message, code: 500 }
   }
 
   if (data) {
@@ -84,6 +82,7 @@ export async function action({ request, context }: Route.ActionArgs) {
 }
 
 export default function Login({ actionData }: Route.ComponentProps) {
+  console.warn('Login actionData', actionData)
   return (
     <>
       <Title ta="center" fw={900}>

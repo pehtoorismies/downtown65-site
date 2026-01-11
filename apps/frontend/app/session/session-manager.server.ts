@@ -47,14 +47,14 @@ type FlashData = {
   success?: string
 }
 
-const getCookieSessionStorage = (_cookieSessionSecret: string) => {
+const getCookieSessionStorage = (cookieSessionSecret: string) => {
   return createCookieSessionStorage<CookieSessionData, FlashData>({
     cookie: {
       name: '__session',
       httpOnly: true,
       path: '/',
       sameSite: 'lax',
-      // secrets: [cookieSessionSecret],
+      secrets: [cookieSessionSecret],
       secure: false, // set to true in production
       maxAge: 60 * 60 * 24 * 365, // 1 year
     },

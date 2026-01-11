@@ -1,3 +1,4 @@
+import { createLogger } from '@downtown65/logger'
 import { APIErrorResponseSchema, UserSchema } from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
 import z from 'zod'
@@ -71,9 +72,11 @@ const route = createRoute({
 
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
+    const logger = createLogger({ appContext: 'Route Login' })
     const { email, password } = c.req.valid('json')
 
     const response = await login(getConfig(c.env), { email, password })
+    logger.withMetadata(response).info('Login response')
 
     switch (response.type) {
       case 'InvalidCredentials':
