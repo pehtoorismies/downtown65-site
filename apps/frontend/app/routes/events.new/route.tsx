@@ -4,7 +4,7 @@ import { useDisclosure } from '@mantine/hooks'
 import { IconAlertCircle, IconCircleOff } from '@tabler/icons-react'
 import { useReducer } from 'react'
 import { redirect } from 'react-router'
-import { apiClient } from '~/api/api-client'
+import { getApiClient } from '~/api/api-client'
 import { CreateEventContainer } from '~/components/event/edit-or-create/CreateEventContainer'
 import { EventFormSchema } from '~/components/event/edit-or-create/event-form-schema'
 import { ModificationDivider } from '~/components/event/edit-or-create/ModificationDivider'
@@ -29,6 +29,7 @@ export const action = async ({ context, request }: Route.ActionArgs) => {
     return { errorMessage: 'Invalid form data' }
   }
 
+  const apiClient = getApiClient(context.cloudflare.env.API_HOST)
   const { error, data } = await apiClient.POST('/events', {
     body: parsed.data,
     headers: {

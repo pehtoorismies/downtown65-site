@@ -5,11 +5,7 @@ export const redirectAuthenticatedMiddleware: MiddlewareFunction = async ({
   request,
   context,
 }) => {
-  const secrets = {
-    COOKIE_SESSION_SECRET: context.cloudflare.env.COOKIE_SESSION_SECRET,
-    API_KEY: context.cloudflare.env.API_KEY,
-  }
-  const sessionManager = createSessionManager(secrets)
+  const sessionManager = createSessionManager(context.cloudflare.env)
   const result = await sessionManager.getUserSession(request)
 
   if (result.success === true) {

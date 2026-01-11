@@ -12,11 +12,7 @@ export const authMiddleware =
   async ({ request, context }, next) => {
     const logger = createLogger({ appContext: 'Auth Middleware' })
 
-    const secrets = {
-      COOKIE_SESSION_SECRET: context.cloudflare.env.COOKIE_SESSION_SECRET,
-      API_KEY: context.cloudflare.env.API_KEY,
-    }
-    const sessionManager = createSessionManager(secrets)
+    const sessionManager = createSessionManager(context.cloudflare.env)
     const result = await sessionManager.getUserSession(request)
 
     if (result.success === false && allowAnonymous === false) {

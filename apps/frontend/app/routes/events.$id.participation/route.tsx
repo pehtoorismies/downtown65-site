@@ -1,11 +1,13 @@
 import { createLogger } from '@downtown65/logger'
 import { stringToID } from '@downtown65/schema'
-import { apiClient } from '~/api/api-client'
+import { getApiClient } from '~/api/api-client'
 import { AuthContext } from '~/context/context'
 import { authMiddleware } from '~/middleware/auth-middleware'
 import type { Route } from './+types/route'
 
-const getApiRequest = (method: string) => {
+const getApiRequest = (method: string, apiHost: string) => {
+  const apiClient = getApiClient(apiHost)
+
   if (method === 'POST') {
     return apiClient.POST
   } else if (method === 'DELETE') {
@@ -35,7 +37,7 @@ export const action = async ({
     throw new Error('Unauthorized')
   }
 
-  const client = getApiRequest(request.method)
+  const client = getApiRequest(request.method, context.cloudflare.env.API_HOST)
   logger.withContext({
     eventID,
     method: request.method,

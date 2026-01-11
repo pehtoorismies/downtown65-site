@@ -8,7 +8,7 @@ import {
   Title,
 } from '@mantine/core'
 import { Link, redirect, useNavigate } from 'react-router'
-import { apiClient } from '~/api/api-client'
+import { getApiClient } from '~/api/api-client'
 import { AuthContext } from '~/context/context'
 import { createLogger } from '~/logger/logger.server'
 import { authMiddleware } from '~/middleware/auth-middleware'
@@ -38,6 +38,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   const page = toPage(url.searchParams.get('page'))
 
   const { user, accessToken } = authContext
+  const apiClient = getApiClient(context.cloudflare.env.API_HOST)
   const { data, error } = await apiClient.GET('/users', {
     params: {
       query: {

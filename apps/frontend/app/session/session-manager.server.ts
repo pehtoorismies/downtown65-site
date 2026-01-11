@@ -4,7 +4,7 @@ import { jwtDecode } from 'jwt-decode'
 import type { Session } from 'react-router'
 import { createCookieSessionStorage } from 'react-router'
 import { z } from 'zod'
-import { apiClient } from '~/api/api-client'
+import { getApiClient } from '~/api/api-client'
 
 const AccessTokenPartialSchema = z.object({
   exp: z.number(),
@@ -28,11 +28,6 @@ const isAccessTokenExpired = (accessToken: string): boolean => {
 
 const isSessionCookieExpired = (expiresAt: string) =>
   isAfter(new Date(), parseISO(expiresAt))
-
-interface Secrets {
-  COOKIE_SESSION_SECRET: string
-  API_KEY: string
-}
 
 const CookieSessionDataSchema = z.object({
   accessToken: z.string(),
@@ -74,9 +69,9 @@ type UserSessionResponse =
       headers: Headers
     }
 
-export const createSessionManager = (secrets: Secrets) => {
+export const createSessionManager = (env: Env) => {
   const { getSession, destroySession, commitSession } = getCookieSessionStorage(
-    secrets.COOKIE_SESSION_SECRET,
+    env.COOKIE_SESSION_SECRET,
   )
 
   const getErrorResponse = async (
@@ -121,6 +116,7 @@ export const createSessionManager = (secrets: Secrets) => {
       }
     }
 
+    const apiClient = getApiClient(env.API_HOST)
     const { data: renewedData, error } = await apiClient.POST(
       '/auth/refresh-token',
       {
@@ -129,7 +125,7 @@ export const createSessionManager = (secrets: Secrets) => {
         },
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': secrets.API_KEY,
+          'x-api-key': env.API_KEY,
         },
       },
     )

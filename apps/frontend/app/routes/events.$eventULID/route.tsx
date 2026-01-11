@@ -7,7 +7,7 @@ import {
 } from '@tabler/icons-react'
 import { useState } from 'react'
 import { Link, redirect } from 'react-router'
-import { apiClient } from '~/api/api-client'
+import { getApiClient } from '~/api/api-client'
 import { EventCard } from '~/components/event/EventCard'
 import { getEventTypeData } from '~/components/event/get-event-type-data'
 import { AuthContext } from '~/context/context'
@@ -82,6 +82,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     return redirect('/login')
   }
   const { accessToken } = authContext
+  const apiClient = getApiClient(context.cloudflare.env.API_HOST)
   const { error } = await apiClient.DELETE('/events/{id}', {
     params: {
       path: { id: stringToID.encode(eventIdDecoded) },
@@ -103,6 +104,7 @@ export async function loader({ context, params }: Route.LoaderArgs) {
   const authContext = context.get(AuthContext)
   const me = authContext ? authContext.user : null
 
+  const apiClient = getApiClient(context.cloudflare.env.API_HOST)
   const { error, data } = await apiClient.GET('/events/{idOrULID}', {
     params: {
       path: { idOrULID: params.eventULID },

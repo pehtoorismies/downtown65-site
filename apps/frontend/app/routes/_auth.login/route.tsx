@@ -15,7 +15,7 @@ import {
 import { IconAlertCircle } from '@tabler/icons-react'
 import { Form, Link, redirect } from 'react-router'
 import z from 'zod'
-import { apiClient } from '~/api/api-client'
+import { getApiClient } from '~/api/api-client'
 import { redirectAuthenticatedMiddleware } from '~/middleware/redirect-authenticated'
 import { createSessionManager } from '~/session/session-manager.server'
 import type { Route } from './+types/route'
@@ -38,7 +38,7 @@ export async function action({ request, context }: Route.ActionArgs) {
       errorPassword: errorTree.properties?.password?.errors[0],
     }
   }
-
+  const apiClient = getApiClient(context.cloudflare.env.API_HOST)
   const { data, error } = await apiClient.POST('/auth/login', {
     body: {
       email: result.data.email,
@@ -56,12 +56,14 @@ export async function action({ request, context }: Route.ActionArgs) {
   }
 
   if (data) {
-    const secrets = {
+    const _secrets = {
       COOKIE_SESSION_SECRET: context.cloudflare.env.COOKIE_SESSION_SECRET,
       API_KEY: context.cloudflare.env.API_KEY,
     }
 
-    const { createUserSession, commitSession } = createSessionManager(secrets)
+    const { createUserSession, commitSession } = createSessionManager(
+      context.cloudflare.env,
+    )
     const userSession = await createUserSession({
       request,
       accessToken: data.accessToken,

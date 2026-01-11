@@ -6,7 +6,7 @@ import { IconAlertCircle } from '@tabler/icons-react'
 import { parse } from 'date-fns'
 import { useReducer } from 'react'
 import { redirect } from 'react-router'
-import { apiClient } from '~/api/api-client'
+import { getApiClient } from '~/api/api-client'
 import { CancelModal } from '~/components/event/edit-or-create/CancelModal'
 import { CreateEventContainer } from '~/components/event/edit-or-create/CreateEventContainer'
 import { EventFormSchema } from '~/components/event/edit-or-create/event-form-schema'
@@ -39,6 +39,7 @@ export const action = async ({
     return { errorMessage: 'Invalid form data' }
   }
 
+  const apiClient = getApiClient(context.cloudflare.env.API_HOST)
   const { error } = await apiClient.PUT('/events/{id}', {
     params: {
       path: { id: params.id },
@@ -66,6 +67,7 @@ export async function loader({ context, params }: Route.LoaderArgs) {
     return redirect('/login')
   }
 
+  const apiClient = getApiClient(context.cloudflare.env.API_HOST)
   const { error, data } = await apiClient.GET('/events/{idOrULID}', {
     params: {
       path: { idOrULID: params.id },

@@ -10,7 +10,7 @@ import {
 import { IconSquarePlus } from '@tabler/icons-react'
 import type { PropsWithChildren } from 'react'
 import { Link, redirect } from 'react-router'
-import { apiClient } from '~/api/api-client'
+import { getApiClient } from '~/api/api-client'
 import { AuthContext } from '~/context/context'
 import { authMiddleware } from '~/middleware/auth-middleware'
 import { EventButtonContainer } from '../events.$eventULID/EventButtonContainer'
@@ -27,6 +27,7 @@ export async function loader({ context }: Route.LoaderArgs) {
 
   const { accessToken, user } = authContext
 
+  const apiClient = getApiClient(context.cloudflare.env.API_HOST)
   const { data, error } = await apiClient.GET('/events', {
     headers: {
       authorization: `Bearer ${accessToken}`,
