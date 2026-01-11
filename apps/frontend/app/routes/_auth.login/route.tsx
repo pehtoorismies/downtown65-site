@@ -38,6 +38,10 @@ export async function action({ request, context }: Route.ActionArgs) {
       errorPassword: errorTree.properties?.password?.errors[0],
     }
   }
+
+  logger
+    .withContext({ apiHost: context.cloudflare.env.API_HOST })
+    .info('Calling apiClient for login')
   const apiClient = getApiClient(context.cloudflare.env.API_HOST)
   const { data, error } = await apiClient.POST('/auth/login', {
     body: {
