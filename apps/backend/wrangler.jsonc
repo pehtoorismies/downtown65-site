@@ -53,7 +53,7 @@
       "workers_dev": false,
       "routes": [
         {
-          "pattern": "https://{VAR_WORKER_NAME}.downtown65.site",
+          "pattern": "{{VAR_WORKER_NAME}}.downtown65.site",
           "custom_domain": true
         }
       ],
