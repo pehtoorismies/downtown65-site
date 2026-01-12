@@ -15,13 +15,14 @@ on:
 
 env:
   WORKER_NAME: "pr-${{ inputs.pr-number }}-dt65-events-frontend"
+  DOMAIN_NAME: "downtown65.site"
 
 jobs:
   deploy:
     runs-on: ubuntu-22.04
     environment: development
     outputs:
-      frontend-url: https://${{ env.WORKER_NAME }}.dt65.workers.dev
+      frontend-url: https://${{ env.WORKER_NAME }}.downtown65.site
     
     steps:
       - uses: actions/checkout@v6

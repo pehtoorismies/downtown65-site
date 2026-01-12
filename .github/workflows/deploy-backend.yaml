@@ -13,13 +13,14 @@ on:
 env:
   DATABASE_NAME: "pr-${{ inputs.pr-number }}-dt65-events"
   WORKER_NAME: "pr-${{ inputs.pr-number }}-dt65-events-api"
+  DOMAIN_NAME: "downtown65.site"
 
 jobs:
   deploy:
     runs-on: ubuntu-22.04
     environment: development
     outputs:
-      backend-url: https://${{ env.WORKER_NAME }}.dt65.workers.dev
+      backend-url: https://${{ env.WORKER_NAME }}.${{ env.DOMAIN_NAME }}
     
     steps:
       - uses: actions/checkout@v6
@@ -74,5 +75,5 @@ jobs:
       
       - name: Sync Users
         run: |
-          curl -X POST "https://${{ env.WORKER_NAME }}.dt65.workers.dev/sync/users" \
+          curl -X POST "https://${{ env.WORKER_NAME }}.${{ env.DOMAIN_NAME }}/sync/users" \
             --header 'x-api-key: ${{ secrets.DT65_API_KEY }}'
