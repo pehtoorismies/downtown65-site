@@ -12,7 +12,7 @@ on:
 
 env:
   DATABASE_NAME: "pr-${{ inputs.pr-number }}-dt65-events"
-  WORKER_NAME: "pr-${{ inputs.pr-number }}-dt65-events-backend"
+  WORKER_NAME: "pr-${{ inputs.pr-number }}-dt65-events-api"
 
 jobs:
   deploy:

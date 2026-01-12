@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "dt65-events-backend",
+  "name": "dt65-events-api",
   "compatibility_date": "2025-04-04",
   "main": "./src/server.ts",
   "compatibility_flags": ["nodejs_compat"],
@@ -50,8 +50,13 @@
     "pull-request": {
       "name": "{{VAR_WORKER_NAME}}",
       "preview_urls": false,
-      "workers_dev": true,
-      "routes": [],
+      "workers_dev": false,
+      "routes": [
+        {
+          "pattern": "https://{VAR_WORKER_NAME}.downtown65.site",
+          "custom_domain": true
+        }
+      ],
       "observability": {
         "enabled": true
       },
