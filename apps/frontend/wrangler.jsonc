@@ -6,15 +6,6 @@
   "workers_dev": true,
   "compatibility_flags": ["nodejs_compat"],
   "env": {
-    // Developer environments
-    // To add a new developer environment, copy this block and
-    // "API_HOST": "dt65-events-backend.<github_username>.workers.dev"    
-    "pehtoorismies": {
-      "workers_dev": true,
-      "vars": {
-        "API_HOST": "dt65-events-backend.pehtoorismies.workers.dev"
-      }
-    },
     "pull-request": {
       "name": "{{VAR_WORKER_NAME}}",
       "preview_urls": false,
