@@ -4,24 +4,6 @@
   "compatibility_date": "2025-04-04",
   "main": "./src/server.ts",
   "compatibility_flags": ["nodejs_compat"],
-  
-  // Base configuration - inherited by all environments unless overridden
-  // Override locally with wrangler.local.jsonc
-  "vars": {
-    "AUTH_CLIENT_ID": "JaoAht7ggce7f5R8DCBGUyjUJeMQEDtz",
-    "AUTH_DOMAIN": "dev-dt65.eu.auth0.com",
-    "AUTH_AUDIENCE": "https://graphql-dev.downtown65.com"
-  },
-  
-  "d1_databases": [
-    {
-      "binding": "D1_DB",
-      "database_name": "dt65-test",
-      "database_id": "78681f8f-1494-49d5-a890-e7ab7b2b55ca",
-      "migrations_dir": "drizzle_flat"
-    }
-  ],
-  
   "env": {
     // CI/CD environments
     "pull-request": {
@@ -51,16 +33,8 @@
         }
       ]
     },
-    // Deployed environments - inherit base vars and override D1 database + routes
+    // Production and staging environments
     "staging": {
-      "d1_databases": [
-        {
-          "binding": "D1_DB",
-          "database_name": "dt65-staging",
-          "database_id": "STAGING_DATABASE_ID",
-          "migrations_dir": "drizzle_flat"
-        }
-      ],
       "routes": [
         {
           "pattern": "staging-api.downtown65.site",
@@ -69,14 +43,6 @@
       ]
     },
     "production": {
-      "d1_databases": [
-        {
-          "binding": "D1_DB",
-          "database_name": "dt65-production",
-          "database_id": "PRODUCTION_DATABASE_ID",
-          "migrations_dir": "drizzle_flat"
-        }
-      ],
       "routes": [
         {
           "pattern": "api.downtown65.site",
