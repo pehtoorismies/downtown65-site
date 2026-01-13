@@ -43,6 +43,22 @@ This project supports multiple developers working simultaneously with isolated D
    npx wrangler d1 migrations apply D1_DB --local --config wrangler.local.jsonc
    ```
 
+5. **Synchronize users from auth0:**
+   ```bash
+
+   # Create flat file structure so that wrangler md1 migrations can read it
+   # Maybe this will be fixed at some point. Keep eye!
+   pnpm dev
+   curl http://localhost:3002/sync/users \
+    --request POST \
+    --header 'x-api-key: <api-key-secret>'
+
+
+   # Use wrangler.local.jsonc
+   npx wrangler d1 migrations apply D1_DB --local --config wrangler.local.jsonc
+   ```
+
+
 ### Daily Development
 
 **Start the dev server with your local config:**
