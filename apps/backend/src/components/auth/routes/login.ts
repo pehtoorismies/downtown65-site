@@ -76,7 +76,11 @@ export const register = (app: AppAPI) => {
     const { email, password } = c.req.valid('json')
 
     const response = await login(getConfig(c.env), { email, password })
-    logger.withMetadata(response).info('Login response')
+    if (response.type !== 'Success') {
+      logger
+        .withMetadata({ error: response.error })
+        .warn('Login response error')
+    }
 
     switch (response.type) {
       case 'InvalidCredentials':
