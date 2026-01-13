@@ -71,4 +71,11 @@ jobs:
       
       - name: Typecheck
         run: pnpm run typecheck
+
+      - name: Version Check
+        run: pnpm run sherif
+
+      - name: Dead code check
+        run: pnpm run knip --reporter github-actions
+
       
