@@ -1,9 +1,9 @@
 {
   "version": "7",
   "dialect": "sqlite",
-  "id": "35634e46-b1a1-4efb-a097-9df3ac0f50ff",
+  "id": "d1d20b0a-3520-45c3-a21f-7fee812cde9a",
   "prevIds": [
-    "a8b7efc0-5d9a-4f8b-837f-239e26477a00"
+    "00000000-0000-0000-0000-000000000000"
   ],
   "ddl": [
     {
@@ -242,7 +242,7 @@
         "id"
       ],
       "onUpdate": "NO ACTION",
-      "onDelete": "NO ACTION",
+      "onDelete": "CASCADE",
       "nameExplicit": false,
       "name": "fk_users_to_events_eventId_events_id_fk",
       "entityType": "fks",

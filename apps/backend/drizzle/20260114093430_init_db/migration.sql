@@ -11,8 +11,7 @@ CREATE TABLE `events` (
 	`race` integer DEFAULT 0 NOT NULL,
 	`createdAt` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	`updatedAt` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	`createdBy` integer NOT NULL,
-	CONSTRAINT `fk_events_createdBy_users_id_fk` FOREIGN KEY (`createdBy`) REFERENCES `users`(`id`)
+	`creatorId` integer NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `users` (
@@ -28,7 +27,7 @@ CREATE TABLE `users_to_events` (
 	`createdAt` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	CONSTRAINT `users_to_events_pk` PRIMARY KEY(`userId`, `eventId`),
 	CONSTRAINT `fk_users_to_events_userId_users_id_fk` FOREIGN KEY (`userId`) REFERENCES `users`(`id`),
-	CONSTRAINT `fk_users_to_events_eventId_events_id_fk` FOREIGN KEY (`eventId`) REFERENCES `events`(`id`)
+	CONSTRAINT `fk_users_to_events_eventId_events_id_fk` FOREIGN KEY (`eventId`) REFERENCES `events`(`id`) ON DELETE CASCADE
 );
 --> statement-breakpoint
 CREATE INDEX `events_eventULID_idx` ON `events` (`eventULID`);--> statement-breakpoint

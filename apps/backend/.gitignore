@@ -17,3 +17,5 @@ db.sqlite
 .generated/
 
 drizzle_flat/
+
+seed_data_tmp/
