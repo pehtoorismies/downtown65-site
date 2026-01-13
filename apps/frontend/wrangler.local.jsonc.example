@@ -1,0 +1,14 @@
+// Copy this file to wrangler.local.jsonc and customize for your local development
+// This file is gitignored - safe for developer-specific settings
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pehtoorismies-dt65-events-frontend",
+  "compatibility_date": "2025-04-04",
+  "main": "./workers/app.ts",
+  "workers_dev": true,
+  "compatibility_flags": ["nodejs_compat"],
+  // Override API host if your backend runs on a different port or host
+  "vars": {
+    "API_HOST": "http://localhost:3002"
+  }
+}
