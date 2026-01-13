@@ -77,3 +77,11 @@ jobs:
         run: |
           curl -X POST "https://${{ env.WORKER_NAME }}.${{ env.DOMAIN_NAME }}/sync/users" \
             --header 'x-api-key: ${{ secrets.DT65_API_KEY }}'
+
+      - name: Display Backend URL
+        run: |
+          echo "### 🚀 Backend Deployed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Backend URL: https://${{ env.WORKER_NAME }}.${{ env.DOMAIN_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 [Open Backend](https://${{ env.WORKER_NAME }}.${{ env.DOMAIN_NAME }})" >> $GITHUB_STEP_SUMMARY
