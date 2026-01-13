@@ -13,9 +13,7 @@ export const action = async ({
   params,
 }: Route.ActionArgs) => {
   const logger = createLogger({
-    appContext:
-      new URL(import.meta.url).pathname.split('/').slice(-2).join(' > ') ||
-      'Event Participation',
+    appContext: 'Event Participation Action',
   })
   const eventID = stringToID.decode(params.id)
   logger.withContext({ eventID, method: request.method })
@@ -26,7 +24,6 @@ export const action = async ({
     throw new Error('Unauthorized')
   }
 
-  const apiClient = getApiClient(context.cloudflare.env.API_HOST)
   logger.withContext({
     eventID,
     method: request.method,
@@ -45,6 +42,8 @@ export const action = async ({
       authorization: `Bearer ${accessToken}`,
     },
   }
+
+  const apiClient = getApiClient(context.cloudflare.env.API_HOST)
 
   const { error } =
     request.method === 'POST'
