@@ -1,0 +1,7 @@
+# Copy this file to .dev.vars for local development secrets
+# This file is gitignored - safe for sensitive values
+
+# Get these from your team's password manager or project lead
+API_KEY=your-local-api-key
+REGISTER_SECRET=your-register-secret
+AUTH_CLIENT_SECRET=your-auth0-client-secret
