@@ -1,0 +1,25 @@
+// Copy this file to wrangler.local.jsonc and customize for your local development
+// This file is gitignored - safe for developer-specific settings
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "dt65-events-api-YOUR_NAME",
+  "compatibility_date": "2025-04-04",
+  "main": "./src/server.ts",
+  "compatibility_flags": ["nodejs_compat"],
+  // Override default vars for local development
+  "vars": {
+    "AUTH_CLIENT_ID": "JaoAht7ggce7f5R8DCBGUyjUJeMQEDtz",
+    "AUTH_DOMAIN": "dev-dt65.eu.auth0.com",
+    "AUTH_AUDIENCE": "https://graphql-dev.downtown65.com"
+  },
+  
+  // Use your own local D1 database (binding must match code: D1_DB)
+  "d1_databases": [
+    {
+      "binding": "D1_DB",
+      "database_name": "YOUR_NAME-development",
+      "database_id": "YOUR_DATABASE_ID",
+      "migrations_dir": "drizzle_flat"
+    }
+  ]
+}

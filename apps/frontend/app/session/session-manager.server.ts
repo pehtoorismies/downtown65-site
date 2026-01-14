@@ -1,0 +1,189 @@
+import { ISODateTimeSchema, type User, UserSchema } from '@downtown65/schema'
+import { addDays, addMonths, isAfter, parseISO } from 'date-fns'
+import { jwtDecode } from 'jwt-decode'
+import type { Session } from 'react-router'
+import { createCookieSessionStorage } from 'react-router'
+import { z } from 'zod'
+import { getApiClient } from '~/api/api-client'
+
+const AccessTokenPartialSchema = z.object({
+  exp: z.number(),
+})
+
+interface CreateUserSessionProps {
+  accessToken: string
+  refreshToken: string
+  rememberMe: boolean
+  request: Request
+  user: User
+}
+
+const isAccessTokenExpired = (accessToken: string): boolean => {
+  const decoded = jwtDecode(accessToken)
+  const { exp } = AccessTokenPartialSchema.parse(decoded)
+  // exp is in seconds since Unix epoch
+  const expirationDate = new Date(exp * 1000)
+  return isAfter(new Date(), expirationDate)
+}
+
+const isSessionCookieExpired = (expiresAt: string) =>
+  isAfter(new Date(), parseISO(expiresAt))
+
+const CookieSessionDataSchema = z.object({
+  accessToken: z.string(),
+  refreshToken: z.string(),
+  expiresAt: ISODateTimeSchema,
+  user: UserSchema,
+})
+type CookieSessionData = z.infer<typeof CookieSessionDataSchema>
+
+type FlashData = {
+  error?: string
+  success?: string
+}
+
+const getCookieSessionStorage = (cookieSessionSecret: string) => {
+  return createCookieSessionStorage<CookieSessionData, FlashData>({
+    cookie: {
+      name: '__session',
+      httpOnly: true,
+      path: '/',
+      sameSite: 'lax',
+      secrets: [cookieSessionSecret],
+      secure: false, // set to true in production
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+    },
+  })
+}
+
+type UserSessionResponse =
+  | {
+      success: true
+      user: User
+      accessToken: string
+      headers: Headers
+    }
+  | {
+      success: false
+      message: string
+      headers: Headers
+    }
+
+export const createSessionManager = (env: Env) => {
+  const { getSession, destroySession, commitSession } = getCookieSessionStorage(
+    env.COOKIE_SESSION_SECRET,
+  )
+
+  const getErrorResponse = async (
+    session: Session<CookieSessionData, FlashData>,
+    message: string,
+  ) => {
+    const headers = new Headers()
+    headers.append('Set-Cookie', await destroySession(session))
+    return {
+      success: false as const,
+      message,
+      headers,
+    }
+  }
+
+  const getUserSession = async (
+    request: Request,
+  ): Promise<UserSessionResponse> => {
+    const session = await getSession(request.headers.get('Cookie'))
+    const sessionData = CookieSessionDataSchema.safeParse(session.data)
+
+    if (!sessionData.success) {
+      return getErrorResponse(session, 'Invalid session data')
+    }
+
+    if (isSessionCookieExpired(sessionData.data.expiresAt)) {
+      return getErrorResponse(
+        session,
+        `Cookie session expired at ${sessionData.data.expiresAt}`,
+      )
+    }
+    const accessTokenExpired = isAccessTokenExpired(
+      sessionData.data.accessToken,
+    )
+
+    if (!accessTokenExpired) {
+      return {
+        success: true,
+        user: sessionData.data.user,
+        accessToken: sessionData.data.accessToken,
+        headers: new Headers(),
+      }
+    }
+
+    const apiClient = getApiClient(env.API_HOST)
+    const { data: renewedData, error } = await apiClient.POST(
+      '/auth/refresh-token',
+      {
+        body: {
+          refreshToken: sessionData.data.refreshToken,
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': env.API_KEY,
+        },
+      },
+    )
+
+    if (error) {
+      return getErrorResponse(session, 'Failed to refresh access token')
+    }
+
+    session.set('accessToken', renewedData.accessToken)
+
+    const headers = new Headers()
+    headers.append('Set-Cookie', await commitSession(session))
+
+    return {
+      success: true,
+      user: sessionData.data.user,
+      accessToken: renewedData.accessToken,
+      headers,
+    }
+  }
+
+  const createUserSession = async ({
+    request,
+    accessToken,
+    refreshToken,
+    rememberMe,
+    user,
+  }: CreateUserSessionProps) => {
+    const session = await getSession(request.headers.get('Cookie'))
+    // const user = getUserFromIdToken(tokens.idToken)
+    const now = new Date()
+    const expiresAt = rememberMe ? addMonths(now, 12) : addDays(now, 2)
+
+    const authResponse = CookieSessionDataSchema.safeParse({
+      refreshToken,
+      user,
+      accessToken,
+      expiresAt: expiresAt.toISOString(),
+    })
+    if (!authResponse.success) {
+      // TODO: log this error
+      console.error(authResponse.error)
+      throw new Error('Session data is malformed')
+    }
+
+    session.set('refreshToken', authResponse.data.refreshToken)
+    session.set('accessToken', authResponse.data.accessToken)
+    session.set('expiresAt', authResponse.data.expiresAt)
+    session.set('user', authResponse.data.user)
+
+    return session
+  }
+
+  return {
+    getUserSession,
+    createUserSession,
+    commitSession,
+    destroySession,
+    getSession,
+  }
+}

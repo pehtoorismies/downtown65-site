@@ -1,9 +1,12 @@
-import { render as testingLibraryRender } from '@testing-library/react'
+import {
+  type RenderResult,
+  render as testingLibraryRender,
+} from '@testing-library/react'
 import type React from 'react'
 import { AppTheme } from '~/app-theme'
 
-export function testRender(ui: React.ReactNode) {
-  return testingLibraryRender(<>{ui}</>, {
+export function testRender(ui: React.ReactNode): RenderResult {
+  return testingLibraryRender(ui, {
     wrapper: ({ children }: { children: React.ReactNode }) => (
       <AppTheme env="test">{children}</AppTheme>
     ),

@@ -6,3 +6,7 @@ coverage
 playwright-report
 .vscode
 .idea
+
+# Wrangler local overrides (developer-specific)
+**/wrangler.local.jsonc
+**/.dev.vars

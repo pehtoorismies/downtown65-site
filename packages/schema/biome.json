@@ -1,0 +1,16 @@
+{
+  "extends": ["../../biome.json"],
+  "linter": {
+    "rules": {
+      "recommended": true,
+      "suspicious": {
+        "noConsole": {
+          "level": "error",
+          "options": {
+            "allow": ["error", "warn"]
+          }
+        }
+      }
+    }
+  }
+}

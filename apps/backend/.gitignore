@@ -1,0 +1,21 @@
+.DS_Store
+.env
+/node_modules/
+*.tsbuildinfo
+
+# React Router
+/build/
+
+# Cloudflare
+.mf
+.wrangler
+
+worker-configuration.d.ts
+
+db.sqlite
+
+.generated/
+
+drizzle_flat/
+
+seed_data_tmp/

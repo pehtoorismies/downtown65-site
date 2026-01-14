@@ -1,16 +1,72 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "downtown65-events-backend",
+  "name": "dt65-events-api",
   "compatibility_date": "2025-04-04",
   "main": "./src/server.ts",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
-  "workers_dev": false,
-  "routes": [
-    {
-      "pattern": "api.downtown65.site",
-      "custom_domain": true
+  "compatibility_flags": ["nodejs_compat"],
+  "env": {
+    // CI/CD environments
+    "pull-request": {
+      "name": "{{VAR_WORKER_NAME}}",
+      "preview_urls": false,
+      "workers_dev": false,
+      "routes": [
+        {
+          "pattern": "{{VAR_WORKER_NAME}}.downtown65.site",
+          "custom_domain": true
+        }
+      ],
+      "observability": {
+        "enabled": true
+      },
+      "vars": {
+        "AUTH_CLIENT_ID": "JaoAht7ggce7f5R8DCBGUyjUJeMQEDtz",
+        "AUTH_DOMAIN": "dev-dt65.eu.auth0.com",
+        "AUTH_AUDIENCE": "https://graphql-dev.downtown65.com"
+      },
+      "d1_databases": [
+        {
+          "binding": "D1_DB",
+          "database_name": "{{VAR_DATABASE_NAME}}",
+          "database_id": "{{VAR_DATABASE_ID}}",
+          "migrations_dir": "drizzle_flat"
+        }
+      ]
+    },
+    // Production and staging environments
+    "staging": {
+      "preview_urls": false,
+      "workers_dev": false,
+      "routes": [
+        {
+          "pattern": "staging-api.downtown65.site",
+          "custom_domain": true
+        }
+      ],
+      "vars": {
+        "AUTH_CLIENT_ID": "uPu5NUyP1yaGw2IAC0B1KeCgbX3FaNzz",
+        "AUTH_DOMAIN": "prod-dt65.eu.auth0.com",
+        "AUTH_AUDIENCE": "https://graphql-dev.downtown65.com"
+      },
+      "observability": {
+        "enabled": true
+      },
+      "d1_databases": [
+        {
+          "binding": "D1_DB",
+          "database_name": "staging-dt65-events",
+          "database_id": "554a46eb-7563-4511-950c-32c6e29140a5",
+          "migrations_dir": "drizzle_flat"
+        }
+      ]
+    },
+    "production": {
+      "routes": [
+        {
+          "pattern": "api.downtown65.site",
+          "custom_domain": true
+        }
+      ]
     }
-  ]
+  }
 }

@@ -1,30 +1,94 @@
 import {
+  AppShell,
   Box,
   Code,
   ColorSchemeScript,
   Container,
+  mantineHtmlProps,
   Text,
   Title,
-  mantineHtmlProps,
 } from '@mantine/core'
-import type React from 'react'
-import { Links, Meta, Outlet, Scripts, ScrollRestoration, isRouteErrorResponse } from 'react-router'
+import {
+  isRouteErrorResponse,
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useRouteLoaderData,
+} from 'react-router'
 import type { Route } from './+types/root'
 import './app.css'
+import type { User } from '@downtown65/schema'
+import { useDisclosure } from '@mantine/hooks'
+import type { PropsWithChildren } from 'react'
 import { AppTheme } from '~/app-theme'
+import {
+  LoggedInNavigation,
+  LoggedOutNavigation,
+  Navbar,
+} from './components/navigation'
+import { AuthContext } from './context/context'
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export const loader = async ({ context }: Route.LoaderArgs) => {
+  const authContext = context.get(AuthContext)
+
+  if (authContext) {
+    return {
+      user: authContext.user,
+    }
+  }
+  return {
+    user: null,
+  }
+}
+
+export function Layout({ children }: PropsWithChildren<Route.ComponentProps>) {
+  const data = useRouteLoaderData('root')
+  const user = (data?.user as User) ?? null
+
+  const [navigationOpened, { toggle, close }] = useDisclosure()
+
   return (
     <html lang="en" {...mantineHtmlProps}>
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1"
+        />
         <ColorSchemeScript />
         <Meta />
         <Links />
       </head>
       <body>
-        <AppTheme>{children}</AppTheme>
+        <AppTheme>
+          <AppShell
+            header={{ height: { base: 60, md: 70, lg: 80 } }}
+            navbar={{
+              width: 300,
+              breakpoint: 'sm',
+              collapsed: { desktop: true, mobile: !navigationOpened },
+            }}
+            padding="xs"
+          >
+            <AppShell.Header>
+              {user && (
+                <LoggedInNavigation
+                  user={user}
+                  toggle={toggle}
+                  close={close}
+                  navigationOpened={navigationOpened}
+                />
+              )}
+              {!user && <LoggedOutNavigation />}
+            </AppShell.Header>
+            <AppShell.Navbar py="md" p="sm">
+              <Navbar close={close} />
+            </AppShell.Navbar>
+            <AppShell.Main>{children}</AppShell.Main>
+          </AppShell>
+        </AppTheme>
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -44,7 +108,9 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   if (isRouteErrorResponse(error)) {
     message = error.status === 404 ? '404' : 'Error'
     details =
-      error.status === 404 ? 'The requested page could not be found.' : error.statusText || details
+      error.status === 404
+        ? 'The requested page could not be found.'
+        : error.statusText || details
   } else if (import.meta.env.DEV && error && error instanceof Error) {
     details = error.message
     stack = error.stack

@@ -1,16 +1,50 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "downtown65-events-frontend",
+  "name": "dt65-events-frontend",
   "compatibility_date": "2025-04-04",
   "main": "./workers/app.ts",
   "workers_dev": true,
-  "routes": [
-    {
-      "pattern": "downtown65.site",
-      "custom_domain": true
+  "compatibility_flags": ["nodejs_compat"],
+  "env": {
+    "pull-request": {
+      "name": "{{VAR_WORKER_NAME}}",
+      "preview_urls": false,
+      "workers_dev": false,
+       "routes": [
+        {
+          "pattern": "{{VAR_WORKER_NAME}}.downtown65.site",
+          "custom_domain": true
+        }
+      ],
+      "observability": {
+        "enabled": true
+      },
+      "vars": {
+        "API_HOST": "{{VAR_API_HOST}}"
+      }
+    },
+    // Production and staging environments
+    "staging": {
+      "routes": [
+        {
+          "pattern": "staging.downtown65.site",
+          "custom_domain": true
+        }
+      ],
+      "vars": {
+        "API_HOST": "staging-api.downtown65.site"
+      }
+    },
+    "production": {
+      "routes": [
+        {
+          "pattern": "downtown65.site",
+          "custom_domain": true
+        }
+      ],
+      "vars": {
+        "API_HOST": "api.downtown65.site"
+      }
     }
-  ],
-  "vars": {
-    "VALUE_FROM_CLOUDFLARE": "Hello from Cloudflare"
   }
 }

@@ -1,8 +1,10 @@
-import type { Config } from "@react-router/dev/config";
+import type { Config } from '@react-router/dev/config'
 
 export default {
   ssr: true,
   future: {
-    unstable_viteEnvironmentApi: true,
+    v8_viteEnvironmentApi: true,
+    v8_middleware: true,
+    v8_splitRouteModules: false,
   },
-} satisfies Config;
+} satisfies Config

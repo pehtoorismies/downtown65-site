@@ -1,21 +1,25 @@
 {
-  "name": "event-monorepo",
+  "name": "downtown65-events",
   "private": true,
   "version": "0.1.0",
-  "packageManager": "pnpm@9.12.0",
+  "packageManager": "pnpm@10.26.0+sha512.3b3f6c725ebe712506c0ab1ad4133cf86b1f4b687effce62a9b38b4d72e3954242e643190fc51fa1642949c735f403debd44f5cb0edd657abe63a8b6a7e1e402",
   "scripts": {
     "dev:backend": "pnpm --filter backend dev",
     "dev:frontend": "pnpm --filter frontend dev",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
+    "knip": "pnpm -r knip",
     "ci:lint": "pnpm -r ci:lint",
     "format": "pnpm -r format",
     "typecheck": "pnpm -r typecheck",
-    "lint-package-versions": "sherif"
+    "sherif": "sherif",
+    "ci:generate": "pnpm --filter frontend generate:api-types:file",
+    "clean": "pnpm -r clean && rimraf node_modules"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
+    "@biomejs/biome": "2.3.11",
+    "rimraf": "6.0.1",
     "sherif": "1.9.0"
   }
 }

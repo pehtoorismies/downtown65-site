@@ -1,0 +1,66 @@
+name: Staging Push
+
+# Controls when the workflow will run
+on:
+    # Triggers the workflow on push or pull request events but only for the "main" branch
+    push:
+        branches: ["staging"]
+
+concurrency:
+    group: merge-${{ github.ref }}
+
+env:
+    DATABASE_NAME: "staging-dt65-events"
+
+jobs:
+    deploy-backend:
+        runs-on: ubuntu-22.04
+        environment: production
+        steps:
+            - uses: actions/checkout@v6
+            - name: Install pnpm
+              uses: pnpm/action-setup@v4
+            - uses: actions/setup-node@v6
+              with:
+                  node-version: 22
+                  cache: pnpm
+            - name: Install dependencies
+              run: pnpm install --ignore-scripts --frozen-lockfile
+
+            - name: Generate files
+              working-directory: apps/backend
+              run: pnpm ci:generate
+
+            - name: Run Migrations
+              uses: cloudflare/wrangler-action@v3
+              with:
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+                  environment: staging
+                  preCommands: ./scripts/drizzle_flatten.sh
+                  command: d1 migrations apply ${{ env.DATABASE_NAME }} --remote
+                  workingDirectory: apps/backend
+
+            - name: Deploy Backend
+              uses: cloudflare/wrangler-action@v3
+              with:
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+                  environment: staging
+                  workingDirectory: apps/backend
+                  secrets: |
+                      API_KEY
+                      REGISTER_SECRET
+                      AUTH_CLIENT_SECRET
+              env:
+                  API_KEY: ${{ secrets.DT65_API_KEY }}
+                  REGISTER_SECRET: ${{ secrets.BACKEND_REGISTER_SECRET }}
+                  AUTH_CLIENT_SECRET: ${{ secrets.BACKEND_AUTH_CLIENT_SECRET }}
+
+            - name: Display Backend URL
+              run: |
+                  echo "### 🚀 Staging Deployed" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  echo "Backend URL: https://staging-api.downtown65.site" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  echo "🔗 [Open Backend](https://staging-api.downtown65.site)" >> $GITHUB_STEP_SUMMARY

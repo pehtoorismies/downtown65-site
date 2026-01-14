@@ -1,10 +1,22 @@
-import { defineConfig } from 'vitest/config'
+import path from 'node:path'
+import { defineWorkersProject } from '@cloudflare/vitest-pool-workers/config'
 
-export default defineConfig({
-  test: {
-    environment: 'node',
-    coverage: {
-      reporter: ['text', 'lcov'],
+export default defineWorkersProject(() => {
+  return {
+    resolve: {
+      alias: {
+        '~': path.resolve(__dirname, './src'),
+      },
     },
-  },
+    test: {
+      environment: 'node',
+      coverage: {
+        reporter: ['text', 'v8'],
+      },
+      globals: true,
+      poolOptions: {
+        workers: { wrangler: { configPath: './wrangler.jsonc' } },
+      },
+    },
+  }
 })

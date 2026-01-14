@@ -1,0 +1,43 @@
+name: Pull Request
+
+on:
+  pull_request:
+    branches: [ "staging" ]
+  workflow_dispatch:
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-backend:
+    uses: ./.github/workflows/pr-deploy-backend.yaml
+    with:
+      pr-number: ${{ github.event.pull_request.number }}
+    secrets: inherit
+  deploy-frontend:
+    name: Deploy Preview Frontend
+    needs: deploy-backend
+    uses: ./.github/workflows/pr-deploy-frontend.yaml
+    with:
+      api-url: ${{ needs.deploy-backend.outputs.backend-url }}
+      pr-number: ${{ github.event.pull_request.number }}
+    secrets: inherit
+  quality-checks:
+    uses: ./.github/workflows/quality-checks.yaml
+    with:
+      cloudflare-environment: pull-request
+    secrets: inherit
+#   comment-pr:
+#     needs: [deploy-preview, quality-checks]
+#     runs-on: ubuntu-22.04
+#     steps:
+#       - uses: actions/github-script@v7
+#         with:
+#           script: |
+#             github.rest.issues.createComment({
+#               issue_number: context.issue.number,
+#               owner: context.repo.owner,
+#               repo: context.repo.repo,
+#               body: `🚀 Preview deployed!\n\n**Backend**: ${{ needs.deploy-preview.outputs.backend-url }}\n**Frontend**: ${{ needs.deploy-preview.outputs.frontend-url }}\n\n✅ All checks passed!`
+#             })
