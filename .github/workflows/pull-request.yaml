@@ -11,14 +11,14 @@ concurrency:
 
 jobs:
   deploy-backend:
-    uses: ./.github/workflows/deploy-backend.yaml
+    uses: ./.github/workflows/pr-deploy-backend.yaml
     with:
       pr-number: ${{ github.event.pull_request.number }}
     secrets: inherit
   deploy-frontend:
     name: Deploy Preview Frontend
     needs: deploy-backend
-    uses: ./.github/workflows/deploy-frontend.yaml
+    uses: ./.github/workflows/pr-deploy-frontend.yaml
     with:
       api-url: ${{ needs.deploy-backend.outputs.backend-url }}
       pr-number: ${{ github.event.pull_request.number }}

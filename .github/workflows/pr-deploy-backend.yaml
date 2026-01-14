@@ -21,7 +21,7 @@ jobs:
     environment: development
     outputs:
       backend-url: https://${{ env.WORKER_NAME }}.${{ env.DOMAIN_NAME }}
-    
+
     steps:
       - uses: actions/checkout@v6
       - name: Install pnpm
@@ -32,7 +32,7 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --ignore-scripts --frozen-lockfile
-      
+
       - name: Setup Database
         id: db-setup
         uses: ./.github/actions/setup-d1-database
@@ -40,13 +40,13 @@ jobs:
           database-name: ${{ env.DATABASE_NAME }}
           cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-      
+
       - name: Configure Wrangler
         run: |
           sed -i "s/{{VAR_WORKER_NAME}}/${{ env.WORKER_NAME }}/g" apps/backend/wrangler.jsonc
           sed -i "s/{{VAR_DATABASE_NAME}}/${{ env.DATABASE_NAME }}/g" apps/backend/wrangler.jsonc
           sed -i "s/{{VAR_DATABASE_ID}}/${{ steps.db-setup.outputs.database-id }}/g" apps/backend/wrangler.jsonc
-      
+
       - name: Run Migrations
         uses: cloudflare/wrangler-action@v3
         with:
@@ -56,7 +56,7 @@ jobs:
           preCommands: ./scripts/drizzle_flatten.sh
           command: d1 migrations apply ${{ env.DATABASE_NAME }} --remote
           workingDirectory: apps/backend
-      
+
       - name: Deploy Backend
         uses: cloudflare/wrangler-action@v3
         with:
@@ -72,7 +72,7 @@ jobs:
           API_KEY: ${{ secrets.DT65_API_KEY }}
           REGISTER_SECRET: ${{ secrets.BACKEND_REGISTER_SECRET }}
           AUTH_CLIENT_SECRET: ${{ secrets.BACKEND_AUTH_CLIENT_SECRET }}
-      
+
       - name: Sync Users
         run: |
           curl -X POST "https://${{ env.WORKER_NAME }}.${{ env.DOMAIN_NAME }}/sync/users" \
