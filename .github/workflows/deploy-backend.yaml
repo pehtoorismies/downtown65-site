@@ -1,4 +1,4 @@
-name: Deploy Backend
+name: Deploy Backend To Production Or Staging
 
 # Controls when the workflow will run
 on:
