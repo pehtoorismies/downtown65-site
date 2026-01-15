@@ -24,15 +24,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          cache: pnpm
-      - name: Install dependencies
-        run: pnpm install --ignore-scripts --frozen-lockfile
-
+      - name: Setup Project
+        uses: ./.github/actions/setup-project
       - name: Setup Database
         id: db-setup
         uses: ./.github/actions/setup-d1-database

@@ -1,0 +1,14 @@
+name: Push to Staging or Production
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+jobs:
+  deploy-backend:
+    uses: ./.github/workflows/deploy-backend.yaml
+    with:
+      wrangler-environment: ${{ github.base_ref == 'main' && 'production' || 'staging' }}
+      database-name: ${{ github.base_ref == 'main' && 'production-dt65-events' || 'staging-dt65-events' }}
+    secrets: inherit
