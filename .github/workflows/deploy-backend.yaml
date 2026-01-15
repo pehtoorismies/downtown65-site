@@ -1,31 +1,29 @@
-name: Staging Push
+name: Deploy Backend
 
 # Controls when the workflow will run
 on:
-    # Triggers the workflow on push or pull request events but only for the "main" branch
-    push:
-        branches: ["staging"]
-
-concurrency:
-    group: merge-${{ github.ref }}
-
-env:
-    DATABASE_NAME: "staging-dt65-events"
+     workflow_call:
+        inputs:
+            wrangler-environment:
+                required: true
+                type: string
+            database-name:
+                required: true
+                type: string
+        outputs:
+            backend-url:
+                value: ${{ jobs.deploy.outputs.backend-url }}
 
 jobs:
-    deploy-backend:
+    deploy:
+        outputs:
+            backend-url: ${{ steps.set-url.outputs.url }}
         runs-on: ubuntu-22.04
         environment: production
         steps:
             - uses: actions/checkout@v6
-            - name: Install pnpm
-              uses: pnpm/action-setup@v4
-            - uses: actions/setup-node@v6
-              with:
-                  node-version: 22
-                  cache: pnpm
-            - name: Install dependencies
-              run: pnpm install --ignore-scripts --frozen-lockfile
+            - name: Setup Project
+              uses: ./.github/actions/setup-project
 
             - name: Generate files
               working-directory: apps/backend
@@ -36,9 +34,9 @@ jobs:
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-                  environment: staging
+                  environment: ${{ inputs.wrangler-environment }}
                   preCommands: ./scripts/drizzle_flatten.sh
-                  command: d1 migrations apply ${{ env.DATABASE_NAME }} --remote
+                  command: d1 migrations apply ${{ inputs.database-name }} --remote
                   workingDirectory: apps/backend
 
             - name: Deploy Backend
@@ -46,7 +44,7 @@ jobs:
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-                  environment: staging
+                  environment: ${{ inputs.wrangler-environment }}
                   workingDirectory: apps/backend
                   secrets: |
                       API_KEY
@@ -57,10 +55,19 @@ jobs:
                   REGISTER_SECRET: ${{ secrets.BACKEND_REGISTER_SECRET }}
                   AUTH_CLIENT_SECRET: ${{ secrets.BACKEND_AUTH_CLIENT_SECRET }}
 
+            - name: Set Backend URL
+              id: set-url
+              run: |
+                  if [ "${{ inputs.wrangler-environment }}" = "staging" ]; then
+                      echo "url=https://staging-api.downtown65.site" >> $GITHUB_OUTPUT
+                  else
+                      echo "url=https://api.downtown65.site" >> $GITHUB_OUTPUT
+                  fi
+
             - name: Display Backend URL
               run: |
-                  echo "### 🚀 Staging Deployed" >> $GITHUB_STEP_SUMMARY
+                  echo "### 🚀 ${{ inputs.wrangler-environment }} deployed" >> $GITHUB_STEP_SUMMARY
                   echo "" >> $GITHUB_STEP_SUMMARY
-                  echo "Backend URL: https://staging-api.downtown65.site" >> $GITHUB_STEP_SUMMARY
+                  echo "Backend URL: ${{ steps.set-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
                   echo "" >> $GITHUB_STEP_SUMMARY
-                  echo "🔗 [Open Backend](https://staging-api.downtown65.site)" >> $GITHUB_STEP_SUMMARY
+                  echo "🔗 [Open Backend](${{ steps.set-url.outputs.url }})" >> $GITHUB_STEP_SUMMARY
