@@ -44,7 +44,7 @@ jobs:
           workingDirectory: apps/frontend
           environment: pull-request
           preCommands: |
-            pnpm run build
+            CLOUDFLARE_ENV=pull-request pnpm run build
           secrets: |
             API_KEY
             COOKIE_SESSION_SECRET
