@@ -15,7 +15,10 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
+
+concurrency:
+  group: merge-staging-to-main
+  cancel-in-progress: false
 
 jobs:
   merge:
