@@ -1,0 +1,26 @@
+name: Push to Staging or Production
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+  
+jobs:
+  deploy-backend:
+    uses: ./.github/workflows/deploy-backend.yaml
+    with:
+      wrangler-environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+      database-name: ${{ github.ref_name == 'main' && 'production-dt65-events' || 'staging-dt65-events' }}
+    secrets: inherit
+  deploy-frontend:
+    uses: ./.github/workflows/deploy-frontend.yaml
+    needs: deploy-backend
+    with:
+      api-url: ${{ needs.deploy-backend.outputs.api-url }}
+      wrangler-environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+    secrets: inherit

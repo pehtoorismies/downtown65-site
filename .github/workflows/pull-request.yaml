@@ -3,7 +3,6 @@ name: Pull Request
 on:
   pull_request:
     branches: [ "staging" ]
-  workflow_dispatch:
 
 concurrency:
   group: pr-${{ github.event.pull_request.number }}
@@ -28,16 +27,3 @@ jobs:
     with:
       cloudflare-environment: pull-request
     secrets: inherit
-#   comment-pr:
-#     needs: [deploy-preview, quality-checks]
-#     runs-on: ubuntu-22.04
-#     steps:
-#       - uses: actions/github-script@v7
-#         with:
-#           script: |
-#             github.rest.issues.createComment({
-#               issue_number: context.issue.number,
-#               owner: context.repo.owner,
-#               repo: context.repo.repo,
-#               body: `🚀 Preview deployed!\n\n**Backend**: ${{ needs.deploy-preview.outputs.backend-url }}\n**Frontend**: ${{ needs.deploy-preview.outputs.frontend-url }}\n\n✅ All checks passed!`
-#             })

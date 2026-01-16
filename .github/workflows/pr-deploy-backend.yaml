@@ -24,15 +24,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          cache: pnpm
-      - name: Install dependencies
-        run: pnpm install --ignore-scripts --frozen-lockfile
-
+      - name: Setup Project
+        uses: ./.github/actions/setup-project
       - name: Setup Database
         id: db-setup
         uses: ./.github/actions/setup-d1-database
@@ -72,6 +65,26 @@ jobs:
           API_KEY: ${{ secrets.DT65_API_KEY }}
           REGISTER_SECRET: ${{ secrets.BACKEND_REGISTER_SECRET }}
           AUTH_CLIENT_SECRET: ${{ secrets.BACKEND_AUTH_CLIENT_SECRET }}
+
+      - name: Wait for Backend Health Check
+        run: |
+          echo "Waiting for backend to be ready..."
+          max_attempts=10
+          attempt=0
+          
+          while [ $attempt -lt $max_attempts ]; do
+            if curl -sf "https://${{ env.WORKER_NAME }}.${{ env.DOMAIN_NAME }}/healthz" > /dev/null; then
+              echo "✅ Backend is ready!"
+              exit 0
+            fi
+            
+            attempt=$((attempt + 1))
+            echo "Attempt $attempt/$max_attempts - Backend not ready yet, waiting 2 seconds..."
+            sleep 2
+          done
+          
+          echo "❌ Backend failed to become ready after $max_attempts attempts"
+          exit 1
 
       - name: Sync Users
         run: |

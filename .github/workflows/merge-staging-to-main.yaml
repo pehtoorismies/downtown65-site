@@ -1,0 +1,74 @@
+name: Merge Staging to Main
+
+on:
+  workflow_dispatch:
+    inputs:
+      merge_strategy:
+        description: 'Merge strategy'
+        required: true
+        default: 'merge'
+        type: choice
+        options:
+          - merge
+          - squash
+          - rebase
+
+permissions:
+  contents: write
+
+concurrency:
+  group: merge-staging-to-main
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # Fetch all history for proper merging
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch latest branches
+        run: |
+          git fetch origin staging
+          git fetch origin main
+
+      - name: Checkout main branch
+        run: git checkout main
+
+      - name: Merge staging into main
+        id: merge
+        run: |
+          if [ "${{ inputs.merge_strategy }}" = "squash" ]; then
+            echo "Using squash merge strategy"
+            git merge --squash origin/staging
+            git commit -m "chore: merge staging to main (squashed)"
+          elif [ "${{ inputs.merge_strategy }}" = "rebase" ]; then
+            echo "Using rebase merge strategy"
+            git rebase origin/staging
+          else
+            echo "Using merge commit strategy"
+            git merge origin/staging --no-ff -m "chore: merge staging to main"
+          fi
+
+      - name: Push to main
+        run: git push origin main
+
+      - name: Notify on success
+        if: success()
+        run: |
+          echo "✅ Successfully merged staging to main"
+          echo "::notice::Staging has been merged to main branch"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Failed to merge staging to main"
+          echo "::error::Merge failed - please resolve conflicts manually"
