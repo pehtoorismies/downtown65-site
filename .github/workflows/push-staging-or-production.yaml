@@ -9,6 +9,13 @@ jobs:
   deploy-backend:
     uses: ./.github/workflows/deploy-backend.yaml
     with:
-      wrangler-environment: ${{ github.base_ref == 'main' && 'production' || 'staging' }}
-      database-name: ${{ github.base_ref == 'main' && 'production-dt65-events' || 'staging-dt65-events' }}
+      wrangler-environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+      database-name: ${{ github.ref_name == 'main' && 'production-dt65-events' || 'staging-dt65-events' }}
+    secrets: inherit
+  deploy-frontend:
+    uses: ./.github/workflows/deploy-frontend.yaml
+    needs: deploy-backend
+    with:
+      api-url: ${{ needs.deploy-backend.outputs.api-url }}
+      wrangler-environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
     secrets: inherit

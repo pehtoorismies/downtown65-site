@@ -11,13 +11,14 @@ on:
                 required: true
                 type: string
         outputs:
-            backend-url:
-                value: ${{ jobs.deploy.outputs.backend-url }}
+            api-url:
+                description: "The URL of the deployed backend"
+                value: ${{ jobs.deploy.outputs.api-url }}
 
 jobs:
     deploy:
         outputs:
-            backend-url: ${{ steps.set-url.outputs.url }}
+            api-url: ${{ steps.set-url.outputs.url }}
         runs-on: ubuntu-22.04
         environment: production
         steps:
