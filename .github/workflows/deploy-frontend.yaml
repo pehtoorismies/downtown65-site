@@ -1,0 +1,60 @@
+name: Deploy Frontend To Production Or Staging
+
+# Controls when the workflow will run
+on:
+    workflow_call:
+        inputs:
+            wrangler-environment:
+                required: true
+                type: string
+            api-url:
+                required: true
+                type: string
+        outputs:
+            api-url:
+                description: "The URL of the deployed frontend"
+                value: ${{ jobs.deploy.outputs.url }}
+
+jobs:
+    deploy:
+        outputs:
+            url: ${{ steps.set-url.outputs.url }}
+        runs-on: ubuntu-22.04
+        environment: production
+        steps:
+            - uses: actions/checkout@v6
+            
+            - name: Setup Project
+              uses: ./.github/actions/setup-project
+            
+            - name: Deploy Frontend
+              uses: cloudflare/wrangler-action@v3
+              with:
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+                  workingDirectory: apps/frontend
+                  environment: ${{ inputs.wrangler-environment }}
+                  preCommands: |
+                      CLOUDFLARE_ENV=${{ inputs.wrangler-environment }} pnpm run build
+                  secrets: |
+                      API_KEY
+                      COOKIE_SESSION_SECRET
+              env:
+                  API_KEY: ${{ secrets.DT65_API_KEY }}
+                  COOKIE_SESSION_SECRET: ${{ secrets.FRONTEND_COOKIE_SESSION_SECRET }}
+
+            - name: Set Frontend URL
+              id: set-url
+              run: |
+                  if [ "${{ inputs.wrangler-environment }}" = "staging" ]; then
+                      echo "url=https://www.staging.downtown65.site" >> $GITHUB_OUTPUT
+                  else
+                      echo "url=https://www.downtown65.site" >> $GITHUB_OUTPUT
+
+            - name: Display Frontend URL
+              run: |
+                echo "### 🚀 Frontend Deployed" >> $GITHUB_STEP_SUMMARY
+                echo "" >> $GITHUB_STEP_SUMMARY
+                echo "Frontend URL: ${{ steps.set-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
+                echo "" >> $GITHUB_STEP_SUMMARY
+                echo "🔗 [Open Frontend](${{ steps.set-url.outputs.url }})" >> $GITHUB_STEP_SUMMARY
