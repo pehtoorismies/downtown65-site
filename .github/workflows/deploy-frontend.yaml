@@ -7,11 +7,8 @@ on:
             wrangler-environment:
                 required: true
                 type: string
-            api-url:
-                required: true
-                type: string
         outputs:
-            api-url:
+            frontend-url:
                 description: "The URL of the deployed frontend"
                 value: ${{ jobs.deploy.outputs.url }}
 
@@ -23,10 +20,10 @@ jobs:
         environment: production
         steps:
             - uses: actions/checkout@v6
-            
+
             - name: Setup Project
               uses: ./.github/actions/setup-project
-            
+
             - name: Deploy Frontend
               uses: cloudflare/wrangler-action@v3
               with:
@@ -47,14 +44,15 @@ jobs:
               id: set-url
               run: |
                   if [ "${{ inputs.wrangler-environment }}" = "staging" ]; then
-                      echo "url=https://www.staging.downtown65.site" >> $GITHUB_OUTPUT
+                      echo "url=https://staging.downtown65.site" >> $GITHUB_OUTPUT
                   else
                       echo "url=https://www.downtown65.site" >> $GITHUB_OUTPUT
+                  fi
 
             - name: Display Frontend URL
               run: |
-                echo "### 🚀 Frontend Deployed" >> $GITHUB_STEP_SUMMARY
-                echo "" >> $GITHUB_STEP_SUMMARY
-                echo "Frontend URL: ${{ steps.set-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
-                echo "" >> $GITHUB_STEP_SUMMARY
-                echo "🔗 [Open Frontend](${{ steps.set-url.outputs.url }})" >> $GITHUB_STEP_SUMMARY
+                  echo "### 🚀 Frontend Deployed" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  echo "Frontend URL: ${{ steps.set-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  echo "🔗 [Open Frontend](${{ steps.set-url.outputs.url }})" >> $GITHUB_STEP_SUMMARY

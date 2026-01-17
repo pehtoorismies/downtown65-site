@@ -38,7 +38,7 @@
     "production": {
       "routes": [
         {
-          "pattern": "downtown65.site",
+          "pattern": "www.downtown65.site",
           "custom_domain": true
         }
       ],
