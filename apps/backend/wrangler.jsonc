@@ -46,7 +46,7 @@
       "vars": {
         "AUTH_CLIENT_ID": "uPu5NUyP1yaGw2IAC0B1KeCgbX3FaNzz",
         "AUTH_DOMAIN": "prod-dt65.eu.auth0.com",
-        "AUTH_AUDIENCE": "https://graphql-dev.downtown65.com"
+        "AUTH_AUDIENCE": "https://graphql-api.downtown65.com/"
       },
       "observability": {
         "enabled": true
@@ -61,10 +61,28 @@
       ]
     },
     "production": {
+      "preview_urls": false,
+      "workers_dev": false,
       "routes": [
         {
           "pattern": "api.downtown65.site",
           "custom_domain": true
+        }
+      ],
+      "vars": {
+        "AUTH_CLIENT_ID": "uPu5NUyP1yaGw2IAC0B1KeCgbX3FaNzz",
+        "AUTH_DOMAIN": "prod-dt65.eu.auth0.com",
+        "AUTH_AUDIENCE": "https://graphql-api.downtown65.com/"
+      },
+      "observability": {
+        "enabled": true
+      },
+      "d1_databases": [
+        {
+          "binding": "D1_DB",
+          "database_name": "production-dt65-events",
+          "database_id": "3c2389cc-3e40-421b-8e5c-57348c24056a",
+          "migrations_dir": "drizzle_flat"
         }
       ]
     }
