@@ -3,13 +3,12 @@
   "name": "dt65-events-frontend",
   "compatibility_date": "2025-04-04",
   "main": "./workers/app.ts",
-  "workers_dev": true,
+  "workers_dev": false,
+  "preview_urls": false,
   "compatibility_flags": ["nodejs_compat"],
   "env": {
     "pull-request": {
       "name": "{{VAR_WORKER_NAME}}",
-      "preview_urls": false,
-      "workers_dev": false,
       "routes": [
         {
           "pattern": "{{VAR_WORKER_NAME}}.downtown65.site",
