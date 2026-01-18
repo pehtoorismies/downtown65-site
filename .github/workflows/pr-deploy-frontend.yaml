@@ -27,12 +27,11 @@ jobs:
       - name: Generate wrangler config for PR
         working-directory: apps/frontend
         run: |
-          cat wrangler.jsonc | \
-            sed "s/\$PR_NUMBER/${PR_NUMBER}/g" | \
-            > wrangler.pr-${PR_NUMBER}.jsonc
+          # Secret works only with default wrangler.jsonc
+          sed "s/\$PR_NUMBER/${PR_NUMBER}/g" wrangler.jsonc
 
-          echo "Show pr json"
-          cat wrangler.pr-${PR_NUMBER}.jsonc
+          echo "Cat wrangler.jsonc after replacements:"
+          cat wrangler.jsonc
 
       - name: Deploy Frontend
         uses: cloudflare/wrangler-action@v3
@@ -43,7 +42,6 @@ jobs:
           environment: pull-request
           preCommands: |
             CLOUDFLARE_ENV=pull-request pnpm run build
-          command: deploy -c wrangler.pr-${{ inputs.pr-number }}.jsonc
           secrets: |
             API_KEY
             COOKIE_SESSION_SECRET
