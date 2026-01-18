@@ -39,15 +39,18 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_DATABASE_ID: ${{ steps.db-setup.outputs.database-id }}
         run: |
-          cat wrangler.jsonc | \
-            sed "s/\$PR_NUMBER/${PR_NUMBER}/g" | \
-            sed "s/\$PR_DATABASE_ID/${PR_DATABASE_ID}/g" \
-            > wrangler.pr-${PR_NUMBER}.jsonc
+          # Secret works only with default wrangler.jsonc
+          echo "Using PR Number: ${PR_NUMBER}"
+          echo "Using Database ID: ${PR_DATABASE_ID}"
 
-          echo "Show pr json"
-          cat wrangler.pr-${PR_NUMBER}.jsonc
-          # sed "s/\$PR_NUMBER/${PR_NUMBER}/g apps/backend/wrangler.jsonc
-          # sed "s/\$PR_DATABASE_ID/${PR_DATABASE_ID}/g" apps/backend/wrangler.jsonc
+          # Use envsubst for safer variable substitution
+          export PR_NUMBER PR_DATABASE_ID
+          envsubst < wrangler.jsonc > wrangler.jsonc.tmp
+          mv wrangler.jsonc.tmp wrangler.jsonc
+
+          echo "Wrangler config after replacements:"
+          cat wrangler.jsonc
+
       - name: Run Migrations
         uses: cloudflare/wrangler-action@v3
         with:
@@ -56,7 +59,7 @@ jobs:
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           environment: pull-request
           preCommands: ./scripts/drizzle_flatten.sh
-          command: d1 migrations apply ${{ env.DATABASE_NAME }} -c wrangler.pr-${{ inputs.pr-number }}.jsonc
+          command: d1 migrations apply ${{ env.DATABASE_NAME }}
 
       - name: Deploy Backend
         uses: cloudflare/wrangler-action@v3
@@ -65,7 +68,6 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           environment: pull-request
-          command: deploy --config wrangler.pr-${{ inputs.pr-number }}.jsonc
           secrets: |
             API_KEY
             REGISTER_SECRET
