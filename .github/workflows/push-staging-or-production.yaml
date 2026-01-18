@@ -15,7 +15,7 @@ jobs:
     uses: ./.github/workflows/deploy-backend.yaml
     with:
       wrangler-environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
-      # TODO: needed for migtations. Check if we can improve this later.
+      # TODO: needed for migrations. Check if we can improve this later.
       database-name: ${{ github.ref_name == 'main' && 'production-dt65-events' || 'staging-dt65-events' }}
     secrets: inherit
   deploy-frontend:

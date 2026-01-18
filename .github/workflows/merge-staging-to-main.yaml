@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       merge_strategy:
-        description: 'Merge strategy'
+        description: "Merge strategy"
         required: true
-        default: 'merge'
+        default: "merge"
         type: choice
         options:
           - merge
