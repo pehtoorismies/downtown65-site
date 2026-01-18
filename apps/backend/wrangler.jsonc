@@ -9,10 +9,10 @@
   "env": {
     // CI/CD environments
     "pull-request": {
-      "name": "$PR_NUMBER-api-dt65-events",
+      "name": "pr-$PR_NUMBER-api-dt65-events",
       "routes": [
         {
-          "pattern": "$PR_NUMBER-api.downtown65.site",
+          "pattern": "pr-$PR_NUMBER-api.downtown65.site",
           "custom_domain": true
         }
       ],
@@ -28,7 +28,7 @@
         {
           "binding": "D1_DB",
           "database_name": "$PR_NUMBER-dt65-events",
-          "database_id": "$DATABASE_ID_PR",
+          "database_id": "$PR_DATABASE_ID",
           "migrations_dir": "drizzle_flat"
         }
       ]

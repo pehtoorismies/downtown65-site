@@ -19,7 +19,6 @@ jobs:
     needs: deploy-backend
     uses: ./.github/workflows/pr-deploy-frontend.yaml
     with:
-      api-url: ${{ needs.deploy-backend.outputs.backend-url }}
       pr-number: ${{ github.event.pull_request.number }}
     secrets: inherit
   quality-checks:

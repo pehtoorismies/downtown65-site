@@ -12,15 +12,14 @@ on:
 
 env:
   DATABASE_NAME: "pr-${{ inputs.pr-number }}-dt65-events"
-  WORKER_NAME: "pr-${{ inputs.pr-number }}-dt65-events-api"
-  DOMAIN_NAME: "downtown65.site"
+  URL: "https://pr-${{ inputs.pr-number }}-api.downtown65.site"
 
 jobs:
   deploy:
     runs-on: ubuntu-22.04
     environment: development
     outputs:
-      backend-url: https://${{ env.WORKER_NAME }}.${{ env.DOMAIN_NAME }}
+      backend-url: "https://pr-${{ inputs.pr-number }}-api.downtown65.site"
 
     steps:
       - uses: actions/checkout@v6
@@ -34,29 +33,35 @@ jobs:
           cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
 
-      - name: Configure Wrangler
+      - name: Generate wrangler config for PR
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_DATABASE_ID: ${{ steps.db-setup.outputs.database-id }}
         run: |
-          sed -i "s/{{VAR_WORKER_NAME}}/${{ env.WORKER_NAME }}/g" apps/backend/wrangler.jsonc
-          sed -i "s/{{VAR_DATABASE_NAME}}/${{ env.DATABASE_NAME }}/g" apps/backend/wrangler.jsonc
-          sed -i "s/{{VAR_DATABASE_ID}}/${{ steps.db-setup.outputs.database-id }}/g" apps/backend/wrangler.jsonc
-
+          cat wrangler.jsonc | \
+            sed "s/\$PR_NUMBER/${PR_NUMBER}/g" | \
+            sed "s/\$PR_DATABASE_ID/${PR_DATABASE_ID}/g" \
+            > wrangler.pr-${PR_NUMBER}.jsonc
+          # sed "s/\$PR_NUMBER/${PR_NUMBER}/g apps/backend/wrangler.jsonc
+          # sed "s/\$PR_DATABASE_ID/${PR_DATABASE_ID}/g" apps/backend/wrangler.jsonc
       - name: Run Migrations
         uses: cloudflare/wrangler-action@v3
         with:
+          workingDirectory: apps/backend
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           environment: pull-request
           preCommands: ./scripts/drizzle_flatten.sh
-          command: d1 migrations apply ${{ env.DATABASE_NAME }} --remote
-          workingDirectory: apps/backend
+          command: d1 migrations apply ${{ env.DATABASE_NAME }} -c wrangler.pr-${{ inputs.pr-number }}.jsonc
 
       - name: Deploy Backend
         uses: cloudflare/wrangler-action@v3
         with:
+          workingDirectory: apps/backend
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           environment: pull-request
-          workingDirectory: apps/backend
+          command: deploy --config wrangler.pr-${{ inputs.pr-number }}.jsonc
           secrets: |
             API_KEY
             REGISTER_SECRET
@@ -73,7 +78,7 @@ jobs:
           attempt=0
 
           while [ $attempt -lt $max_attempts ]; do
-            if curl -sf "https://${{ env.WORKER_NAME }}.${{ env.DOMAIN_NAME }}/healthz" > /dev/null; then
+            if curl -sf "${{ env.URL }}/healthz" > /dev/null; then
               echo "✅ Backend is ready!"
               exit 0
             fi
@@ -88,13 +93,13 @@ jobs:
 
       - name: Sync Users
         run: |
-          curl -X POST "https://${{ env.WORKER_NAME }}.${{ env.DOMAIN_NAME }}/sync/users" \
+          curl -X POST "${{ env.URL }}/sync/users" \
             --header 'x-api-key: ${{ secrets.DT65_API_KEY }}'
 
       - name: Display Backend URL
         run: |
           echo "### 🚀 Backend Deployed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Backend URL: https://${{ env.WORKER_NAME }}.${{ env.DOMAIN_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "Backend URL: ${{ env.URL }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🔗 [Open Backend](https://${{ env.WORKER_NAME }}.${{ env.DOMAIN_NAME }})" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 [Open Backend](${{ env.URL }})" >> $GITHUB_STEP_SUMMARY
