@@ -6,35 +6,33 @@ on:
       pr-number:
         required: true
         type: number
-      api-url:
-        required: true
-        type: string
     outputs:
       frontend-url:
         value: ${{ jobs.deploy.outputs.frontend-url }}
 
 env:
-  WORKER_NAME: "pr-${{ inputs.pr-number }}-dt65-events-frontend"
-  DOMAIN_NAME: "downtown65.site"
+  URL: "https://pr-${{ inputs.pr-number }}.downtown65.site"
 
 jobs:
   deploy:
     runs-on: ubuntu-22.04
     environment: development
     outputs:
-      frontend-url: https://${{ env.WORKER_NAME }}.downtown65.site
+      frontend-url: ${{ env.URL }}
 
     steps:
       - uses: actions/checkout@v6
       - name: Setup Project
         uses: ./.github/actions/setup-project
-      - name: Configure Wrangler
+      - name: Generate wrangler config for PR
+        working-directory: apps/frontend
         run: |
-          sed -i "s|{{VAR_WORKER_NAME}}|${{ env.WORKER_NAME }}|g" apps/frontend/wrangler.jsonc
-          sed -i "s|{{VAR_API_HOST}}|${{ inputs.api-url }}|g" apps/frontend/wrangler.jsonc
+          cat wrangler.jsonc | \
+            sed "s/\$PR_NUMBER/${PR_NUMBER}/g" | \
+            > wrangler.pr-${PR_NUMBER}.jsonc
 
-          echo "Show modified json"
-          cat apps/frontend/wrangler.jsonc
+          echo "Show pr json"
+          cat wrangler.pr-${PR_NUMBER}.jsonc
 
       - name: Deploy Frontend
         uses: cloudflare/wrangler-action@v3
@@ -45,6 +43,7 @@ jobs:
           environment: pull-request
           preCommands: |
             CLOUDFLARE_ENV=pull-request pnpm run build
+          command: deploy -c wrangler.pr-${{ inputs.pr-number }}.jsonc
           secrets: |
             API_KEY
             COOKIE_SESSION_SECRET
@@ -56,6 +55,6 @@ jobs:
         run: |
           echo "### 🚀 Frontend Deployed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Frontend URL: https://${{ env.WORKER_NAME }}.downtown65.site" >> $GITHUB_STEP_SUMMARY
+          echo "Frontend URL: ${{ env.URL }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🔗 [Open Frontend](https://${{ env.WORKER_NAME }}.downtown65.site)" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 [Open Frontend](${{ env.URL }})" >> $GITHUB_STEP_SUMMARY

@@ -34,6 +34,7 @@ jobs:
           cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Generate wrangler config for PR
+        working-directory: apps/backend
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_DATABASE_ID: ${{ steps.db-setup.outputs.database-id }}
@@ -42,6 +43,9 @@ jobs:
             sed "s/\$PR_NUMBER/${PR_NUMBER}/g" | \
             sed "s/\$PR_DATABASE_ID/${PR_DATABASE_ID}/g" \
             > wrangler.pr-${PR_NUMBER}.jsonc
+
+          echo "Show pr json"
+          cat wrangler.pr-${PR_NUMBER}.jsonc
           # sed "s/\$PR_NUMBER/${PR_NUMBER}/g apps/backend/wrangler.jsonc
           # sed "s/\$PR_DATABASE_ID/${PR_DATABASE_ID}/g" apps/backend/wrangler.jsonc
       - name: Run Migrations
