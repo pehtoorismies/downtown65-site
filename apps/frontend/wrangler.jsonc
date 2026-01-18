@@ -8,10 +8,10 @@
   "compatibility_flags": ["nodejs_compat"],
   "env": {
     "pull-request": {
-      "name": "$PR_NUMBER-frontend-dt65-events",
+      "name": "pr-$PR_NUMBER-frontend-dt65-events",
       "routes": [
         {
-          "pattern": "$PR_NUMBER-frontend.downtown65.site",
+          "pattern": "pr-$PR_NUMBER-frontend.downtown65.site",
           "custom_domain": true
         }
       ],
@@ -19,7 +19,7 @@
         "enabled": true
       },
       "vars": {
-        "API_HOST": "$PR_NUMBER-api.downtown65.site"
+        "API_HOST": "pr-$PR_NUMBER-api.downtown65.site"
       }
     },
     // Production and staging environments

@@ -36,7 +36,7 @@ jobs:
       - name: Generate wrangler config for PR
         working-directory: apps/backend
         env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_NUMBER: ${{ inputs.pr-number }}
           PR_DATABASE_ID: ${{ steps.db-setup.outputs.database-id }}
         run: |
           # Secret works only with default wrangler.jsonc
