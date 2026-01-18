@@ -71,7 +71,7 @@ jobs:
           echo "Waiting for backend to be ready..."
           max_attempts=10
           attempt=0
-          
+
           while [ $attempt -lt $max_attempts ]; do
             if curl -sf "https://${{ env.WORKER_NAME }}.${{ env.DOMAIN_NAME }}/healthz" > /dev/null; then
               echo "✅ Backend is ready!"
@@ -82,7 +82,7 @@ jobs:
             echo "Attempt $attempt/$max_attempts - Backend not ready yet, waiting 2 seconds..."
             sleep 2
           done
-          
+
           echo "❌ Backend failed to become ready after $max_attempts attempts"
           exit 1
 

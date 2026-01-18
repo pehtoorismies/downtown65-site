@@ -10,7 +10,7 @@
       "name": "{{VAR_WORKER_NAME}}",
       "preview_urls": false,
       "workers_dev": false,
-       "routes": [
+      "routes": [
         {
           "pattern": "{{VAR_WORKER_NAME}}.downtown65.site",
           "custom_domain": true

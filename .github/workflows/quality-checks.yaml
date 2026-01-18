@@ -2,7 +2,7 @@ name: Quality Checks
 
 on:
   workflow_call:
-     inputs:
+    inputs:
       cloudflare-environment:
         required: true
         type: string
@@ -31,7 +31,7 @@ jobs:
           API_KEY=placeholder-secret
           EOF
           echo "Created .env.${{ inputs.cloudflare-environment }} with placeholder secrets"
-          
+
           pnpm generate:openapi
           npx wrangler types --env ${{ inputs.cloudflare-environment }}
 
@@ -51,7 +51,7 @@ jobs:
           COOKIE_SESSION_SECRET=placeholder-secret
           EOF
           echo "Created .env.${{ inputs.cloudflare-environment }} with placeholder secrets"
-          
+
           pnpm run generate:react-router-types
           pnpm run generate:api-types:file
           npx wrangler types --env ${{ inputs.cloudflare-environment }}
@@ -60,7 +60,7 @@ jobs:
 
       - name: Lint
         run: pnpm run ci:lint
-      
+
       - name: Typecheck
         run: pnpm run typecheck
 
@@ -69,5 +69,3 @@ jobs:
 
       - name: Dead code check
         run: pnpm run knip --reporter github-actions
-
-      
