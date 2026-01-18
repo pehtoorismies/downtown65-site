@@ -26,6 +26,8 @@ jobs:
         uses: ./.github/actions/setup-project
       - name: Generate wrangler config for PR
         working-directory: apps/frontend
+        env:
+          PR_NUMBER: ${{ inputs.pr-number }}
         run: |
           # Secret works only with default wrangler.jsonc
           envsubst < wrangler.jsonc > wrangler.jsonc.tmp
