@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "dt65-events-frontend",
+  "name": "frontend-dt65-events",
   "compatibility_date": "2025-04-04",
   "main": "./workers/app.ts",
   "workers_dev": false,
@@ -8,10 +8,10 @@
   "compatibility_flags": ["nodejs_compat"],
   "env": {
     "pull-request": {
-      "name": "{{VAR_WORKER_NAME}}",
+      "name": "$PR_NUMBER-frontend-dt65-events",
       "routes": [
         {
-          "pattern": "{{VAR_WORKER_NAME}}.downtown65.site",
+          "pattern": "$PR_NUMBER-frontend.downtown65.site",
           "custom_domain": true
         }
       ],
@@ -19,7 +19,7 @@
         "enabled": true
       },
       "vars": {
-        "API_HOST": "{{VAR_API_HOST}}"
+        "API_HOST": "$PR_NUMBER-api.downtown65.site"
       }
     },
     // Production and staging environments
