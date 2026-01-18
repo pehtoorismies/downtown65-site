@@ -28,9 +28,10 @@ jobs:
         working-directory: apps/frontend
         run: |
           # Secret works only with default wrangler.jsonc
-          sed "s/\$PR_NUMBER/${PR_NUMBER}/g" wrangler.jsonc
+          envsubst < wrangler.jsonc > wrangler.jsonc.tmp
+          mv wrangler.jsonc.tmp wrangler.jsonc
 
-          echo "Cat wrangler.jsonc after replacements:"
+          echo "Wrangler config after replacements:"
           cat wrangler.jsonc
 
       - name: Deploy Frontend

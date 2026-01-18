@@ -40,11 +40,6 @@ jobs:
           PR_DATABASE_ID: ${{ steps.db-setup.outputs.database-id }}
         run: |
           # Secret works only with default wrangler.jsonc
-          echo "Using PR Number: ${PR_NUMBER}"
-          echo "Using Database ID: ${PR_DATABASE_ID}"
-
-          # Use envsubst for safer variable substitution
-          export PR_NUMBER PR_DATABASE_ID
           envsubst < wrangler.jsonc > wrangler.jsonc.tmp
           mv wrangler.jsonc.tmp wrangler.jsonc
 
