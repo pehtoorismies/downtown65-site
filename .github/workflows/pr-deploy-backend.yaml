@@ -54,7 +54,7 @@ jobs:
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           environment: pull-request
           preCommands: ./scripts/drizzle_flatten.sh
-          command: d1 migrations apply ${{ env.DATABASE_NAME }}
+          command: d1 migrations apply ${{ env.DATABASE_NAME }} --remote
 
       - name: Deploy Backend
         uses: cloudflare/wrangler-action@v3
