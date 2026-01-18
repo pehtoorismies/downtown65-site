@@ -27,7 +27,7 @@
       "d1_databases": [
         {
           "binding": "D1_DB",
-          "database_name": "$PR_NUMBER-dt65-events",
+          "database_name": "pr-$PR_NUMBER-dt65-events",
           "database_id": "$PR_DATABASE_ID",
           "migrations_dir": "drizzle_flat"
         }
