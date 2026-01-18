@@ -19,14 +19,11 @@ jobs:
         working-directory: apps/backend
         env:
           CLOUDFLARE_ENV: ${{ inputs.cloudflare-environment }}
+          PR_NUMBER: "typegen"
+          PR_DATABASE_ID: "typegen-database-id"
         run: |
-          PR_NUMBER="typegen"
-          PR_DATABASE_ID="typegen-database-id"
-        
-          cat wrangler.jsonc | \
-            sed "s/\$PR_NUMBER/${PR_NUMBER}/g" | \
-            sed "s/\$PR_DATABASE_ID/${PR_DATABASE_ID}/g" \
-            > wrangler.pr-${PR_NUMBER}.jsonc
+          envsubst < wrangler.jsonc > wrangler.jsonc.tmp
+          mv wrangler.jsonc.tmp wrangler.jsonc
 
           cat > .env.${{ inputs.cloudflare-environment }} << EOF
           AUTH_CLIENT_SECRET=placeholder-secret
@@ -44,12 +41,10 @@ jobs:
         working-directory: apps/frontend
         env:
           CLOUDFLARE_ENV: ${{ inputs.cloudflare-environment }}
+          PR_NUMBER: "typegen"
         run: |
-          PR_NUMBER="typegen"
-
-          cat wrangler.jsonc | \
-            sed "s/\$PR_NUMBER/${PR_NUMBER}/g" | \
-            > wrangler.pr-${PR_NUMBER}.jsonc
+          envsubst < wrangler.jsonc > wrangler.jsonc.tmp
+          mv wrangler.jsonc.tmp wrangler.jsonc
 
           cat > .env.${{ inputs.cloudflare-environment }} << EOF
           API_KEY=placeholder-secret
