@@ -1,18 +1,18 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "dt65-events-api",
+  "name": "api-dt65-events",
   "compatibility_date": "2025-04-04",
   "main": "./src/server.ts",
   "compatibility_flags": ["nodejs_compat"],
+  "preview_urls": false,
+  "workers_dev": false,
   "env": {
     // CI/CD environments
     "pull-request": {
-      "name": "{{VAR_WORKER_NAME}}",
-      "preview_urls": false,
-      "workers_dev": false,
+      "name": "$PR_NUMBER-api-dt65-events",
       "routes": [
         {
-          "pattern": "{{VAR_WORKER_NAME}}.downtown65.site",
+          "pattern": "$PR_NUMBER-api.downtown65.site",
           "custom_domain": true
         }
       ],
@@ -27,16 +27,14 @@
       "d1_databases": [
         {
           "binding": "D1_DB",
-          "database_name": "{{VAR_DATABASE_NAME}}",
-          "database_id": "{{VAR_DATABASE_ID}}",
+          "database_name": "$PR_NUMBER-dt65-events",
+          "database_id": "$DATABASE_ID_PR",
           "migrations_dir": "drizzle_flat"
         }
       ]
     },
     // Production and staging environments
     "staging": {
-      "preview_urls": false,
-      "workers_dev": false,
       "routes": [
         {
           "pattern": "staging-api.downtown65.site",
@@ -61,8 +59,6 @@
       ]
     },
     "production": {
-      "preview_urls": false,
-      "workers_dev": false,
       "routes": [
         {
           "pattern": "api.downtown65.site",
