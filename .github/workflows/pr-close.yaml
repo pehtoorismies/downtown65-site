@@ -7,7 +7,7 @@ on:
 
 env:
     PR_NUMBER: ${{ github.event.pull_request.number }}
-    PR_DATABASE_ID: '00000000-0000-0000-0000-000000000000'  # Dummy Database ID; value is not needed for deletion
+    PR_DATABASE_ID: "00000000-0000-0000-0000-000000000000" # Dummy Database ID; value is not needed for deletion
     DATABASE_NAME: "pr-${{ github.event.pull_request.number }}-dt65-events"
 
 jobs:
@@ -22,6 +22,7 @@ jobs:
         environment: development
         steps:
             - uses: actions/checkout@v6
+            - uses: ./.github/actions/setup-project
             - name: Generate wrangler config for PR
               working-directory: apps/backend
               run: |
@@ -44,6 +45,7 @@ jobs:
         environment: development
         steps:
             - uses: actions/checkout@v6
+            - uses: ./.github/actions/setup-project
             - name: Generate wrangler config for PR
               working-directory: apps/frontend
               run: |
