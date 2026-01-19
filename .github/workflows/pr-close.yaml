@@ -38,7 +38,7 @@ jobs:
                   accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
                   workingDirectory: apps/backend
                   environment: pull-request
-                  preCommands: npx wrangler d1 database delete ${{ env.DATABASE_NAME }} --remote
+                  preCommands: npx wrangler d1 delete ${{ env.DATABASE_NAME }} -y
                   command: npx wrangler delete
     remove-frontend:
         runs-on: ubuntu-22.04
