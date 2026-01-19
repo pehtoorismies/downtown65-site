@@ -12,6 +12,10 @@ on:
           - merge
           - squash
           - rebase
+      confirm_production_deploy:
+        description: "Type 'DEPLOY' to confirm production deployment"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -21,8 +25,18 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  validate:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Validate confirmation
+        run: |
+          if [ "${{ inputs.confirm_production_deploy }}" != "DEPLOY" ]; then
+            echo "::error::Deployment cancelled - confirmation text did not match"
+            exit 1
+          fi
   merge:
     runs-on: ubuntu-22.04
+    needs: validate
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
