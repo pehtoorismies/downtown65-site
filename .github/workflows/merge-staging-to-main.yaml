@@ -3,15 +3,6 @@ name: Merge Staging to Main
 on:
   workflow_dispatch:
     inputs:
-      merge_strategy:
-        description: "Merge strategy"
-        required: true
-        default: "merge"
-        type: choice
-        options:
-          - merge
-          - squash
-          - rebase
       confirm_production_deploy:
         description: "Type 'DEPLOY' to confirm production deployment"
         required: true
@@ -71,17 +62,8 @@ jobs:
       - name: Merge staging into main
         id: merge
         run: |
-          if [ "${{ inputs.merge_strategy }}" = "squash" ]; then
-            echo "Using squash merge strategy"
-            git merge --squash origin/staging
-            git commit -m "chore: merge staging to main (squashed)"
-          elif [ "${{ inputs.merge_strategy }}" = "rebase" ]; then
-            echo "Using rebase merge strategy"
-            git rebase origin/staging
-          else
-            echo "Using merge commit strategy"
-            git merge origin/staging --no-ff -m "chore: merge staging to main"
-          fi
+          echo "Using rebase merge strategy"
+          git rebase origin/staging
 
       - name: Push to main
         run: git push origin main
