@@ -1,17 +1,8 @@
-name: Merge Staging to Main
+name: Promote Staging to Production (Merge)
 
 on:
   workflow_dispatch:
     inputs:
-      merge_strategy:
-        description: "Merge strategy"
-        required: true
-        default: "merge"
-        type: choice
-        options:
-          - merge
-          - squash
-          - rebase
       confirm_production_deploy:
         description: "Type 'DEPLOY' to confirm production deployment"
         required: true
@@ -21,7 +12,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: merge-staging-to-main
+  group: deploy-production
   cancel-in-progress: false
 
 jobs:
@@ -43,7 +34,7 @@ jobs:
         run: |
           echo "Checking staging health..."
           curl -f https://staging.downtown65.site/ || exit 1
-          curl -f https://staging-api.downtown65.site/health || exit 1
+          curl -f https://staging-api.downtown65.site/healthz || exit 1
           echo "✅ Staging is healthy"
   merge:
     runs-on: ubuntu-22.04
@@ -71,17 +62,8 @@ jobs:
       - name: Merge staging into main
         id: merge
         run: |
-          if [ "${{ inputs.merge_strategy }}" = "squash" ]; then
-            echo "Using squash merge strategy"
-            git merge --squash origin/staging
-            git commit -m "chore: merge staging to main (squashed)"
-          elif [ "${{ inputs.merge_strategy }}" = "rebase" ]; then
-            echo "Using rebase merge strategy"
-            git rebase origin/staging
-          else
-            echo "Using merge commit strategy"
-            git merge origin/staging --no-ff -m "chore: merge staging to main"
-          fi
+          echo "Using merge commit strategy"
+          git merge origin/staging --no-ff -m 'chore: promote staging to production'
 
       - name: Push to main
         run: git push origin main

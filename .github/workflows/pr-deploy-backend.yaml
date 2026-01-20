@@ -1,4 +1,4 @@
-name: Deploy Preview Backend
+name: Deploy PR Backend
 
 on:
   workflow_call:
@@ -39,8 +39,7 @@ jobs:
           PR_NUMBER: ${{ inputs.pr-number }}
           PR_DATABASE_ID: ${{ steps.db-setup.outputs.database-id }}
         run: |
-          # Secret works only with default wrangler.jsonc
-          envsubst < wrangler.jsonc > wrangler.jsonc.tmp
+          envsubst '$PR_NUMBER $PR_DATABASE_ID' < wrangler.jsonc > wrangler.jsonc.tmp
           mv wrangler.jsonc.tmp wrangler.jsonc
 
           echo "Wrangler config after replacements:"

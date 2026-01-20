@@ -1,4 +1,4 @@
-name: Deploy Preview Frontend
+name: Deploy PR Frontend
 
 on:
   workflow_call:
@@ -29,8 +29,7 @@ jobs:
         env:
           PR_NUMBER: ${{ inputs.pr-number }}
         run: |
-          # Secret works only with default wrangler.jsonc
-          envsubst < wrangler.jsonc > wrangler.jsonc.tmp
+          envsubst '$PR_NUMBER' < wrangler.jsonc > wrangler.jsonc.tmp
           mv wrangler.jsonc.tmp wrangler.jsonc
 
           echo "Wrangler config after replacements:"
