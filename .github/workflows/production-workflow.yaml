@@ -1,4 +1,4 @@
-name: Merge Staging to Main
+name: Deploy to Production
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: merge-staging-to-main
+  group: deploy-production
   cancel-in-progress: false
 
 jobs:
