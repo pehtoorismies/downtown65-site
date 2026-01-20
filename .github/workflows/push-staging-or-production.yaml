@@ -12,20 +12,42 @@ on:
         type: string
 
 concurrency:
-  group: deploy-${{ github.ref }}
+  group: deploy-${{ inputs.ref || github.ref }}
   cancel-in-progress: false
 
 jobs:
+  determine-environment:
+    runs-on: ubuntu-22.04
+    outputs:
+      environment: ${{ steps.set-env.outputs.environment }}
+      database-name: ${{ steps.set-env.outputs.database-name }}
+    steps:
+      - name: Set environment variables
+        id: set-env
+        run: |
+          BRANCH="${{ inputs.ref || github.ref_name }}"
+          
+          if [ "$BRANCH" = "main" ]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+            echo "database-name=production-dt65-events" >> $GITHUB_OUTPUT
+          else
+            echo "environment=staging" >> $GITHUB_OUTPUT
+            echo "database-name=staging-dt65-events" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "Deploying to: $BRANCH → $([ "$BRANCH" = "main" ] && echo "production" || echo "staging")"
+
   deploy-backend:
+    needs: determine-environment
     uses: ./.github/workflows/deploy-backend.yaml
     with:
-      wrangler-environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
-      # TODO: needed for migrations. Check if we can improve this later.
-      database-name: ${{ github.ref_name == 'main' && 'production-dt65-events' || 'staging-dt65-events' }}
+      wrangler-environment: ${{ needs.determine-environment.outputs.environment }}
+      database-name: ${{ needs.determine-environment.outputs.database-name }}
     secrets: inherit
+
   deploy-frontend:
+    needs: [determine-environment, deploy-backend]
     uses: ./.github/workflows/deploy-frontend.yaml
-    needs: deploy-backend
     with:
-      wrangler-environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+      wrangler-environment: ${{ needs.determine-environment.outputs.environment }}
     secrets: inherit
