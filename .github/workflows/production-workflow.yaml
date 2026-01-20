@@ -34,7 +34,7 @@ jobs:
         run: |
           echo "Checking staging health..."
           curl -f https://staging.downtown65.site/ || exit 1
-          curl -f https://staging-api.downtown65.site/health || exit 1
+          curl -f https://staging-api.downtown65.site/healthz || exit 1
           echo "✅ Staging is healthy"
   merge:
     runs-on: ubuntu-22.04
