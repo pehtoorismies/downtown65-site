@@ -59,7 +59,7 @@ jobs:
       - name: Checkout main branch
         run: git checkout main
 
-      - name: Merge staging into main
+      - name: Rebase staging into main
         id: merge
         run: |
           echo "Using rebase merge strategy"
@@ -71,14 +71,14 @@ jobs:
       - name: Notify on success
         if: success()
         run: |
-          echo "✅ Successfully merged staging to main"
-          echo "::notice::Staging has been merged to main branch"
+          echo "✅ Successfully rebased staging to main"
+          echo "::notice::Staging has been rebased to main branch"
 
       - name: Notify on failure
         if: failure()
         run: |
-          echo "❌ Failed to merge staging to main"
-          echo "::error::Merge failed - please resolve conflicts manually"
+          echo "❌ Failed to rebase staging to main"
+          echo "::error::Rebase failed - please resolve conflicts manually"
   
   deploy-production:
     needs: merge
