@@ -16,7 +16,6 @@ jobs:
     secrets: inherit
   deploy-frontend:
     name: Deploy Preview Frontend
-    needs: deploy-backend
     uses: ./.github/workflows/pr-deploy-frontend.yaml
     with:
       pr-number: ${{ github.event.pull_request.number }}
