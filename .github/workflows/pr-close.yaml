@@ -26,7 +26,7 @@ jobs:
             - name: Generate wrangler config for PR
               working-directory: apps/backend
               run: |
-                  envsubst < wrangler.jsonc > wrangler.jsonc.tmp
+                  envsubst '$PR_NUMBER $PR_DATABASE_ID' < wrangler.jsonc > wrangler.jsonc.tmp
                   mv wrangler.jsonc.tmp wrangler.jsonc
 
                   echo "Wrangler config after replacements:"
@@ -49,7 +49,7 @@ jobs:
             - name: Generate wrangler config for PR
               working-directory: apps/frontend
               run: |
-                  envsubst < wrangler.jsonc > wrangler.jsonc.tmp
+                  envsubst '$PR_NUMBER' < wrangler.jsonc > wrangler.jsonc.tmp
                   mv wrangler.jsonc.tmp wrangler.jsonc
 
                   echo "Wrangler config after replacements:"
