@@ -1,4 +1,4 @@
-name: Deploy to Production
+name: Apply staging commits to main via rebase (PRODUCTION DEPLOY)
 
 on:
   workflow_dispatch:
