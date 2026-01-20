@@ -2,8 +2,7 @@ name: Push to Staging or Production
 
 on:
   push:
-    branches:
-      - staging
+    branches: ['staging']
   workflow_call:
     inputs:
       ref:
