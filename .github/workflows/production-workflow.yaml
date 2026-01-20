@@ -1,4 +1,4 @@
-name: Apply staging commits to main via rebase (PRODUCTION DEPLOY)
+name: Promote Staging to Production (Merge)
 
 on:
   workflow_dispatch:
@@ -59,11 +59,11 @@ jobs:
       - name: Checkout main branch
         run: git checkout main
 
-      - name: Rebase staging into main
+      - name: Merge staging into main
         id: merge
         run: |
-          echo "Using rebase merge strategy"
-          git rebase origin/staging
+          echo "Using merge commit strategy"
+          git merge origin/staging --no-ff -m 'chore: promote staging to production'
 
       - name: Push to main
         run: git push origin main
@@ -71,14 +71,14 @@ jobs:
       - name: Notify on success
         if: success()
         run: |
-          echo "✅ Successfully rebased staging to main"
-          echo "::notice::Staging has been rebased to main branch"
+          echo "✅ Successfully merged staging to main"
+          echo "::notice::Staging has been merged to main branch"
 
       - name: Notify on failure
         if: failure()
         run: |
-          echo "❌ Failed to rebase staging to main"
-          echo "::error::Rebase failed - please resolve conflicts manually"
+          echo "❌ Failed to merge staging to main"
+          echo "::error::Merge failed - please resolve conflicts manually"
   
   deploy-production:
     needs: merge
