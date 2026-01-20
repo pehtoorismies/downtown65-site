@@ -26,7 +26,7 @@ jobs:
             - name: Generate wrangler config for PR
               working-directory: apps/backend
               run: |
-                  envsubst < wrangler.jsonc > wrangler.jsonc.tmp
+                  envsubst '$PR_NUMBER $PR_DATABASE_ID' < wrangler.jsonc > wrangler.jsonc.tmp
                   mv wrangler.jsonc.tmp wrangler.jsonc
 
                   echo "Wrangler config after replacements:"
@@ -39,7 +39,7 @@ jobs:
                   workingDirectory: apps/backend
                   environment: pull-request
                   preCommands: npx wrangler d1 delete ${{ env.DATABASE_NAME }} -y
-                  command: npx wrangler delete
+                  command: delete
     remove-frontend:
         runs-on: ubuntu-22.04
         environment: development
@@ -49,7 +49,7 @@ jobs:
             - name: Generate wrangler config for PR
               working-directory: apps/frontend
               run: |
-                  envsubst < wrangler.jsonc > wrangler.jsonc.tmp
+                  envsubst '$PR_NUMBER' < wrangler.jsonc > wrangler.jsonc.tmp
                   mv wrangler.jsonc.tmp wrangler.jsonc
 
                   echo "Wrangler config after replacements:"
@@ -61,4 +61,4 @@ jobs:
                   accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
                   workingDirectory: apps/frontend
                   environment: pull-request
-                  command: npx wrangler delete
+                  command: delete
