@@ -1,4 +1,4 @@
-name: Deploy Preview Backend
+name: Deploy PR Backend
 
 on:
   workflow_call:
