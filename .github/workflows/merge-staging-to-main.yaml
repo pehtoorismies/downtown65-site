@@ -34,9 +34,20 @@ jobs:
             echo "::error::Deployment cancelled - confirmation text did not match"
             exit 1
           fi
-  merge:
+
+  check-staging-health:
     runs-on: ubuntu-22.04
     needs: validate
+    steps:
+      - name: Check staging deployment status
+        run: |
+          echo "Checking staging health..."
+          curl -f https://staging.downtown65.site/ || exit 1
+          curl -f https://staging-api.downtown65.site/health || exit 1
+          echo "✅ Staging is healthy"
+  merge:
+    runs-on: ubuntu-22.04
+    needs: check-staging-health
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -86,3 +97,11 @@ jobs:
         run: |
           echo "❌ Failed to merge staging to main"
           echo "::error::Merge failed - please resolve conflicts manually"
+  
+  deploy-production:
+    needs: merge
+    uses: ./.github/workflows/push-staging-or-production.yaml
+    with:
+      # Pass the branch name so the reusable workflow knows which environment
+      ref: main
+    secrets: inherit
