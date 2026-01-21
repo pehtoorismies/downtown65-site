@@ -41,6 +41,10 @@
         {
           "pattern": "www.downtown65.site",
           "custom_domain": true
+        },
+        {
+          "pattern": "downtown65.site",
+          "custom_domain": true
         }
       ],
       "vars": {
