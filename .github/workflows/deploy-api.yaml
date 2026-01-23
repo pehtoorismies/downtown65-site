@@ -60,7 +60,7 @@ jobs:
               id: set-url
               run: |
                   if [ "${{ inputs.wrangler-environment }}" = "staging" ]; then
-                      echo "url=https://api.staging.downtown65.com" >> $GITHUB_OUTPUT
+                      echo "url=https://api-staging.downtown65.com" >> $GITHUB_OUTPUT
                   else
                       echo "url=https://api.downtown65.com" >> $GITHUB_OUTPUT
                   fi

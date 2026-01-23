@@ -33,8 +33,8 @@ jobs:
       - name: Check staging deployment status
         run: |
           echo "Checking staging health..."
-          curl -f https://events.staging.downtown65.com/ || exit 1
-          curl -f https://api.staging.downtown65.com/healthz || exit 1
+          curl -f https://events-staging.downtown65.com/ || exit 1
+          curl -f https://api-staging.downtown65.com/healthz || exit 1
           echo "✅ Staging is healthy"
   merge:
     runs-on: ubuntu-22.04
