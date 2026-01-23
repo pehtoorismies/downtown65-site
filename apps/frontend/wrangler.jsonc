@@ -11,7 +11,7 @@
       "name": "frontend-dt65-events-pr-$PR_NUMBER",
       "routes": [
         {
-          "pattern": "pr-$PR_NUMBER.events.downtown65.com",
+          "pattern": "events.pr-$PR_NUMBER.downtown65.com",
           "custom_domain": true
         }
       ],
@@ -27,7 +27,7 @@
       "name": "frontend-dt65-events-staging",
       "routes": [
         {
-          "pattern": "staging.events.downtown65.com",
+          "pattern": "events.staging.downtown65.com",
           "custom_domain": true
         }
       ],
