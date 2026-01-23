@@ -44,7 +44,7 @@ jobs:
               id: set-url
               run: |
                   if [ "${{ inputs.wrangler-environment }}" = "staging" ]; then
-                      echo "url=https://events.staging.downtown65.com" >> $GITHUB_OUTPUT
+                      echo "url=https://events-staging.downtown65.com" >> $GITHUB_OUTPUT
                   else
                       echo "url=https://events.downtown65.com" >> $GITHUB_OUTPUT
                   fi

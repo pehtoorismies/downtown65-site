@@ -12,7 +12,7 @@ on:
 
 env:
   DATABASE_NAME: "pr-${{ inputs.pr-number }}-dt65-events"
-  URL: "https://api.pr-${{ inputs.pr-number }}.downtown65.com"
+  URL: "https://api-pr-${{ inputs.pr-number }}.downtown65.com"
 
 jobs:
   deploy:
