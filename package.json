@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "packageManager": "pnpm@10.26.0+sha512.3b3f6c725ebe712506c0ab1ad4133cf86b1f4b687effce62a9b38b4d72e3954242e643190fc51fa1642949c735f403debd44f5cb0edd657abe63a8b6a7e1e402",
   "scripts": {
-    "dev:backend": "pnpm --filter backend dev",
-    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:api": "pnpm --filter api dev",
+    "dev:events": "pnpm --filter events dev",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
@@ -14,7 +14,7 @@
     "format": "pnpm -r format",
     "typecheck": "pnpm -r typecheck",
     "sherif": "sherif",
-    "ci:generate": "pnpm --filter frontend generate:api-types:file",
+    "ci:generate": "pnpm --filter events generate:api-types:file",
     "clean": "pnpm -r clean && rimraf node_modules"
   },
   "devDependencies": {
