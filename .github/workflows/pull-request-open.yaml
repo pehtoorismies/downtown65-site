@@ -10,12 +10,12 @@ concurrency:
 
 jobs:
   deploy-backend:
-    uses: ./.github/workflows/pr-deploy-backend.yaml
+    uses: ./.github/workflows/deploy-pull-request-backend.yaml
     with:
       pr-number: ${{ github.event.pull_request.number }}
     secrets: inherit
   deploy-frontend:
-    uses: ./.github/workflows/pr-deploy-frontend.yaml
+    uses: ./.github/workflows/deploy-pull-request-frontend.yaml
     with:
       pr-number: ${{ github.event.pull_request.number }}
     secrets: inherit
