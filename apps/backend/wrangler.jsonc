@@ -12,7 +12,7 @@
       "name": "api-dt65-events-pr-$PR_NUMBER",
       "routes": [
         {
-          "pattern": "pr-$PR_NUMBER-api.downtown65.site",
+          "pattern": "api.pr-$PR_NUMBER.downtown65.com",
           "custom_domain": true
         }
       ],
@@ -38,7 +38,7 @@
       "name": "api-dt65-events-staging",
       "routes": [
         {
-          "pattern": "staging-api.downtown65.site",
+          "pattern": "api.staging.downtown65.com",
           "custom_domain": true
         }
       ],
@@ -63,7 +63,7 @@
       "name": "api-dt65-events-production",
       "routes": [
         {
-          "pattern": "api.downtown65.site",
+          "pattern": "api.downtown65.com",
           "custom_domain": true
         }
       ],
