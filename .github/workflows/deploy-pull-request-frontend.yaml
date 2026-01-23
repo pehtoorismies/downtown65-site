@@ -11,7 +11,7 @@ on:
         value: ${{ jobs.deploy.outputs.frontend-url }}
 
 env:
-  URL: "https://pr-${{ inputs.pr-number }}-frontend.downtown65.site"
+  URL: "https://events.pr-${{ inputs.pr-number }}.downtown65.com"
 
 jobs:
   deploy:

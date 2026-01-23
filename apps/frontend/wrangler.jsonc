@@ -11,7 +11,7 @@
       "name": "frontend-dt65-events-pr-$PR_NUMBER",
       "routes": [
         {
-          "pattern": "pr-$PR_NUMBER-frontend.downtown65.site",
+          "pattern": "events.pr-$PR_NUMBER.downtown65.com",
           "custom_domain": true
         }
       ],
@@ -19,7 +19,7 @@
         "enabled": true
       },
       "vars": {
-        "API_HOST": "pr-$PR_NUMBER-api.downtown65.site"
+        "API_HOST": "api.pr-$PR_NUMBER.downtown65.com"
       }
     },
     // Production and staging environments
@@ -27,28 +27,24 @@
       "name": "frontend-dt65-events-staging",
       "routes": [
         {
-          "pattern": "staging.downtown65.site",
+          "pattern": "events.staging.downtown65.com",
           "custom_domain": true
         }
       ],
       "vars": {
-        "API_HOST": "staging-api.downtown65.site"
+        "API_HOST": "api.staging.downtown65.com"
       }
     },
     "production": {
       "name": "frontend-dt65-events-production",
       "routes": [
         {
-          "pattern": "www.downtown65.site",
-          "custom_domain": true
-        },
-        {
-          "pattern": "downtown65.site",
+          "pattern": "events.downtown65.com",
           "custom_domain": true
         }
       ],
       "vars": {
-        "API_HOST": "api.downtown65.site"
+        "API_HOST": "api.downtown65.com"
       }
     }
   }
