@@ -9,13 +9,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy-backend:
-    uses: ./.github/workflows/deploy-pull-request-backend.yaml
+  deploy-api:
+    uses: ./.github/workflows/deploy-pull-request-api.yaml
     with:
       pr-number: ${{ github.event.pull_request.number }}
     secrets: inherit
-  deploy-frontend:
-    uses: ./.github/workflows/deploy-pull-request-frontend.yaml
+  deploy-events:
+    uses: ./.github/workflows/deploy-pull-request-events.yaml
     with:
       pr-number: ${{ github.event.pull_request.number }}
     secrets: inherit
