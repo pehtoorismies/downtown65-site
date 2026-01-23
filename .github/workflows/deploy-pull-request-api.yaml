@@ -1,4 +1,4 @@
-name: Deploy PR Backend
+name: Deploy PR API
 
 on:
   workflow_call:
@@ -7,19 +7,19 @@ on:
         required: true
         type: number
     outputs:
-      backend-url:
-        value: ${{ jobs.deploy.outputs.backend-url }}
+      api-url:
+        value: ${{ jobs.deploy.outputs.api-url }}
 
 env:
   DATABASE_NAME: "pr-${{ inputs.pr-number }}-dt65-events"
-  URL: "https://api.pr-${{ inputs.pr-number }}.downtown65.com"
+  URL: "https://api-pr-${{ inputs.pr-number }}.downtown65.com"
 
 jobs:
   deploy:
     runs-on: ubuntu-22.04
     environment: development
     outputs:
-      backend-url: ${{ env.URL }}
+      api-url: ${{ env.URL }}
 
     steps:
       - uses: actions/checkout@v6
@@ -34,7 +34,7 @@ jobs:
           cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Generate wrangler config for PR
-        working-directory: apps/backend
+        working-directory: apps/api
         env:
           PR_NUMBER: ${{ inputs.pr-number }}
           PR_DATABASE_ID: ${{ steps.db-setup.outputs.database-id }}
@@ -48,17 +48,17 @@ jobs:
       - name: Run Migrations
         uses: cloudflare/wrangler-action@v3
         with:
-          workingDirectory: apps/backend
+          workingDirectory: apps/api
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           environment: pull-request
           preCommands: ./scripts/drizzle_flatten.sh
           command: d1 migrations apply ${{ env.DATABASE_NAME }} --remote
 
-      - name: Deploy Backend
+      - name: Deploy API
         uses: cloudflare/wrangler-action@v3
         with:
-          workingDirectory: apps/backend
+          workingDirectory: apps/api
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           environment: pull-request
@@ -71,24 +71,24 @@ jobs:
           REGISTER_SECRET: ${{ secrets.BACKEND_REGISTER_SECRET }}
           AUTH_CLIENT_SECRET: ${{ secrets.BACKEND_AUTH_CLIENT_SECRET }}
 
-      - name: Wait for Backend Health Check
+      - name: Wait for API Health Check
         run: |
-          echo "Waiting for backend to be ready..."
+          echo "Waiting for API to be ready..."
           max_attempts=10
           attempt=0
 
           while [ $attempt -lt $max_attempts ]; do
             if curl -sf "${{ env.URL }}/healthz" > /dev/null; then
-              echo "✅ Backend is ready!"
+              echo "✅ API is ready!"
               exit 0
             fi
             
             attempt=$((attempt + 1))
-            echo "Attempt $attempt/$max_attempts - Backend not ready yet, waiting 2 seconds..."
+            echo "Attempt $attempt/$max_attempts - API not ready yet, waiting 2 seconds..."
             sleep 2
           done
 
-          echo "❌ Backend failed to become ready after $max_attempts attempts"
+          echo "❌ API failed to become ready after $max_attempts attempts"
           exit 1
 
       - name: Sync Users
@@ -96,10 +96,10 @@ jobs:
           curl -X POST "${{ env.URL }}/sync/users" \
             --header 'x-api-key: ${{ secrets.DT65_API_KEY }}'
 
-      - name: Display Backend URL
+      - name: Display API URL
         run: |
-          echo "### 🚀 Backend Deployed" >> $GITHUB_STEP_SUMMARY
+          echo "### 🚀 API Deployed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Backend URL: ${{ env.URL }}" >> $GITHUB_STEP_SUMMARY
+          echo "API URL: ${{ env.URL }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🔗 [Open Backend](${{ env.URL }})" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 [Open API](${{ env.URL }})" >> $GITHUB_STEP_SUMMARY

@@ -29,7 +29,7 @@ runs:
         apiToken: ${{ inputs.cloudflare-api-token }}
         accountId: ${{ inputs.cloudflare-account-id }}
         command: d1 list --json
-        workingDirectory: apps/backend
+        workingDirectory: apps/api
     - name: Check if DB exists and create if needed
       shell: bash
       id: db-setup
@@ -42,7 +42,7 @@ runs:
           echo "database-id=$EXISTING_DB" >> $GITHUB_OUTPUT
         else
           echo "Creating new database..."
-          cd apps/backend
+          cd apps/api
           CREATE_OUTPUT=$(npx wrangler d1 create "$DB_NAME")
           echo "$CREATE_OUTPUT"
           # Extract database_id from the JSON snippet in the output

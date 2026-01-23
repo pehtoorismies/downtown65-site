@@ -1,4 +1,4 @@
-name: Deploy Frontend To Production Or Staging
+name: Deploy Events To Production Or Staging
 
 # Controls when the workflow will run
 on:
@@ -8,8 +8,8 @@ on:
                 required: true
                 type: string
         outputs:
-            frontend-url:
-                description: "The URL of the deployed frontend"
+            events-url:
+                description: "The URL of the deployed events"
                 value: ${{ jobs.deploy.outputs.url }}
 
 jobs:
@@ -24,12 +24,12 @@ jobs:
             - name: Setup Project
               uses: ./.github/actions/setup-project
 
-            - name: Deploy Frontend
+            - name: Deploy Events
               uses: cloudflare/wrangler-action@v3
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-                  workingDirectory: apps/frontend
+                  workingDirectory: apps/events
                   environment: ${{ inputs.wrangler-environment }}
                   preCommands: |
                       CLOUDFLARE_ENV=${{ inputs.wrangler-environment }} pnpm run build
@@ -40,19 +40,19 @@ jobs:
                   API_KEY: ${{ secrets.DT65_API_KEY }}
                   COOKIE_SESSION_SECRET: ${{ secrets.FRONTEND_COOKIE_SESSION_SECRET }}
 
-            - name: Set Frontend URL
+            - name: Set Events URL
               id: set-url
               run: |
                   if [ "${{ inputs.wrangler-environment }}" = "staging" ]; then
-                      echo "url=https://events.staging.downtown65.com" >> $GITHUB_OUTPUT
+                      echo "url=https://events-staging.downtown65.com" >> $GITHUB_OUTPUT
                   else
                       echo "url=https://events.downtown65.com" >> $GITHUB_OUTPUT
                   fi
 
-            - name: Display Frontend URL
+            - name: Display Events URL
               run: |
-                  echo "### 🚀 Frontend Deployed" >> $GITHUB_STEP_SUMMARY
+                  echo "### 🚀 Events Deployed" >> $GITHUB_STEP_SUMMARY
                   echo "" >> $GITHUB_STEP_SUMMARY
-                  echo "Frontend URL: ${{ steps.set-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
+                  echo "Events URL: ${{ steps.set-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
                   echo "" >> $GITHUB_STEP_SUMMARY
-                  echo "🔗 [Open Frontend](${{ steps.set-url.outputs.url }})" >> $GITHUB_STEP_SUMMARY
+                  echo "🔗 [Open Events](${{ steps.set-url.outputs.url }})" >> $GITHUB_STEP_SUMMARY

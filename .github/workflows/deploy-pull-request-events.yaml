@@ -1,4 +1,4 @@
-name: Deploy PR Frontend
+name: Deploy PR Events
 
 on:
   workflow_call:
@@ -7,25 +7,25 @@ on:
         required: true
         type: number
     outputs:
-      frontend-url:
-        value: ${{ jobs.deploy.outputs.frontend-url }}
+      events-url:
+        value: ${{ jobs.deploy.outputs.events-url }}
 
 env:
-  URL: "https://events.pr-${{ inputs.pr-number }}.downtown65.com"
+  URL: "https://events-pr-${{ inputs.pr-number }}.downtown65.com"
 
 jobs:
   deploy:
     runs-on: ubuntu-22.04
     environment: development
     outputs:
-      frontend-url: ${{ env.URL }}
+      events-url: ${{ env.URL }}
 
     steps:
       - uses: actions/checkout@v6
       - name: Setup Project
         uses: ./.github/actions/setup-project
       - name: Generate wrangler config for PR
-        working-directory: apps/frontend
+        working-directory: apps/events
         env:
           PR_NUMBER: ${{ inputs.pr-number }}
         run: |
@@ -35,12 +35,12 @@ jobs:
           echo "Wrangler config after replacements:"
           cat wrangler.jsonc
 
-      - name: Deploy Frontend
+      - name: Deploy Events
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: apps/frontend
+          workingDirectory: apps/events
           environment: pull-request
           preCommands: |
             CLOUDFLARE_ENV=pull-request pnpm run build
@@ -51,10 +51,10 @@ jobs:
           API_KEY: ${{ secrets.DT65_API_KEY }}
           COOKIE_SESSION_SECRET: ${{ secrets.FRONTEND_COOKIE_SESSION_SECRET }}
 
-      - name: Display Frontend URL
+      - name: Display Events URL
         run: |
-          echo "### 🚀 Frontend Deployed" >> $GITHUB_STEP_SUMMARY
+          echo "### 🚀 Events Deployed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Frontend URL: ${{ env.URL }}" >> $GITHUB_STEP_SUMMARY
+          echo "Events URL: ${{ env.URL }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🔗 [Open Frontend](${{ env.URL }})" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 [Open Events](${{ env.URL }})" >> $GITHUB_STEP_SUMMARY
