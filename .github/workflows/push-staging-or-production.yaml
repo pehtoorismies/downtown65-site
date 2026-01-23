@@ -36,17 +36,17 @@ jobs:
           
           echo "Deploying to: $BRANCH → $([ "$BRANCH" = "main" ] && echo "production" || echo "staging")"
 
-  deploy-backend:
+  deploy-api:
     needs: determine-environment
-    uses: ./.github/workflows/deploy-backend.yaml
+    uses: ./.github/workflows/deploy-api.yaml
     with:
       wrangler-environment: ${{ needs.determine-environment.outputs.environment }}
       database-name: ${{ needs.determine-environment.outputs.database-name }}
     secrets: inherit
 
-  deploy-frontend:
-    needs: [determine-environment, deploy-backend]
-    uses: ./.github/workflows/deploy-frontend.yaml
+  deploy-events:
+    needs: [determine-environment, deploy-api]
+    uses: ./.github/workflows/deploy-events.yaml
     with:
       wrangler-environment: ${{ needs.determine-environment.outputs.environment }}
     secrets: inherit

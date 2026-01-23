@@ -15,8 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-project
-      - name: Generate Backend types
-        working-directory: apps/backend
+      - name: Generate API types
+        working-directory: apps/api
         env:
           CLOUDFLARE_ENV: ${{ inputs.cloudflare-environment }}
           PR_NUMBER: "typegen"
@@ -37,8 +37,8 @@ jobs:
 
           rm .env.${{ inputs.cloudflare-environment }}
 
-      - name: Generate Frontend types
-        working-directory: apps/frontend
+      - name: Generate Events types
+        working-directory: apps/events
         env:
           CLOUDFLARE_ENV: ${{ inputs.cloudflare-environment }}
           PR_NUMBER: "typegen"

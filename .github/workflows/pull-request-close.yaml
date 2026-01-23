@@ -17,14 +17,14 @@ jobs:
         steps:
             - run: |
                   echo The PR was merged
-    remove-backend:
+    remove-api:
         runs-on: ubuntu-22.04
         environment: development
         steps:
             - uses: actions/checkout@v6
             - uses: ./.github/actions/setup-project
             - name: Generate wrangler config for PR
-              working-directory: apps/backend
+              working-directory: apps/api
               run: |
                   envsubst '$PR_NUMBER $PR_DATABASE_ID' < wrangler.jsonc > wrangler.jsonc.tmp
                   mv wrangler.jsonc.tmp wrangler.jsonc
@@ -36,18 +36,18 @@ jobs:
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-                  workingDirectory: apps/backend
+                  workingDirectory: apps/api
                   environment: pull-request
                   preCommands: npx wrangler d1 delete ${{ env.DATABASE_NAME }} -y
                   command: delete
-    remove-frontend:
+    remove-events:
         runs-on: ubuntu-22.04
         environment: development
         steps:
             - uses: actions/checkout@v6
             - uses: ./.github/actions/setup-project
             - name: Generate wrangler config for PR
-              working-directory: apps/frontend
+              working-directory: apps/events
               run: |
                   envsubst '$PR_NUMBER' < wrangler.jsonc > wrangler.jsonc.tmp
                   mv wrangler.jsonc.tmp wrangler.jsonc
@@ -59,6 +59,6 @@ jobs:
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-                  workingDirectory: apps/frontend
+                  workingDirectory: apps/events
                   environment: pull-request
                   command: delete
