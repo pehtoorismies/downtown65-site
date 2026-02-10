@@ -1,15 +1,18 @@
+import type { RequestContext } from '~/app-api'
 import { getManagementClient } from '~/common/auth0/client'
-import type { Config } from '~/common/config/config'
 import { getUserId } from './get-user-id'
 import { Auth0UserSchema } from './support/auth0-schema'
 import { QUERY_USER_RETURNED_FIELDS } from './support/query-user-returned-fields'
 
-export const getUserByNickname = async (config: Config, nickname: string) => {
-  const management = await getManagementClient(config)
+export const getUserByNickname = async (
+  ctx: RequestContext,
+  nickname: string,
+) => {
+  const management = await getManagementClient(ctx.authConfig)
 
   const { data } = await management.users.list({
-    q: `nickname:${nickname}`,
     fields: QUERY_USER_RETURNED_FIELDS,
+    q: `nickname:${nickname}`,
     sort: 'created_at:1',
   })
 
@@ -18,7 +21,7 @@ export const getUserByNickname = async (config: Config, nickname: string) => {
   }
   const auth0User = Auth0UserSchema.parse(data[0])
 
-  const id = await getUserId(config, auth0User.auth0Sub)
+  const id = await getUserId(ctx, auth0User.auth0Sub)
 
   if (id == null) {
     throw new Error('User not found in the database but in external Auth0')

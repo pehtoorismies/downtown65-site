@@ -1,20 +1,19 @@
-import { createLogger } from '@downtown65/logger'
 import { UserSchema } from '@downtown65/schema'
 import { jwtDecode } from 'jwt-decode'
 import { z } from 'zod'
-import type { Config } from '~/common/config/config'
+import type { RequestContext } from '~/app-api'
 import { getDb } from '~/db/get-db'
 import type { LoginInput } from '../shared-schema'
 import { auth0Login } from './auth0-login'
 import { Auth0TokensSchema, Auth0UserSchema } from './support/auth0-schema'
 
 const LoginResponse = z.discriminatedUnion('type', [
-  z.object({ type: z.literal('InvalidCredentials'), error: z.string() }),
-  z.object({ type: z.literal('UnknownError'), error: z.string() }),
-  z.object({ type: z.literal('AccessDenied'), error: z.string() }),
+  z.object({ error: z.string(), type: z.literal('InvalidCredentials') }),
+  z.object({ error: z.string(), type: z.literal('UnknownError') }),
+  z.object({ error: z.string(), type: z.literal('AccessDenied') }),
   z.object({
-    type: z.literal('Success'),
     tokens: Auth0TokensSchema,
+    type: z.literal('Success'),
     user: UserSchema,
   }),
 ])
@@ -22,13 +21,13 @@ const LoginResponse = z.discriminatedUnion('type', [
 type LoginResponse = z.infer<typeof LoginResponse>
 
 export const login = async (
-  config: Config,
+  ctx: RequestContext,
   input: LoginInput,
 ): Promise<LoginResponse> => {
-  const logger = createLogger({ appContext: 'Login DB' })
-
   try {
-    const auth0 = await auth0Login(config, input)
+    const logger = ctx.logger.child().withContext({ db: 'login' })
+    const auth0 = await auth0Login(ctx, input)
+    logger.withMetadata({ auth0 }).info('Auth0 login attempt')
 
     if (auth0.type !== 'Success') {
       return auth0
@@ -36,7 +35,7 @@ export const login = async (
 
     const { auth0Sub } = Auth0UserSchema.parse(jwtDecode(auth0.tokens.idToken))
 
-    const db = getDb(config.D1_DB)
+    const db = getDb(ctx.db)
     const localUser = await db.query.users.findFirst({
       where: {
         auth0Sub,
@@ -45,23 +44,23 @@ export const login = async (
 
     if (!localUser) {
       // TODO: insert if not found
-      logger.fatal(
+      ctx.logger.fatal(
         `User not found locally after successful authentication: ${auth0Sub}`,
       )
       throw new Error('User not found locally after successful authentication')
     }
 
     return {
-      type: 'Success',
       tokens: auth0.tokens,
+      type: 'Success',
       user: localUser,
     }
   } catch (error) {
-    logger.withError(error).error('Unknown error during login')
+    ctx.logger.withError(error as Error).error('Unknown error during login')
 
     return {
-      type: 'UnknownError',
       error: error instanceof Error ? error.message : String(error),
+      type: 'UnknownError',
     }
   }
 }

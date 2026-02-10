@@ -1,0 +1,27 @@
+{
+  "name": "@downtown65/wrangler-config",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "generate-wrangler-config": "./src/cli.ts"
+  },
+  "exports": {
+    "./cli": "./src/cli.ts"
+  },
+  "scripts": {
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf node_modules"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "catalog:",
+    "@types/node": "catalog:",
+    "rimraf": "catalog:",
+    "typescript": "catalog:"
+  }
+}

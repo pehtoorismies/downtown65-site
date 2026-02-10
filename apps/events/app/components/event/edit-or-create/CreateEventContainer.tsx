@@ -44,10 +44,10 @@ export const CreateEventContainer: FC<Props> = ({ state, me, dispatch }) => {
 
   return (
     <Stepper
+      active={state.activeStep}
       allowNextStepsSelect={false}
       color={state.kind === 'edit' ? 'dtPink.4' : 'blue'}
       iconSize={iconSize}
-      active={state.activeStep}
       onStepClick={(stepIndex: number) => {
         if (!isStepNumber(stepIndex)) {
           throw new Error('Not in step range')
@@ -55,26 +55,26 @@ export const CreateEventContainer: FC<Props> = ({ state, me, dispatch }) => {
         dispatch({ kind: 'step', step: stepIndex })
       }}
     >
-      <Stepper.Step icon={<IconRun />} data-testid="step-type">
-        <StepEventType state={state} dispatch={dispatch} />
+      <Stepper.Step data-testid="step-type" icon={<IconRun />}>
+        <StepEventType dispatch={dispatch} state={state} />
       </Stepper.Step>
-      <Stepper.Step icon={<IconEdit />} data-testid="step-basic-info">
-        <StepTitle state={state} dispatch={dispatch} />
+      <Stepper.Step data-testid="step-basic-info" icon={<IconEdit />}>
+        <StepTitle dispatch={dispatch} state={state} />
       </Stepper.Step>
-      <Stepper.Step icon={<IconCalendar />} data-testid="step-date">
-        <StepDate state={state} dispatch={dispatch} />
+      <Stepper.Step data-testid="step-date" icon={<IconCalendar />}>
+        <StepDate dispatch={dispatch} state={state} />
       </Stepper.Step>
-      <Stepper.Step icon={<IconClockHour5 />} data-testid="step-time">
-        <StepTime state={state} dispatch={dispatch} />
+      <Stepper.Step data-testid="step-time" icon={<IconClockHour5 />}>
+        <StepTime dispatch={dispatch} state={state} />
       </Stepper.Step>
-      <Stepper.Step icon={<IconAlignLeft />} data-testid="step-description">
-        <StepDescription state={state} dispatch={dispatch} />
+      <Stepper.Step data-testid="step-description" icon={<IconAlignLeft />}>
+        <StepDescription dispatch={dispatch} state={state} />
       </Stepper.Step>
-      <Stepper.Step icon={<IconRocket />} data-testid="step-preview">
+      <Stepper.Step data-testid="step-preview" icon={<IconRocket />}>
         <StepPreview
-          state={state}
-          me={me}
           dispatch={dispatch}
+          me={me}
+          state={state}
           submit={submit}
           submitState={fetcher.state}
         />

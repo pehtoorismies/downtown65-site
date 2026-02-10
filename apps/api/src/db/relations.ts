@@ -2,21 +2,21 @@ import { defineRelations } from 'drizzle-orm'
 import * as schema from './schema'
 
 export const relations = defineRelations(schema, (r) => ({
-  users: {
-    participation: r.many.events({
-      from: r.users.id.through(r.usersToEvent.userId),
-      to: r.events.id.through(r.usersToEvent.eventId),
-    }),
-  },
   events: {
     createdBy: r.one.users({
       from: r.events.creatorId,
-      to: r.users.id,
       optional: false,
+      to: r.users.id,
     }),
     participants: r.many.users({
       from: r.events.id.through(r.usersToEvent.eventId),
       to: r.users.id.through(r.usersToEvent.userId),
+    }),
+  },
+  users: {
+    participation: r.many.events({
+      from: r.users.id.through(r.usersToEvent.userId),
+      to: r.events.id.through(r.usersToEvent.eventId),
     }),
   },
 }))

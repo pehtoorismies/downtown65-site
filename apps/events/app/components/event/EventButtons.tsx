@@ -16,14 +16,14 @@ export const LeaveEventButton = ({
 }: ParticipationProps) => {
   return (
     <Button
-      style={{ width: 140 }}
-      onClick={onClick}
-      loading={isLoading}
-      leftSection={<IconHandOff size={18} />}
-      variant="gradient"
-      gradient={Gradient.dtPink}
       data-testid="leave"
+      gradient={Gradient.dtPink}
+      leftSection={<IconHandOff size={18} />}
+      loading={isLoading}
+      onClick={onClick}
       size="sm"
+      style={{ width: 140 }}
+      variant="gradient"
       // disabled={!actions.participationEnabled}
     >
       {title}
@@ -37,12 +37,12 @@ export const JoinEventButton = ({
 }: ParticipationProps) => {
   return (
     <Button
-      style={{ width: 140 }}
-      size="sm"
-      onClick={onClick}
-      loading={isLoading}
-      leftSection={<IconHandStop size={18} />}
       data-testid="participate"
+      leftSection={<IconHandStop size={18} />}
+      loading={isLoading}
+      onClick={onClick}
+      size="sm"
+      style={{ width: 140 }}
       // disabled={!actions.participationEnabled}
     >
       {title}
@@ -54,10 +54,10 @@ export const ToLoginButton = () => {
   return (
     <Button
       component={Link}
-      to="/login"
-      leftSection={<IconLogin size={18} />}
       data-testid="event-goto-login"
+      leftSection={<IconLogin size={18} />}
       size="sm"
+      to="/login"
     >
       Kirjaudu
     </Button>

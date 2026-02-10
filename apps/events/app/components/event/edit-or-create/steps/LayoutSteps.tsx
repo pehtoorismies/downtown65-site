@@ -12,10 +12,10 @@ interface StepLayoutProps {
 const ResponsiveTitle = ({ children }: PropsWithChildren) => {
   return (
     <>
-      <Title ta="center" order={2} size="h4" mb="xs" hiddenFrom="sm">
+      <Title hiddenFrom="sm" mb="xs" order={2} size="h4" ta="center">
         {children}
       </Title>
-      <Title ta="center" order={2} size="h2" mb="xs" visibleFrom="sm">
+      <Title mb="xs" order={2} size="h2" ta="center" visibleFrom="sm">
         {children}
       </Title>
     </>
@@ -54,8 +54,8 @@ export const NextButton = (
 
   const common = {
     mt: 'xs',
-    rightSection: <IconArrowRight size={18} />,
     onClick: props.onClick,
+    rightSection: <IconArrowRight size={18} />,
   }
 
   return (
@@ -63,7 +63,7 @@ export const NextButton = (
       <Button {...common} hiddenFrom="sm" size="xs" {...rest}>
         {children}
       </Button>
-      <Button {...common} visibleFrom="sm" size="sm" {...rest}>
+      <Button {...common} size="sm" visibleFrom="sm" {...rest}>
         {children}
       </Button>
     </>
@@ -76,8 +76,8 @@ export const PreviousButton = (
   const { children, ...rest } = props
 
   const common = {
-    mt: 'xs',
     leftSection: <IconArrowLeft size={18} />,
+    mt: 'xs',
     onClick: props.onClick,
   }
 
@@ -86,7 +86,7 @@ export const PreviousButton = (
       <Button {...common} hiddenFrom="sm" size="xs" {...rest}>
         {children}
       </Button>
-      <Button {...common} visibleFrom="sm" size="sm" {...rest}>
+      <Button {...common} size="sm" visibleFrom="sm" {...rest}>
         {children}
       </Button>
     </>

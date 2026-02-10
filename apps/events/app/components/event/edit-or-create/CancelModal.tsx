@@ -17,30 +17,30 @@ export const CancelModal = ({
 }: Props) => {
   return (
     <Modal
-      zIndex={2000}
-      opened={opened}
-      onClose={onClose}
-      title={title}
       closeButtonProps={{ 'aria-label': 'Close' }}
+      onClose={onClose}
+      opened={opened}
+      title={title}
+      zIndex={2000}
     >
       <Group
+        data-testid="confirmation-modal-content"
         justify="space-between"
         mt={50}
-        data-testid="confirmation-modal-content"
       >
         <Button
-          onClick={onClose}
-          leftSection={<IconCircleX size={18} />}
           data-testid="modal-close"
+          leftSection={<IconCircleX size={18} />}
+          onClick={onClose}
         >
           Sulje
         </Button>
-        <Form method="GET" action={navigationPath}>
+        <Form action={navigationPath} method="GET">
           <Button
-            type="submit"
             color="red"
-            rightSection={<IconCircleOff size={18} />}
             data-testid="modal-cancel-event-creation"
+            rightSection={<IconCircleOff size={18} />}
+            type="submit"
           >
             Keskeytä
           </Button>

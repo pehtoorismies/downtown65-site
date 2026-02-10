@@ -5,9 +5,10 @@ export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
     environment: 'jsdom',
-    exclude: ['build', 'node_modules', 'tmp'],
+    exclude: ['.wrangler', 'build', 'node_modules', 'tmp', 'e2e'],
     globals: true,
     reporters: ['verbose'],
     setupFiles: ['./vitest.setup.ts'],
+    silent: true,
   },
 })

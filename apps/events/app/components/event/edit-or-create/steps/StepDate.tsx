@@ -27,28 +27,28 @@ export const StepDate = ({ state, dispatch }: ReducerProps) => {
 
   return (
     <StepLayout
-      prevButton={previousButton}
       nextButton={nextButton}
+      prevButton={previousButton}
       title={`Päivämäärä: ${format(state.date, 'd.M.yyyy')}`}
     >
       <Group justify="center">
         <DatePicker
-          minDate={state.kind === 'create' ? new Date() : undefined}
-          value={state.date}
           defaultDate={state.date}
+          locale="fi"
+          minDate={state.kind === 'create' ? new Date() : undefined}
+          numberOfColumns={1}
           onChange={(date: DateValue) => {
             if (date == null) {
               throw new Error('Date can not be null')
             }
             if (typeof date === 'string') {
-              dispatch({ kind: 'date', date: new Date(date) })
+              dispatch({ date: new Date(date), kind: 'date' })
             } else {
-              dispatch({ kind: 'date', date })
+              dispatch({ date, kind: 'date' })
             }
           }}
-          numberOfColumns={1}
           size={size}
-          locale="fi"
+          value={state.date}
         />
       </Group>
     </StepLayout>

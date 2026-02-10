@@ -19,3 +19,7 @@ db.sqlite
 drizzle_flat/
 
 seed_data_tmp/
+
+wrangler.local.jsonc
+wrangler.pr.jsonc
+.envrc

@@ -14,15 +14,15 @@ const validate = (inputTitle: string) => (value: string) => {
 export const StepTitle = ({ state, dispatch }: ReducerProps) => {
   const form = useForm({
     initialValues: {
-      title: state.title,
-      subtitle: state.subtitle,
       location: state.location,
+      subtitle: state.subtitle,
+      title: state.title,
     },
     // validateInputOnChange: true,
     validate: {
-      title: validate('Nimi'),
-      subtitle: validate('Tarkenne'),
       location: validate('Sijainti'),
+      subtitle: validate('Tarkenne'),
+      title: validate('Nimi'),
     },
   })
 
@@ -35,20 +35,6 @@ export const StepTitle = ({ state, dispatch }: ReducerProps) => {
 
   return (
     <StepLayout
-      title="Perustiedot"
-      prevButton={
-        <PreviousButton
-          onClick={() => {
-            dispatch({
-              kind: 'info',
-              ...form.values,
-              activeStep: ActiveStep.STEP_EVENT_TYPE,
-            })
-          }}
-        >
-          Laji
-        </PreviousButton>
-      }
       nextButton={
         <NextButton
           onClick={() => {
@@ -64,46 +50,60 @@ export const StepTitle = ({ state, dispatch }: ReducerProps) => {
           Päivämäärä
         </NextButton>
       }
+      prevButton={
+        <PreviousButton
+          onClick={() => {
+            dispatch({
+              kind: 'info',
+              ...form.values,
+              activeStep: ActiveStep.STEP_EVENT_TYPE,
+            })
+          }}
+        >
+          Laji
+        </PreviousButton>
+      }
+      title="Perustiedot"
     >
       <TextInput
-        name="title"
-        my={spacing}
-        placeholder="Jukola Konala"
         label="Tapahtuman nimi"
+        my={spacing}
+        name="title"
+        placeholder="Jukola Konala"
         size={size}
         withAsterisk
         {...form.getInputProps('title')}
       />
       <TextInput
-        name="subtitle"
-        my={spacing}
-        placeholder="6-7 joukkuetta"
         label="Tarkenne"
+        my={spacing}
+        name="subtitle"
+        placeholder="6-7 joukkuetta"
         size={size}
         withAsterisk
         {...form.getInputProps('subtitle')}
       />
       <TextInput
-        name="location"
-        my={spacing}
-        placeholder="Sijainti"
         label="Missä tapahtuma järjestetään?"
+        my={spacing}
+        name="location"
+        placeholder="Sijainti"
         size={size}
         withAsterisk
         {...form.getInputProps('location')}
       />
       <Center>
         <Switch
-          data-testid="race-switch"
-          onLabel="ON"
-          offLabel="EI"
-          size={switchSize}
-          labelPosition="left"
-          label="Onko kilpailu?"
-          onChange={(event) => {
-            dispatch({ kind: 'race', isRace: event.currentTarget.checked })
-          }}
           checked={state.isRace}
+          data-testid="race-switch"
+          label="Onko kilpailu?"
+          labelPosition="left"
+          offLabel="EI"
+          onChange={(event) => {
+            dispatch({ isRace: event.currentTarget.checked, kind: 'race' })
+          }}
+          onLabel="ON"
+          size={switchSize}
         />
       </Center>
     </StepLayout>

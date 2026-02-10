@@ -1,13 +1,15 @@
-import { createLogger } from '@downtown65/logger'
 import { type EventList, EventListSchema } from '@downtown65/schema'
-import type { Config } from '~/common/config/config'
+import type { RequestContext } from '~/app-api'
 import { getDb } from '~/db/get-db'
 
-export const getEvents = async (config: Config): Promise<EventList> => {
-  const db = getDb(config.D1_DB)
-  const logger = createLogger({ appContext: 'DB getEvents' })
+export const getEvents = async (ctx: RequestContext): Promise<EventList> => {
+  const db = getDb(ctx.db)
 
   const result = await db.query.events.findMany({
+    orderBy: (events, { asc }) => [
+      asc(events.dateStart),
+      asc(events.timeStart),
+    ],
     where: {
       dateStart: { gte: new Date().toISOString().slice(0, 10) },
     },
@@ -15,10 +17,6 @@ export const getEvents = async (config: Config): Promise<EventList> => {
       createdBy: true,
       participants: true,
     },
-    orderBy: (events, { asc }) => [
-      asc(events.dateStart),
-      asc(events.timeStart),
-    ],
   })
 
   const withJoinedAt = result.map((event) => {
@@ -34,7 +32,7 @@ export const getEvents = async (config: Config): Promise<EventList> => {
   })
 
   const events = EventListSchema.decode(withJoinedAt)
-  logger.withMetadata(events).debug('Events fetched from DB')
+  ctx.logger.withMetadata(events).debug('Events fetched from DB')
 
   return events
 }

@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "dt65-events",
+  "compatibility_date": "2025-04-04",
+  "main": "./workers/app.ts",
+  "compatibility_flags": ["nodejs_compat"],
+  "preview_urls": false,
+  "workers_dev": false,
+  "vars": {
+    "API_HOST": "localhost:3002",
+    "LOG_LEVEL": "debug"
+  }
+}

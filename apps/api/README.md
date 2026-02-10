@@ -9,20 +9,19 @@ This project supports multiple developers working simultaneously with isolated D
 1. **Create your local D1 database:**
    ```bash
    # Create a new D1 database with your name
-   npx wrangler d1 create YOUR_NAME-development
+   npx wrangler d1 create USERNAME-development-dt65-events
    ```
    Save the `database_id` from the output.
 
 2. **Configure local wrangler settings:**
    ```bash
-   # Copy the example file
-   cp wrangler.local.jsonc.example wrangler.local.jsonc
+   pnpm generate:wrangler-config local-development <USERNAME> <DATABASE_ID>
    ```
    
    Edit `wrangler.local.jsonc`:
-   - Replace `YOUR_NAME` with your identifier (e.g., your GitHub username)
-   - Replace `YOUR_DATABASE_ID` with the ID from step 1
-
+   - Replace `USERNAME` with your identifier (e.g., your GitHub username)
+   - Replace `DATABASE_ID` with the ID from step 1
+    
 3. **Set up local secrets:**
    ```bash
    # Copy the example file
@@ -38,21 +37,11 @@ This project supports multiple developers working simultaneously with isolated D
    # Maybe this will be fixed at some point. Keep eye!
    pnpm run migrations:flatten
 
-
    # Use wrangler.local.jsonc
    npx wrangler d1 migrations apply <DB_NAME> --local --config wrangler.local.jsonc
    ```
 
-5. **Create seed data:**
-
-    Download users from Auth0
-    Get dynamo-events.csv (export from AWS DynamoTable)
-    ```bash
-    pnmp seed:create-sql
-    npx wrangler d1 execute <DB_NAME> --local --file=./seed-data/seed-data.sql -c wrangler.local.jsonc
-    ```
-
-6. **Synchronize users from auth0:**
+5. **Synchronize users from auth0:**
    ```bash
 
    # Create flat file structure so that wrangler md1 migrations can read it
@@ -61,10 +50,6 @@ This project supports multiple developers working simultaneously with isolated D
    curl http://localhost:3002/sync/users \
     --request POST \
     --header 'x-api-key: <api-key-secret>'
-
-
-   # Use wrangler.local.jsonc
-   npx wrangler d1 migrations apply D1_DB --local --config wrangler.local.jsonc
    ```
 
 
@@ -170,3 +155,33 @@ To verify secrets are set:
 ```bash
 wrangler secret list --env production
 ```
+
+
+# Wrangler Configuration Generation
+
+This document explains how wrangler configuration is generated for different environments.
+
+## Overview
+
+The `wrangler.jsonc` file is **generated dynamically** rather than committed to version control. This approach:
+
+
+## Modes
+
+The generator supports three modes:
+
+### 1. Default Mode (Staging + Production)
+
+**When to use:** CI/CD for staging and production deployments
+
+**Command:**
+```bash
+Usage:
+ - Default (staging + production): pnpm generate:wrangler-config default
+ - Local development:              pnpm generate:wrangler-config local-development <USERNAME> <DATABASE_ID>
+ - Pull request:                   pnpm generate:wrangler-config pr <PR_NUMBER> <PR_DATABASE_ID>
+*
+Examples:
+ pnpm generate:wrangler-config default
+ pnpm generate:wrangler-config local-development pehtoorismies "00000000-0000-0000-0000-000000000000"
+ pnpm generate:wrangler-config pr 42 "00000000-0000-0000-0000-000000000000"

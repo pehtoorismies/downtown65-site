@@ -30,10 +30,10 @@ const getButtonProps = (
 ): { text: string; icon: React.ReactNode } => {
   switch (kind) {
     case 'create': {
-      return { text: 'Luo tapahtuma', icon: <IconRocket size={18} /> }
+      return { icon: <IconRocket size={18} />, text: 'Luo tapahtuma' }
     }
     case 'edit': {
-      return { text: 'Tallenna', icon: <IconDeviceFloppy size={18} /> }
+      return { icon: <IconDeviceFloppy size={18} />, text: 'Tallenna' }
     }
   }
 }
@@ -59,11 +59,11 @@ export const StepPreview = ({
 
   const nextButton = (
     <NextButton
+      gradient={Gradient.dtPink}
+      loading={submitState !== 'idle'}
       onClick={submit}
       rightSection={icon}
-      gradient={Gradient.dtPink}
       variant="gradient"
-      loading={submitState !== 'idle'}
     >
       {text}
     </NextButton>
@@ -71,26 +71,26 @@ export const StepPreview = ({
 
   return (
     <StepLayout
-      title="Esikatselu"
-      prevButton={previousButton}
       nextButton={nextButton}
+      prevButton={previousButton}
+      title="Esikatselu"
     >
       <EventCard
         event={{
           ...state,
-          dateStart: getDate(state.date),
-          timeStart: getTime(state.time),
           createdBy: me,
-          race: state.isRace,
+          dateStart: getDate(state.date),
           eventType: state.eventType,
           participants: state.participants,
+          race: state.isRace,
+          timeStart: getTime(state.time),
         }}
         me={me}
       >
         <EventButtonContainer
-          participants={state.participants}
-          me={me}
           dispatch={dispatch}
+          me={me}
+          participants={state.participants}
         />
       </EventCard>
     </StepLayout>

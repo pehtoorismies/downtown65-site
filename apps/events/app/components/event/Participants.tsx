@@ -19,25 +19,25 @@ const ParticipantBadge = ({
 }: ParticipantBadgeProps) => {
   const gradient = isCurrentUser
     ? Gradient.dtPink
-    : { from: 'indigo', to: 'blue', deg: 45 }
+    : { deg: 45, from: 'indigo', to: 'blue' }
 
   return (
     <Badge
       data-testid="event-participant"
-      m={2}
-      radius="md"
-      styles={{ label: { textTransform: 'none' } }}
-      variant="gradient"
-      style={{ paddingLeft: 0 }}
       gradient={gradient}
       leftSection={
         <Avatar
           alt={`${participant.nickname}'s avatar`}
-          size={24}
           mr={5}
+          size={24}
           src={participant.picture}
         />
       }
+      m={2}
+      radius="md"
+      style={{ paddingLeft: 0 }}
+      styles={{ label: { textTransform: 'none' } }}
+      variant="gradient"
     >
       {participant.nickname}
     </Badge>
@@ -62,9 +62,9 @@ export const Participants = ({ participants, me }: Props) => {
     <Group align="left" gap={2}>
       {participants.map((participant) => (
         <ParticipantBadge
+          isCurrentUser={me?.id === participant.id}
           key={participant.id}
           participant={participant}
-          isCurrentUser={me?.id === participant.id}
         />
       ))}
     </Group>

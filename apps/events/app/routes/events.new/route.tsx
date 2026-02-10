@@ -33,8 +33,8 @@ export const action = async ({ context, request }: Route.ActionArgs) => {
   const { error, data } = await apiClient.POST('/events', {
     body: parsed.data,
     headers: {
-      'Content-Type': 'application/json',
       Authorization: `Bearer ${authContext.accessToken}`,
+      'Content-Type': 'application/json',
       'x-api-key': context.cloudflare.env.API_KEY,
     },
   })
@@ -75,13 +75,13 @@ export default function CreateEvent({
     date: new Date(),
     description: '',
     isRace: false,
+    kind: 'create',
     location: '',
     participants: [meParticipant],
     submitEvent: false,
     subtitle: '',
     time: {},
     title: '',
-    kind: 'create',
   })
 
   return (
@@ -90,17 +90,17 @@ export default function CreateEvent({
         {actionData?.errorMessage}
       </Title>
       <CancelModal
-        opened={opened}
-        onClose={handlers.close}
-        title="Keskeytä tapahtuman luonti"
         navigationPath="/events"
+        onClose={handlers.close}
+        opened={opened}
+        title="Keskeytä tapahtuman luonti"
       />
       {actionData?.errorMessage && (
         <Alert
-          icon={<IconAlertCircle size={16} />}
-          title="Virhe luomisessa"
           color="red"
+          icon={<IconAlertCircle size={16} />}
           mb="sm"
+          title="Virhe luomisessa"
         >
           {actionData?.errorMessage}
         </Alert>
@@ -108,15 +108,15 @@ export default function CreateEvent({
       <Title order={1} size="h5">
         Uusi tapahtuma: {eventState.title || 'ei nimeä'}
       </Title>
-      <CreateEventContainer state={eventState} dispatch={dispatch} me={me} />
+      <CreateEventContainer dispatch={dispatch} me={me} state={eventState} />
       <ModificationDivider />
       <Center>
         <Button
-          my="md"
           color="red"
-          rightSection={<IconCircleOff size={18} />}
-          onClick={handlers.open}
           data-testid="cancel-event-creation-button"
+          my="md"
+          onClick={handlers.open}
+          rightSection={<IconCircleOff size={18} />}
         >
           Keskeytä luonti
         </Button>

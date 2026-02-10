@@ -2,61 +2,28 @@ name: Quality Checks
 
 on:
   workflow_call:
-    inputs:
-      cloudflare-environment:
-        required: true
-        type: string
 
-env:
-  CLOUDFLARE_ENV: ${{ inputs.cloudflare-environment }}
 jobs:
   checks:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-project
-      - name: Generate API types
+      - name: Generate Files for API
         working-directory: apps/api
-        env:
-          CLOUDFLARE_ENV: ${{ inputs.cloudflare-environment }}
-          PR_NUMBER: "typegen"
-          PR_DATABASE_ID: "typegen-database-id"
         run: |
-          envsubst < wrangler.jsonc > wrangler.jsonc.tmp
-          mv wrangler.jsonc.tmp wrangler.jsonc
-
-          cat > .env.${{ inputs.cloudflare-environment }} << EOF
-          AUTH_CLIENT_SECRET=placeholder-secret
-          REGISTER_SECRET=placeholder-secret
-          API_KEY=placeholder-secret
-          EOF
-          echo "Created .env.${{ inputs.cloudflare-environment }} with placeholder secrets"
-
+          # Generate types for Frontend (SMELL)
           pnpm generate:openapi
-          npx wrangler types --env ${{ inputs.cloudflare-environment }}
-
-          rm .env.${{ inputs.cloudflare-environment }}
+          npx wrangler types --strict-vars false -c wrangler.jsonc --env unit-test
+          # needed for knip
+          pnpm run migrations:flatten
 
       - name: Generate Events types
         working-directory: apps/events
-        env:
-          CLOUDFLARE_ENV: ${{ inputs.cloudflare-environment }}
-          PR_NUMBER: "typegen"
         run: |
-          envsubst < wrangler.jsonc > wrangler.jsonc.tmp
-          mv wrangler.jsonc.tmp wrangler.jsonc
-
-          cat > .env.${{ inputs.cloudflare-environment }} << EOF
-          API_KEY=placeholder-secret
-          COOKIE_SESSION_SECRET=placeholder-secret
-          EOF
-          echo "Created .env.${{ inputs.cloudflare-environment }} with placeholder secrets"
-
           pnpm run generate:react-router-types
           pnpm run generate:api-types:file
-          npx wrangler types --env ${{ inputs.cloudflare-environment }}
-
-          rm .env.${{ inputs.cloudflare-environment }}
+          npx wrangler types --config wrangler.jsonc --env unit-test
 
       - name: Lint
         run: pnpm run ci:lint
@@ -69,3 +36,6 @@ jobs:
 
       - name: Dead code check
         run: pnpm run knip --reporter github-actions
+
+      - name: Unit tests
+        run: pnpm run test

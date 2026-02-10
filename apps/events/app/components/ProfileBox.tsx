@@ -10,23 +10,23 @@ type Properties = {
 export const ProfileBox = ({ picture, name, nickname, email }: Properties) => {
   return (
     <Paper p="sm">
-      <Avatar src={picture} size={120} radius={120} mx="auto" />
+      <Avatar mx="auto" radius={120} size={120} src={picture} />
       <Text
-        ta="center"
-        fz={30}
-        variant="gradient"
-        gradient={{ from: 'indigo', to: 'cyan', deg: 45 }}
-        fw={700}
-        mt="md"
         data-testid="profile-nick"
+        fw={700}
+        fz={30}
+        gradient={{ deg: 45, from: 'indigo', to: 'cyan' }}
+        mt="md"
         style={{ fontFamily: 'Roboto, sans-serif' }}
+        ta="center"
+        variant="gradient"
       >
         {nickname}
       </Text>
-      <Text ta="center" fw={500} fz="md" data-testid="profile-name">
+      <Text data-testid="profile-name" fw={500} fz="md" ta="center">
         {name}
       </Text>
-      <Text ta="center" fw={500} fz="sm" c="dimmed" data-testid="profile-email">
+      <Text c="dimmed" data-testid="profile-email" fw={500} fz="sm" ta="center">
         {email}
       </Text>
     </Paper>

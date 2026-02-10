@@ -10,10 +10,10 @@ const navLinks = [
   // { id: 20, title: 'Haasteet', to: '/challenges' },
   {
     id: 30,
-    title: 'Luo uusi',
-    to: '/events/new',
     // to: '/create',
     testId: 'nav-create-new-event',
+    title: 'Luo uusi',
+    to: '/events/new',
   },
   { id: 40, title: 'Jäsenet', to: '/members' },
 ]
@@ -36,12 +36,12 @@ export const LoggedInNavigation = ({
   return (
     <Group h="100%" px="md" wrap="nowrap">
       <Burger
-        opened={navigationOpened}
-        onClick={toggle}
         hiddenFrom="sm"
+        onClick={toggle}
+        opened={navigationOpened}
         size="sm"
       />
-      <Group gap={0} style={{ flex: 1 }} justify="space-between" wrap="nowrap">
+      <Group gap={0} justify="space-between" style={{ flex: 1 }} wrap="nowrap">
         <Group style={{ width: 130 }}>
           <Text
             style={{
@@ -53,15 +53,14 @@ export const LoggedInNavigation = ({
         </Group>
         <Group
           gap={5}
-          visibleFrom="sm"
           justify="center"
           style={{
             flex: 1,
           }}
+          visibleFrom="sm"
         >
           {navLinks.map(({ id, to, title, testId }) => (
             <NavLink
-              key={id}
               className={({ isActive }) => {
                 return cx(
                   classes.control,
@@ -69,32 +68,33 @@ export const LoggedInNavigation = ({
                   isActive && classes.active,
                 )
               }}
-              to={to}
               data-testid={testId}
               end
+              key={id}
+              to={to}
             >
               {title}
             </NavLink>
           ))}
         </Group>
         <Menu
-          width={160}
           position="bottom-end"
-          transitionProps={{ transition: 'pop-top-right' }}
           shadow="md"
+          transitionProps={{ transition: 'pop-top-right' }}
+          width={160}
         >
           <Menu.Target>
             <Button
-              variant="subtle"
               leftSection={
                 <Avatar
-                  src={user.picture}
                   alt={user.nickname}
                   radius="xl"
                   size={20}
+                  src={user.picture}
                 />
               }
               rightSection={<IconChevronDown size={12} stroke={1.5} />}
+              variant="subtle"
             >
               {user.nickname}
             </Button>
@@ -102,18 +102,18 @@ export const LoggedInNavigation = ({
           <Menu.Dropdown>
             <Menu.Item
               component={Link}
+              leftSection={<IconUser size={14} stroke={1.5} />}
               onClick={close}
               to="/profile"
-              leftSection={<IconUser size={14} stroke={1.5} />}
             >
               Profiili
             </Menu.Item>
             <Menu.Item
+              leftSection={<IconLogout size={14} stroke={1.5} />}
               onClick={() => {
                 close()
                 fetcher.submit({}, { action: '/logout', method: 'post' })
               }}
-              leftSection={<IconLogout size={14} stroke={1.5} />}
             >
               Logout
             </Menu.Item>
@@ -129,16 +129,16 @@ export const LoggedOutNavigation = () => {
     <Group h="100%" px="md">
       <Group justify="space-between" style={{ flex: 1 }}>
         <Text style={{ userSelect: 'none' }}>Dt65 Events</Text>
-        <Group ml="xl" gap={10} visibleFrom="sm">
+        <Group gap={10} ml="xl" visibleFrom="sm">
           <Button
             component={Link}
+            data-testid="button-to-login"
             to="/login"
             variant="default"
-            data-testid="button-to-login"
           >
             Kirjaudu
           </Button>
-          <Button component={Link} to="/signup" data-testid="button-to-signup">
+          <Button component={Link} data-testid="button-to-signup" to="/signup">
             Rekisteröidy
           </Button>
         </Group>
@@ -157,7 +157,6 @@ export const Navbar = ({ close }: NavbarProps) => {
       {navLinks.map(({ id, to, title, testId }) => {
         return (
           <NavLink
-            key={id}
             className={({ isActive }) => {
               return cx(
                 classes.control,
@@ -165,23 +164,24 @@ export const Navbar = ({ close }: NavbarProps) => {
                 isActive && classes.active,
               )
             }}
-            to={to}
-            onClick={close}
             data-testid={testId}
             end
+            key={id}
+            onClick={close}
+            to={to}
           >
             {title}
           </NavLink>
         )
       })}
-      <Group justify="center" grow pb="xl" px="md">
+      <Group grow justify="center" pb="xl" px="md">
         <Form action="/logout" method="post">
           <Button
-            my="md"
-            type="submit"
-            onClick={close}
-            leftSection={<IconLogout size={18} />}
             fullWidth
+            leftSection={<IconLogout size={18} />}
+            my="md"
+            onClick={close}
+            type="submit"
           >
             Kirjaudu ulos
           </Button>

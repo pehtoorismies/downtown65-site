@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/**/*.ts",
+    "scripts/*.ts",
+    "drizzle.config.ts",
+    "worker-configuration.d.ts"
+  ],
+  "exclude": ["**/*.spec.ts", "**/__tests__/**", "src/common/test/**"],
+  "compilerOptions": {
+    "composite": true,
+    "types": ["node"]
+  }
+}

@@ -1,9 +1,9 @@
 export const Gradient = {
-  dtPink: { from: 'dtPink.2', to: 'dtPink.4', deg: 45 },
-  blue: { from: 'indigo', to: 'cyan', deg: 45 },
+  blue: { deg: 45, from: 'indigo', to: 'cyan' },
+  dtPink: { deg: 45, from: 'dtPink.2', to: 'dtPink.4' },
 }
 
 export const GradientInverse = {
-  dtPink: { to: 'dtPink.2', from: 'dtPink.4', deg: 45 },
-  blue: { from: 'cyan', to: 'indigo', deg: 45 },
+  blue: { deg: 45, from: 'cyan', to: 'indigo' },
+  dtPink: { deg: 45, from: 'dtPink.4', to: 'dtPink.2' },
 }

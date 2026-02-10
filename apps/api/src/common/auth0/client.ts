@@ -1,24 +1,20 @@
 import { AuthenticationClient, ManagementClient } from 'auth0'
-import type { Config } from '../config/config'
+import type { AuthConfig } from '../config/config'
 
-export const createAuthClient = (authConfig: Config['authConfig']) => {
-  return new AuthenticationClient({
-    domain: authConfig.AUTH_DOMAIN,
-    clientId: authConfig.AUTH_CLIENT_ID,
-    clientSecret: authConfig.AUTH_CLIENT_SECRET,
-  })
+export const createAuthClient = (authConfig: AuthConfig) => {
+  return new AuthenticationClient(authConfig)
 }
 
-export const getManagementClient = async ({
-  authConfig,
-}: Config): Promise<ManagementClient> => {
+export const getManagementClient = async (
+  authConfig: AuthConfig,
+): Promise<ManagementClient> => {
   const authClient = createAuthClient(authConfig)
   const tokenResult = await authClient.oauth.clientCredentialsGrant({
-    audience: `https://${authConfig.AUTH_DOMAIN}/api/v2/`,
+    audience: `https://${authConfig.domain}/api/v2/`,
   })
 
   return new ManagementClient({
+    domain: authConfig.domain,
     token: tokenResult.data.access_token,
-    domain: authConfig.AUTH_DOMAIN,
   })
 }

@@ -1,13 +1,13 @@
 import { eq } from 'drizzle-orm'
-import type { Config } from '~/common/config/config'
+import type { RequestContext } from '~/app-api'
 import { getDb } from '~/db/get-db'
 import { events as eventsTable } from '~/db/schema'
 
 export const deleteEvent = async (
-  config: Config,
+  ctx: RequestContext,
   id: number,
 ): Promise<boolean> => {
-  const db = getDb(config.D1_DB)
+  const db = getDb(ctx.db)
   const deletedEvent = await db
     .delete(eventsTable)
     .where(eq(eventsTable.id, id))

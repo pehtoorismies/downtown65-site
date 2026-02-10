@@ -21,16 +21,16 @@ export const middleware = [authMiddleware()]
 
 export const loader = async () => {
   return {
-    user: {
-      nickname: 'nickname',
-      id: '123',
-      picture: 'https://example.com/avatar.jpg',
-    },
     email: 'email@example.com',
     name: 'Simon Saimaanranta',
     preferences: {
-      subscribeWeeklyEmail: true,
       subscribeEventCreationEmail: true,
+      subscribeWeeklyEmail: true,
+    },
+    user: {
+      id: '123',
+      nickname: 'nickname',
+      picture: 'https://example.com/avatar.jpg',
     },
   }
 }
@@ -57,8 +57,8 @@ export default function Profile() {
   const { name, user, preferences, email } = useLoaderData<typeof loader>()
 
   const [emailSettings, setEmailSettings] = useState<UserPreferences>({
-    weekly: preferences.subscribeWeeklyEmail,
     eventCreated: preferences.subscribeEventCreationEmail,
+    weekly: preferences.subscribeWeeklyEmail,
   })
 
   const onChangeEventCreatedSubscription: ChangeEventHandler<
@@ -86,18 +86,18 @@ export default function Profile() {
       </Container>
       <Container size={BOX_SIZE}>
         <ProfileBox
-          picture={user.picture}
-          nickname={user.nickname}
-          name={name}
           email={email}
+          name={name}
+          nickname={user.nickname}
+          picture={user.picture}
         />
         <Center mt="sm">
           <Form action="/profile/change-avatar">
             <Button
-              size="compact-xs"
-              variant="outline"
-              type="submit"
               data-testid="change-avatar-btn"
+              size="compact-xs"
+              type="submit"
+              variant="outline"
             >
               Vaihda profiilikuva
             </Button>
@@ -105,43 +105,43 @@ export default function Profile() {
         </Center>
       </Container>
       <Container size={BOX_SIZE}>
-        <Divider my="sm" label="Sähköpostiasetukset" labelPosition="center" />
+        <Divider label="Sähköpostiasetukset" labelPosition="center" my="sm" />
         <Group justify="center">
           <div style={{ position: 'relative' }}>
             {fetcher.state === 'submitting' && <LoadingOverlay visible />}
             <Switch
-              styles={switchStyles}
-              name="eventCreated"
-              label="Lähetä sähköposti, kun uusi tapahtuma luodaan."
               checked={emailSettings.eventCreated}
+              data-testid="preference-event-created"
+              label="Lähetä sähköposti, kun uusi tapahtuma luodaan."
+              name="eventCreated"
+              offLabel="OFF"
               onChange={onChangeEventCreatedSubscription}
               onLabel="ON"
-              offLabel="OFF"
               size="md"
-              data-testid="preference-event-created"
+              styles={switchStyles}
             />
             <Switch
-              disabled
-              name="weekly"
-              styles={switchStyles}
-              label="Lähetä viikon tapahtumat sähköpostitse. (Ei käytössä)"
-              onLabel="ON"
-              offLabel="OFF"
               checked={preferences.subscribeWeeklyEmail}
-              size="md"
+              disabled
+              label="Lähetä viikon tapahtumat sähköpostitse. (Ei käytössä)"
               my="sm"
+              name="weekly"
+              offLabel="OFF"
+              onLabel="ON"
+              size="md"
+              styles={switchStyles}
             />
           </div>
         </Group>
       </Container>
       <Container size={BOX_SIZE}>
-        <Divider my="sm" label="Kirjaudu ulos" labelPosition="center" />
+        <Divider label="Kirjaudu ulos" labelPosition="center" my="sm" />
         <Group justify="center">
           <Form action="/logout" method="post">
             <Button
-              type="submit"
-              leftSection={<IconLogout size={18} />}
               data-testid="profile-logout"
+              leftSection={<IconLogout size={18} />}
+              type="submit"
             >
               Kirjaudu ulos
             </Button>

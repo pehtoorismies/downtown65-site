@@ -31,8 +31,8 @@ const isSessionCookieExpired = (expiresAt: string) =>
 
 const CookieSessionDataSchema = z.object({
   accessToken: z.string(),
-  refreshToken: z.string(),
   expiresAt: ISODateTimeSchema,
+  refreshToken: z.string(),
   user: UserSchema,
 })
 type CookieSessionData = z.infer<typeof CookieSessionDataSchema>
@@ -45,13 +45,13 @@ type FlashData = {
 const getCookieSessionStorage = (cookieSessionSecret: string) => {
   return createCookieSessionStorage<CookieSessionData, FlashData>({
     cookie: {
-      name: '__session',
       httpOnly: true,
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+      name: '__session',
       path: '/',
       sameSite: 'lax',
       secrets: [cookieSessionSecret],
       secure: false, // set to true in production
-      maxAge: 60 * 60 * 24 * 365, // 1 year
     },
   })
 }
@@ -81,9 +81,9 @@ export const createSessionManager = (env: Env) => {
     const headers = new Headers()
     headers.append('Set-Cookie', await destroySession(session))
     return {
-      success: false as const,
-      message,
       headers,
+      message,
+      success: false as const,
     }
   }
 
@@ -109,10 +109,10 @@ export const createSessionManager = (env: Env) => {
 
     if (!accessTokenExpired) {
       return {
-        success: true,
-        user: sessionData.data.user,
         accessToken: sessionData.data.accessToken,
         headers: new Headers(),
+        success: true,
+        user: sessionData.data.user,
       }
     }
 
@@ -140,10 +140,10 @@ export const createSessionManager = (env: Env) => {
     headers.append('Set-Cookie', await commitSession(session))
 
     return {
-      success: true,
-      user: sessionData.data.user,
       accessToken: renewedData.accessToken,
       headers,
+      success: true,
+      user: sessionData.data.user,
     }
   }
 
@@ -160,10 +160,10 @@ export const createSessionManager = (env: Env) => {
     const expiresAt = rememberMe ? addMonths(now, 12) : addDays(now, 2)
 
     const authResponse = CookieSessionDataSchema.safeParse({
-      refreshToken,
-      user,
       accessToken,
       expiresAt: expiresAt.toISOString(),
+      refreshToken,
+      user,
     })
     if (!authResponse.success) {
       // TODO: log this error
@@ -180,10 +180,10 @@ export const createSessionManager = (env: Env) => {
   }
 
   return {
-    getUserSession,
-    createUserSession,
     commitSession,
+    createUserSession,
     destroySession,
     getSession,
+    getUserSession,
   }
 }

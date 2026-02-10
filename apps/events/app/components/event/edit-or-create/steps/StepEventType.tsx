@@ -32,30 +32,30 @@ export const StepEventType = ({ state, dispatch }: ReducerProps) => {
     .map(({ eventText, type, icon: TypeIcon }) => {
       return (
         <Button
+          color={state.eventType === type ? 'dtPink' : 'blue'}
           data-testid={
             state.eventType === type
               ? `button-${type}-selected`
               : `button-${type}`
           }
-          color={state.eventType === type ? 'dtPink' : 'blue'}
-          key={type}
-          onClick={() => {
-            dispatch({ kind: 'eventType', eventType: type })
-          }}
-          leftSection={<TypeIcon size={20} />}
-          rightSection={<span />}
-          justify="space-between"
-          variant="gradient"
-          size={size}
           gradient={
             state.eventType === type
               ? Gradient.dtPink
               : {
+                  deg: 45,
                   from: 'indigo',
                   to: 'cyan',
-                  deg: 45,
                 }
           }
+          justify="space-between"
+          key={type}
+          leftSection={<TypeIcon size={20} />}
+          onClick={() => {
+            dispatch({ eventType: type, kind: 'eventType' })
+          }}
+          rightSection={<span />}
+          size={size}
+          variant="gradient"
         >
           {eventText}
         </Button>
@@ -69,7 +69,7 @@ export const StepEventType = ({ state, dispatch }: ReducerProps) => {
   ) : null
 
   return (
-    <StepLayout prevButton={null} nextButton={nextButton} title="Laji">
+    <StepLayout nextButton={nextButton} prevButton={null} title="Laji">
       <SimpleGrid cols={2} spacing={{ base: 'xs', sm: 'md' }}>
         {buttons}
       </SimpleGrid>

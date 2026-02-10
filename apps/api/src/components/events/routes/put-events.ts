@@ -1,53 +1,69 @@
-import { createLogger } from '@downtown65/logger'
-import { EventUpdateSchema, MessageSchema } from '@downtown65/schema'
-import { createRoute } from '@hono/zod-openapi'
+import {
+  EventUpdateSchema,
+  MessageSchema,
+  StringIDSchema,
+} from '@downtown65/schema'
+import { createRoute, z } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
-import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
+import { getEventById } from '../db/get-event-by-id'
 import { updateEvent } from '../db/update-event'
-import { IDParamSchema } from './api-schema'
+
+const ParamsSchema = z.object({
+  id: StringIDSchema,
+})
 
 const route = createRoute({
   method: 'put',
-  path: '/events/{id}',
-  security: [{ ApiKeyAuth: [], BearerToken: [] }],
   middleware: [apiKeyAuth, jwtToken()],
+  path: '/events/{id}',
   request: {
-    params: IDParamSchema,
     body: {
-      required: true,
       content: {
         'application/json': { schema: EventUpdateSchema },
       },
+      required: true,
     },
+    params: ParamsSchema,
   },
   responses: {
     200: {
+      content: {
+        'application/json': { schema: MessageSchema },
+      },
       description: 'Event updated',
-      content: {
-        'application/json': { schema: MessageSchema },
-      },
     },
-
-    404: {
-      description: 'Event not found',
+    403: {
       content: {
         'application/json': { schema: MessageSchema },
       },
+      description: 'Only event creator can update event',
+    },
+    404: {
+      content: {
+        'application/json': { schema: MessageSchema },
+      },
+      description: 'Event not found',
     },
   },
+  security: [{ ApiKeyAuth: [], BearerToken: [] }],
 })
 
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
-    const logger = createLogger({
-      appContext: 'OPENAPI: put event',
-    })
-    const eventId = c.req.param('id')
+    const ctx = c.get('requestContext')
+    const { id: eventId } = c.req.valid('param')
     const eventData = c.req.valid('json')
-    logger.withMetadata({ eventData }).debug('Updating event')
-    await updateEvent(getConfig(c.env), Number(eventId), eventData)
+
+    // Check if event exists
+    const existingEvent = await getEventById(ctx, eventId)
+    if (!existingEvent) {
+      return c.json({ message: 'Event not found' }, 404)
+    }
+
+    ctx.logger.withMetadata({ eventData }).debug('Updating event')
+    await updateEvent(ctx, eventId, eventData)
     return c.json({ message: 'Event updated successfully' }, 200)
   })
 }

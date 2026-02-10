@@ -65,10 +65,10 @@ export default function EventsList({ loaderData }: Route.ComponentProps) {
         <Center>
           <Button
             component={Link}
-            to="/events/new"
-            size="lg"
             mt="xs"
             rightSection={<IconSquarePlus size={30} />}
+            size="lg"
+            to="/events/new"
           >
             Luo uusi tapahtuma
           </Button>
@@ -87,11 +87,11 @@ export default function EventsList({ loaderData }: Route.ComponentProps) {
       >
         {events.map((x) => {
           return (
-            <ListEventCard key={x.id} event={x} me={user}>
+            <ListEventCard event={x} key={x.id} me={user}>
               <EventButtonContainer
-                participants={x.participants}
-                me={user}
                 eventId={x.id}
+                me={user}
+                participants={x.participants}
               />
             </ListEventCard>
           )

@@ -5,15 +5,15 @@ import { type EventForm, EventFormSchema } from '../event-form-schema'
 describe('eventFormSchema', () => {
   it('should encode event form data correctly', () => {
     const validData: EventForm = {
-      title: 'Test Event',
-      description: null,
       dateStart: ISODateSchema.parse('2024-01-01'),
-      location: 'Test Location',
-      subtitle: 'Test Subtitle',
-      race: false,
-      timeStart: null,
+      description: null,
       eventType: 'MEETING',
       includeEventCreator: false,
+      location: 'Test Location',
+      race: false,
+      subtitle: 'Test Subtitle',
+      timeStart: null,
+      title: 'Test Event',
     }
 
     const encoded = EventFormSchema.encode(validData)
@@ -27,15 +27,15 @@ describe('eventFormSchema', () => {
 
   it('should encode event form data correctly', () => {
     const validData: EventForm = {
-      title: 'Test Event',
-      description: 'Some description',
       dateStart: ISODateSchema.parse('2024-01-01'),
-      location: 'Test Location',
-      subtitle: 'Test Subtitle',
-      race: true,
-      timeStart: ISOTimeSchema.parse('10:30'),
+      description: 'Some description',
       eventType: 'MEETING',
       includeEventCreator: true,
+      location: 'Test Location',
+      race: true,
+      subtitle: 'Test Subtitle',
+      timeStart: ISOTimeSchema.parse('10:30'),
+      title: 'Test Event',
     }
 
     const encoded = EventFormSchema.encode(validData)

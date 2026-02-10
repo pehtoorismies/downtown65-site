@@ -1,53 +1,68 @@
-import { createLogger } from '@downtown65/logger'
-import { APIErrorResponseSchema } from '@downtown65/schema'
-import { createRoute } from '@hono/zod-openapi'
+import { APIErrorResponseSchema, StringIDSchema } from '@downtown65/schema'
+import { createRoute, z } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
-import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
+import { getUserId } from '~/components/users/db/get-user-id'
 import { deleteEvent } from '../db/delete-event'
-import { IDParamSchema } from './api-schema'
+import { getEventById } from '../db/get-event-by-id'
+
+const ParamsSchema = z.object({
+  id: StringIDSchema,
+})
 
 const route = createRoute({
   method: 'delete',
-  path: '/events/{id}',
-  security: [{ ApiKeyAuth: [], BearerToken: [] }],
   middleware: [apiKeyAuth, jwtToken()],
+  path: '/events/{id}',
   request: {
-    params: IDParamSchema,
+    params: ParamsSchema,
   },
   responses: {
     204: {
       description: 'Event deleted successfully',
     },
-    // 401: {
-    //   $ref: '#/components/responses/UnauthorizedError',
-    // },
-    404: {
-      description: 'Event not found',
+    403: {
       content: {
         'application/json': { schema: APIErrorResponseSchema },
       },
+      description: 'Only event creator can delete event',
     },
-    // 422: {
-    //   $ref: '#/components/responses/ValidationError',
-    // },
+    404: {
+      content: {
+        'application/json': { schema: APIErrorResponseSchema },
+      },
+      description: 'Event not found',
+    },
   },
+  security: [{ ApiKeyAuth: [], BearerToken: [] }],
 })
 
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
-    const logger = createLogger({ appContext: 'Route: Delete Event By ID' })
+    const ctx = c.get('requestContext')
     const { id } = c.req.valid('param')
-    logger.info(`Deleting event with ID ${id}`)
+    const jwtPayload = c.var.jwtPayload
 
-    const deleted = await deleteEvent(getConfig(c.env), id)
+    ctx.logger.info(`Deleting event with ID ${id}`)
 
-    logger.info(`Delete successful: ${deleted}`)
-
-    if (!deleted) {
-      return c.json({ message: 'Event not found', code: 404 }, 404)
+    // Check if event exists
+    const existingEvent = await getEventById(ctx, id)
+    if (!existingEvent) {
+      return c.json({ code: 404, message: 'Event not found' }, 404)
     }
+
+    // SECURITY: Only event creator can delete the event
+    const requestingUserId = await getUserId(ctx, jwtPayload.sub)
+    if (!requestingUserId || existingEvent.createdBy.id !== requestingUserId) {
+      return c.json(
+        { code: 403, message: 'Only event creator can delete event' },
+        403,
+      )
+    }
+
+    const deleted = await deleteEvent(ctx, id)
+    ctx.logger.info(`Delete successful: ${deleted}`)
 
     return c.body(null, 204)
   })

@@ -1,4 +1,3 @@
-import { createLogger } from '@downtown65/logger'
 import { EventSchema, type ISOTime } from '@downtown65/schema'
 import { Alert, Button, Center, Title } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
@@ -23,9 +22,9 @@ export const action = async ({
   request,
   params,
 }: Route.ActionArgs) => {
-  const logger = createLogger({
-    appContext: 'Frontend: events.$id.edit action',
-  })
+  const logger = context.logger.child()
+  logger.withContext({ route: 'events.$id.edit action' })
+
   const authContext = context.get(AuthContext)
   if (!authContext) {
     return redirect('/login')
@@ -41,14 +40,14 @@ export const action = async ({
 
   const apiClient = getApiClient(context.cloudflare.env.API_HOST)
   const { error } = await apiClient.PUT('/events/{id}', {
-    params: {
-      path: { id: params.id },
-    },
     body: parsed.data,
     headers: {
-      'Content-Type': 'application/json',
       Authorization: `Bearer ${authContext.accessToken}`,
+      'Content-Type': 'application/json',
       'x-api-key': context.cloudflare.env.API_KEY,
+    },
+    params: {
+      path: { id: params.id },
     },
   })
 
@@ -69,14 +68,14 @@ export async function loader({ context, params }: Route.LoaderArgs) {
 
   const apiClient = getApiClient(context.cloudflare.env.API_HOST)
   const { error, data } = await apiClient.GET('/events/{idOrULID}', {
-    params: {
-      path: { idOrULID: params.id },
-    },
     headers: {
-      'x-api-key': context.cloudflare.env.API_KEY,
       authorization: authContext
         ? `Bearer ${authContext.accessToken}`
         : undefined,
+      'x-api-key': context.cloudflare.env.API_KEY,
+    },
+    params: {
+      path: { idOrULID: params.id },
     },
   })
 
@@ -114,33 +113,33 @@ export default function EditEvent({
   const [opened, handlers] = useDisclosure(false)
   const [eventState, dispatch] = useReducer(reducer, {
     activeStep: ActiveStep.STEP_EVENT_TYPE,
-    eventType: event.eventType,
     date: parse(event.dateStart, 'yyyy-MM-dd', new Date()),
     description: event.description ?? '',
+    eventType: event.eventType,
     isRace: event.race,
+    kind: 'edit',
     location: event.location,
     participants: event.participants || [],
     submitEvent: false,
     subtitle: event.subtitle,
     time: toTimeComponents(event.timeStart),
     title: event.title,
-    kind: 'edit',
   })
 
   return (
     <>
       <CancelModal
-        opened={opened}
-        onClose={handlers.close}
-        title="Keskeytä tapahtuman muokkaus"
         navigationPath={`/events/${event.id}`}
+        onClose={handlers.close}
+        opened={opened}
+        title="Keskeytä tapahtuman muokkaus"
       />
       {actionData?.errorMessage && (
         <Alert
-          icon={<IconAlertCircle size={16} />}
-          title="Virhe muokkauksessa"
           color="red"
+          icon={<IconAlertCircle size={16} />}
           mb="sm"
+          title="Virhe muokkauksessa"
         >
           {actionData?.errorMessage}
         </Alert>
@@ -148,15 +147,15 @@ export default function EditEvent({
       <Title order={1} size="h5">
         Muokkaa tapahtumaa: {eventState.title}
       </Title>
-      <CreateEventContainer state={eventState} dispatch={dispatch} me={me} />
+      <CreateEventContainer dispatch={dispatch} me={me} state={eventState} />
       <ModificationDivider />
       <Center>
         <Button
-          my="md"
           color="red"
-          rightSection={<IconAlertCircle size={18} />}
-          onClick={handlers.open}
           data-testid="cancel-event-editing-button"
+          my="md"
+          onClick={handlers.open}
+          rightSection={<IconAlertCircle size={18} />}
         >
           Keskeytä muokkaus
         </Button>

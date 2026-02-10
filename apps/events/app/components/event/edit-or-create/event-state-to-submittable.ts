@@ -36,11 +36,11 @@ export const toSubmittable = (eventState: EventState) => {
     dateStart: DateToISODateSchema.parse(eventState.date),
     description: eventState.description,
     eventType: eventState.eventType,
-    race: eventState.isRace,
-    location: eventState.location,
     includeEventCreator: eventState.participants.length > 0,
+    location: eventState.location,
+    race: eventState.isRace,
     subtitle: eventState.subtitle,
-    title: eventState.title,
     timeStart: getAsISOTime(eventState.time),
+    title: eventState.title,
   })
 }

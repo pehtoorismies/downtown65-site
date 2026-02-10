@@ -1,0 +1,10 @@
+{
+  "assist": {
+    "includes": ["**", "!**/*.json", "!*.jsonc"]
+  },
+  "extends": "//",
+  "files": {
+    "includes": ["src/**/*.ts", "*.jsonc", "tsconfig*.json"]
+  },
+  "root": false
+}

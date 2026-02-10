@@ -13,3 +13,7 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
     headers,
   })
 }
+
+export default function LogoutAction() {
+  return null
+}

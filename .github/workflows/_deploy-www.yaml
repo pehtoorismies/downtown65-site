@@ -1,0 +1,75 @@
+name: Deploy WWW
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+        description: "Environment (pull-request, staging, production)"
+    outputs:
+      url:
+        description: "The URL of the deployed WWW"
+        value: ${{ jobs.deploy.outputs.url }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+    environment: ${{ inputs.environment == 'pull-request' && 'development' || 'production' }}
+    outputs:
+      url: ${{ steps.set-url.outputs.url }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Project
+        uses: ./.github/actions/setup-project
+
+      - name: Set environment config
+        id: config
+        run: |
+          case "${{ inputs.environment }}" in
+            pull-request)
+              WRANGLER_ENV=staging
+              DEPLOY_CMD="versions upload"
+              ;;
+            staging)
+              WRANGLER_ENV=staging
+              DEPLOY_CMD="versions deploy"
+              ;;
+            production)
+              WRANGLER_ENV=production
+              DEPLOY_CMD="deploy"
+              ;;
+          esac
+
+          echo "wrangler-env=$WRANGLER_ENV" >> $GITHUB_OUTPUT
+          echo "deploy-cmd=$DEPLOY_CMD" >> $GITHUB_OUTPUT
+
+      - name: Set Url
+        id: set-url
+        uses: ./.github/actions/read-wrangler-url
+        with:
+          config-file: apps/www/wrangler.jsonc
+          environment: ${{ steps.config.outputs.wrangler-env }}
+
+      - name: Build WWW
+        working-directory: apps/www
+        run: pnpm run build
+
+      - name: Deploy WWW
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/www
+          environment: ${{ steps.config.outputs.wrangler-env }}
+          command: ${{ steps.config.outputs.deploy-cmd }}
+
+      - name: Deploy Summary
+        run: |
+          echo "### WWW Deployed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "**URL:** ${{ steps.set-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,30 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "dt65-www",
+  "compatibility_date": "2025-04-04",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": true,
+  "assets": {
+    "directory": "./dist"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "env": {
+    "staging": {
+      "name": "dt65-www-staging",
+      "workers_dev": true,
+      "preview_urls": true,
+      "routes": [
+        { "custom_domain": true, "pattern": "www.staging.downtown65.com" }
+      ]
+    },
+    "production": {
+      "name": "dt65-www-production",
+      "workers_dev": false,
+      "preview_urls": false,
+      "routes": [{ "custom_domain": true, "pattern": "www.downtown65.com" }]
+    }
+  }
+}

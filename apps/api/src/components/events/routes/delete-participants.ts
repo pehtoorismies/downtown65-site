@@ -1,44 +1,47 @@
 import { MessageSchema, StringIDSchema } from '@downtown65/schema'
-import { createRoute } from '@hono/zod-openapi'
+import { createRoute, z } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
-import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { leaveEvent } from '../db/leave-event'
-import { IDParamSchema } from './api-schema'
+
+const ParamsSchema = z.object({
+  id: StringIDSchema,
+})
 
 const route = createRoute({
-  method: 'delete',
-  path: '/events/{id}/participants/me',
   description: 'Unregister the authenticated user from the event',
-  security: [{ ApiKeyAuth: [], BearerToken: [] }],
+  method: 'delete',
   middleware: [apiKeyAuth, jwtToken()],
+  path: '/events/{id}/participants/me',
   request: {
-    params: IDParamSchema,
+    params: ParamsSchema,
   },
   responses: {
     200: {
-      description: 'User is unregistered from the event successfully',
       content: {
         'application/json': { schema: MessageSchema },
       },
+      description: 'User is unregistered from the event successfully',
     },
     404: {
-      description: 'Event not found',
       content: {
         'application/json': { schema: MessageSchema },
       },
+      description: 'Event not found',
     },
   },
+  security: [{ ApiKeyAuth: [], BearerToken: [] }],
 })
 
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
-    const eventId = c.req.param('id')
+    const ctx = c.get('requestContext')
+    const { id: eventId } = c.req.valid('param')
     const user = c.get('jwtPayload')
 
-    const result = await leaveEvent(getConfig(c.env), {
-      eventId: StringIDSchema.parse(eventId),
+    const result = await leaveEvent(ctx, {
+      eventId,
       userAuth0Sub: user.sub,
     })
 

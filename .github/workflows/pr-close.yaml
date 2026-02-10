@@ -1,0 +1,45 @@
+name: Cleanup PR Environment
+
+on:
+  pull_request:
+    types: [closed]
+    paths:
+      - "apps/**"
+
+jobs:
+  cleanup-database:
+    if: inputs.app == 'api'
+    runs-on: ubuntu-22.04
+    environment: development
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-project
+
+      - name: Delete API and D1 Database
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/api
+          environment: pull-request
+          preCommands: |
+            pnpm generate:wrangler-config pr ${{ github.event.pull_request.number }} 00000000-0000-0000-0000-000000000000
+            npx wrangler d1 delete pr-${{ github.event.pull_request.number }}-dt65-events -y
+          command: delete -c wrangler.pr.jsonc
+
+  cleanup-deployment:
+    runs-on: ubuntu-22.04
+    environment: development
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-project
+
+      - name: Delete events
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          environment: pull-request
+          workingDirectory: apps/events
+          preCommands: pnpm generate:wrangler-config pr ${{ github.event.pull_request.number }}
+          command: delete -c wrangler.pr.jsonc

@@ -26,10 +26,10 @@ export const middleware = [authMiddleware()]
 
 export function loader({ params }: Route.LoaderArgs) {
   return {
-    picture: 'https://example.com/avatar.jpg',
+    email: 'response.user.email',
     name: 'Nimi Sukunimi',
     nickname: params.nickname,
-    email: 'response.user.email',
+    picture: 'https://example.com/avatar.jpg',
   }
 }
 
@@ -42,8 +42,8 @@ export default function MemberPage() {
         <Breadcrumbs mb="xs">
           <Anchor
             component={Link}
-            to="/members"
             data-testid="breadcrumbs-parent"
+            to="/members"
           >
             Jäsenet
           </Anchor>
@@ -51,28 +51,28 @@ export default function MemberPage() {
         </Breadcrumbs>
       </Container>
       <Container size="xs">
-        <Title ta="center" order={1} mt="sm">
+        <Title mt="sm" order={1} ta="center">
           Jäsenprofiili
         </Title>
         <ProfileBox
-          picture={picture}
+          email={email}
           name={name}
           nickname={nickname}
-          email={email}
+          picture={picture}
         />
-        <Divider my="sm" label="System stats" labelPosition="center" />
+        <Divider label="System stats" labelPosition="center" my="sm" />
         <Text
-          ta="center"
-          fz="sm"
-          fw={500}
-          fs="italic"
           data-testid="member-created-at"
+          fs="italic"
+          fw={500}
+          fz="sm"
+          ta="center"
         >
           {createdAt}
         </Text>
 
         <Center mt="xl">
-          <Anchor component={Link} to="/members" data-testid="to-members-link">
+          <Anchor component={Link} data-testid="to-members-link" to="/members">
             Jäsenet-sivulle &#187;
           </Anchor>
         </Center>
@@ -95,23 +95,23 @@ export const ErrorBoundary = () => {
 
   return (
     <Container py="lg">
-      <Title my="sm" ta="center" size={40}>
+      <Title my="sm" size={40} ta="center">
         {error.status}
       </Title>
       <Image
+        alt="Anonymous holding fire"
         radius="md"
         src={notFoundProfileImage}
-        alt="Anonymous holding fire"
       />
       <Text ta="center"> {error.statusText}</Text>
       <Button
         component={Link}
+        data-testid="to-members-button"
+        leftSection={<IconArrowNarrowLeft size={18} />}
+        mt="xl"
+        size="md"
         to="/members"
         variant="outline"
-        size="md"
-        mt="xl"
-        leftSection={<IconArrowNarrowLeft size={18} />}
-        data-testid="to-members-button"
       >
         Jäsensivulle
       </Button>

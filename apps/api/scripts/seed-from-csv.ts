@@ -18,14 +18,44 @@ const DynamoISODateTime = z.object({
 
 export const DynamoEventSchema = z
   .object({
-    eventId: z.ulid(),
+    _ct: z.iso.datetime(),
+    _md: z.iso.datetime(),
+    createdBy: z.preprocess(
+      (val) => JSON.parse(val as string),
+      z
+        .object({
+          id: DynamoString,
+          nickname: DynamoString,
+          picture: DynamoString,
+        })
+        .transform((obj) => ({
+          id: obj.id.S,
+          nickname: obj.nickname.S,
+          picture: obj.picture.S,
+        })),
+    ),
     dateStart: ISODateSchema,
     description: z.union([z.literal(''), z.string()]).transform((val) => {
       if (val === '') return null
       return val
     }),
-    race: z.stringbool(),
+    eventId: z.ulid(),
     location: z.string(),
+    participants: z.preprocess(
+      (val) => JSON.parse(val as string),
+      z.record(
+        z.string(),
+        z.object({
+          M: z.object({
+            id: DynamoString,
+            joinedAt: DynamoISODateTime,
+            nickname: DynamoString,
+            picture: DynamoUrl,
+          }),
+        }),
+      ),
+    ),
+    race: z.stringbool(),
     subtitle: z.string(),
     timeStart: z.union([z.literal(''), ISOTimeSchema]).transform((val) => {
       if (val === '') return null
@@ -33,36 +63,6 @@ export const DynamoEventSchema = z
     }),
     title: z.string().trim().min(1),
     type: EventTypeEnum,
-    _ct: z.iso.datetime(),
-    _md: z.iso.datetime(),
-    participants: z.preprocess(
-      (val) => JSON.parse(val as string),
-      z.record(
-        z.string(),
-        z.object({
-          M: z.object({
-            nickname: DynamoString,
-            picture: DynamoUrl,
-            id: DynamoString,
-            joinedAt: DynamoISODateTime,
-          }),
-        }),
-      ),
-    ),
-    createdBy: z.preprocess(
-      (val) => JSON.parse(val as string),
-      z
-        .object({
-          nickname: DynamoString,
-          picture: DynamoString,
-          id: DynamoString,
-        })
-        .transform((obj) => ({
-          nickname: obj.nickname.S,
-          picture: obj.picture.S,
-          id: obj.id.S,
-        })),
-    ),
   })
   .transform((obj) => {
     const { _ct, _md, ...rest } = obj
@@ -100,16 +100,16 @@ const readUsers = (fileName: string) => {
       try {
         return z
           .object({
+            'Created At': z.iso.datetime(),
+            Id: z.string(),
             Nickname: z.string(),
             Picture: z.string(),
-            Id: z.string(),
-            'Created At': z.iso.datetime(),
           })
           .transform((obj) => ({
-            nickname: obj.Nickname,
-            picture: obj.Picture,
             auth0Sub: obj.Id,
             createdAt: obj['Created At'],
+            nickname: obj.Nickname,
+            picture: obj.Picture,
           }))
           .parse(JSON.parse(line))
       } catch {

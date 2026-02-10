@@ -40,30 +40,30 @@ export const ListEventCard = ({
   return (
     <Voucher>
       <EventHeader
-        title={title}
+        count={count}
+        creatorNickname={createdBy.nickname}
         eventText={eventText}
         imageUrl={imageUrl}
-        creatorNickname={createdBy.nickname}
-        count={count}
         meAttending={meAttending}
         race={race}
+        title={title}
       />
       <Voucher.Content>
         <EventDetails
+          dateStart={dateStart}
           location={location}
           subtitle={subtitle}
-          dateStart={dateStart}
           timeStart={timeStart}
         >
           {children}
         </EventDetails>
         <Button
           component={Link}
-          to={`/events/${id}`}
           fullWidth
           my="xs"
-          size="compact-sm"
           rightSection={<IconArrowNarrowRight size={18} />}
+          size="compact-sm"
+          to={`/events/${id}`}
           variant="subtle"
         >
           {VIEW_MORE_TEXT}

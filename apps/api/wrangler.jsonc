@@ -6,49 +6,57 @@
   "compatibility_flags": ["nodejs_compat"],
   "preview_urls": false,
   "workers_dev": false,
+  "observability": { "enabled": true },
   "env": {
-    // CI/CD environments
-    "pull-request": {
-      "name": "dt65-api-pr-$PR_NUMBER",
-      "routes": [
-        {
-          "pattern": "api-pr-$PR_NUMBER.downtown65.com",
-          "custom_domain": true
-        }
-      ],
-      "observability": {
-        "enabled": true
-      },
+    "unit-test": {
+      "name": "dt65-api-unit-test",
       "vars": {
         "AUTH_CLIENT_ID": "JaoAht7ggce7f5R8DCBGUyjUJeMQEDtz",
         "AUTH_DOMAIN": "dev-dt65.eu.auth0.com",
-        "AUTH_AUDIENCE": "https://graphql-dev.downtown65.com"
+        "AUTH_AUDIENCE": "https://graphql-dev.downtown65.com",
+        "LOG_LEVEL": "silent"
       },
       "d1_databases": [
         {
           "binding": "D1_DB",
-          "database_name": "pr-$PR_NUMBER-dt65-events",
-          "database_id": "$PR_DATABASE_ID",
+          "database_name": "unit-test",
+          "database_id": "00000000-0000-0000-0000-000000000000",
           "migrations_dir": "drizzle_flat"
         }
       ]
     },
-    // Production and staging environments
+    "pull-request": {
+      "name": "dt65-api-pr-$PR_NUMBER",
+      "preview_urls": false,
+      "workers_dev": false,
+      "routes": [
+        { "custom_domain": true, "pattern": "api-pr-$PR_NUMBER.downtown65.com" }
+      ],
+      "d1_databases": [
+        {
+          "binding": "D1_DB",
+          "database_id": "$PR_DATABASE_ID",
+          "database_name": "pr-$PR_NUMBER-dt65-events",
+          "migrations_dir": "drizzle_flat"
+        }
+      ],
+      "vars": {
+        "AUTH_AUDIENCE": "https://graphql-dev.downtown65.com",
+        "AUTH_CLIENT_ID": "JaoAht7ggce7f5R8DCBGUyjUJeMQEDtz",
+        "AUTH_DOMAIN": "dev-dt65.eu.auth0.com",
+        "LOG_LEVEL": "info"
+      }
+    },
     "staging": {
       "name": "dt65-api-staging",
       "routes": [
-        {
-          "pattern": "api-staging.downtown65.com",
-          "custom_domain": true
-        }
+        { "pattern": "api-staging.downtown65.com", "custom_domain": true }
       ],
       "vars": {
         "AUTH_CLIENT_ID": "uPu5NUyP1yaGw2IAC0B1KeCgbX3FaNzz",
         "AUTH_DOMAIN": "prod-dt65.eu.auth0.com",
-        "AUTH_AUDIENCE": "https://graphql-api.downtown65.com/"
-      },
-      "observability": {
-        "enabled": true
+        "AUTH_AUDIENCE": "https://graphql-api.downtown65.com/",
+        "LOG_LEVEL": "warning"
       },
       "d1_databases": [
         {
@@ -61,19 +69,12 @@
     },
     "production": {
       "name": "dt65-api-production",
-      "routes": [
-        {
-          "pattern": "api.downtown65.com",
-          "custom_domain": true
-        }
-      ],
+      "routes": [{ "pattern": "api.downtown65.com", "custom_domain": true }],
       "vars": {
         "AUTH_CLIENT_ID": "uPu5NUyP1yaGw2IAC0B1KeCgbX3FaNzz",
         "AUTH_DOMAIN": "prod-dt65.eu.auth0.com",
-        "AUTH_AUDIENCE": "https://graphql-api.downtown65.com/"
-      },
-      "observability": {
-        "enabled": true
+        "AUTH_AUDIENCE": "https://graphql-api.downtown65.com/",
+        "LOG_LEVEL": "info"
       },
       "d1_databases": [
         {

@@ -10,9 +10,13 @@
 # Cloudflare
 .mf
 .wrangler
-.dev.vars*
+.dev.vars
 worker-configuration.d.ts
 
 .dev.vars
 
 .generated/
+wrangler.pr.jsonc
+.env.e2e
+test-results/
+wrangler.local.jsonc

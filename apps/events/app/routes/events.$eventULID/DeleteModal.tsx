@@ -34,48 +34,48 @@ export const DeleteModal = ({
 
   return (
     <Modal
-      zIndex={2000}
-      opened={opened}
-      onClose={onCloseModal}
-      title="Tapahtuman poisto"
       closeButtonProps={{ 'aria-label': 'Close' }}
+      onClose={onCloseModal}
+      opened={opened}
+      title="Tapahtuman poisto"
+      zIndex={2000}
     >
       <LoadingOverlay
         visible={navigation.state === 'submitting'}
         // TODO: below
         //transitionDuration={200}
       />
-      <Typography my="sm" data-testid="delete-confirmation-modal-content">
+      <Typography data-testid="delete-confirmation-modal-content" my="sm">
         <p>
           Varmista tapahtuman <strong>{eventTitle}</strong> poisto. Kirjoita
           allaolevaan kenttään <i>poista</i> ja klikkaa Poista.
         </p>
       </Typography>
       <Form method="delete">
-        <TextInput type="hidden" name="eventId" value={eventId} />
+        <TextInput name="eventId" type="hidden" value={eventId} />
         <TextInput
-          placeholder="poista"
           label="Kirjoita 'poista'"
-          value={formValue}
           onChange={handleChange}
+          placeholder="poista"
+          value={formValue}
         />
         <Text mt="sm">
           Voit peruuttaa poiston sulkemalla dialogin tai klikkaamalla Peruuta.
         </Text>
         <Group justify="space-between" mt="lg">
           <Button
-            onClick={onCloseModal}
-            leftSection={<IconCircleX size={18} />}
             data-testid="modal-close"
+            leftSection={<IconCircleX size={18} />}
+            onClick={onCloseModal}
           >
             Peruuta
           </Button>
           <Button
-            type="submit"
             color="red"
+            data-testid="confirm-delete"
             disabled={formValue !== 'poista'}
             rightSection={<IconCircleOff size={18} />}
-            data-testid="confirm-delete"
+            type="submit"
           >
             Poista
           </Button>

@@ -1,13 +1,13 @@
+import type { RequestContext } from '~/app-api'
 import { getManagementClient } from '~/common/auth0/client'
-import type { Config } from '~/common/config/config'
 import { getDb } from '~/db/get-db'
 import { users } from '~/db/schema'
 import { getUserId } from './get-user-id'
 import { Auth0UserSchema } from './support/auth0-schema'
 import { QUERY_USER_RETURNED_FIELDS } from './support/query-user-returned-fields'
 
-export const getUser = async (config: Config, auth0Sub: string) => {
-  const management = await getManagementClient(config)
+export const getUser = async (ctx: RequestContext, auth0Sub: string) => {
+  const management = await getManagementClient(ctx.authConfig)
 
   const user = await management.users.get(auth0Sub, {
     fields: QUERY_USER_RETURNED_FIELDS,
@@ -19,7 +19,7 @@ export const getUser = async (config: Config, auth0Sub: string) => {
 
   const auth0User = Auth0UserSchema.parse(user)
 
-  const userId = await getUserId(config, auth0User.auth0Sub)
+  const userId = await getUserId(ctx, auth0User.auth0Sub)
 
   if (userId != null) {
     return {
@@ -28,7 +28,7 @@ export const getUser = async (config: Config, auth0Sub: string) => {
     }
   }
 
-  const db = getDb(config.D1_DB)
+  const db = getDb(ctx.db)
   const inserted = await db
     .insert(users)
     .values({

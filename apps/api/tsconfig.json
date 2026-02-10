@@ -1,19 +1,19 @@
 {
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.node.json" },
+    { "path": "./tsconfig.test.json" }
+  ],
   "compilerOptions": {
+    "strict": true,
     "target": "esnext",
     "lib": ["esnext"],
     "module": "esnext",
     "moduleResolution": "bundler",
-    "skipLibCheck": true,
-    "types": [
-      "./worker-configuration.d.ts",
-      "@cloudflare/vitest-pool-workers"
-    ],
     "noEmit": true,
-    "strict": true,
+    "skipLibCheck": true,
     "paths": {
       "~/*": ["./src/*"]
     }
-  },
-  "include": ["src", "scripts"]
+  }
 }

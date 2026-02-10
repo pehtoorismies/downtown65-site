@@ -1,42 +1,40 @@
-import { createLogger } from '@downtown65/logger'
 import { PaginationQuerySchema } from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
 import z from 'zod'
 import type { AppAPI } from '~/app-api'
-import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { listUsers } from '../db/list-users'
 import { UserAPIResponseSchema } from './api-schema'
 
 const route = createRoute({
-  method: 'get',
-  path: '/users',
   description: 'Get all users',
-  security: [{ ApiKeyAuth: [], BearerToken: [] }],
+  method: 'get',
   middleware: [apiKeyAuth, jwtToken()],
+  path: '/users',
   request: {
     query: PaginationQuerySchema,
   },
   responses: {
     200: {
-      description: 'List of all users',
       content: {
         'application/json': {
           schema: z.object({
-            users: z.array(UserAPIResponseSchema.omit({ id: true })),
-            total: z.number(),
-            start: z.number(),
-            limit: z.number(),
             length: z.number(),
+            limit: z.number(),
+            start: z.number(),
+            total: z.number(),
+            users: z.array(UserAPIResponseSchema.omit({ id: true })),
           }),
         },
       },
+      description: 'List of all users',
     },
     // 401: {
     //   $ref: '#/components/responses/UnauthorizedError',
     // },
   },
+  security: [{ ApiKeyAuth: [], BearerToken: [] }],
 })
 
 const toValidPage = (page: string | undefined | null) => {
@@ -55,17 +53,17 @@ const toValidLimit = (limit: string | undefined | null) => {
 
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
-    const logger = createLogger({ appContext: 'Route: Get Users' })
+    const ctx = c.get('requestContext')
 
     const { page, limit } = c.req.valid('query')
 
-    logger
-      .withMetadata({ data: { page, limit } })
+    ctx.logger
+      .withMetadata({ data: { limit, page } })
       .debug('Handling request to get users')
 
-    const paginatedUsers = await listUsers(getConfig(c.env), {
-      page: toValidPage(page),
+    const paginatedUsers = await listUsers(ctx, {
       limit: toValidLimit(limit),
+      page: toValidPage(page),
     })
 
     return c.json(paginatedUsers, 200)

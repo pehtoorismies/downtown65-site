@@ -7,15 +7,15 @@ import { NextButton, PreviousButton, StepLayout } from './LayoutSteps'
 
 export const StepDescription = ({ state, dispatch }: ReducerProps) => {
   const editor = useEditor({
-    extensions: [StarterKit],
-    content: state.description,
     autofocus: true,
+    content: state.description,
     editable: true,
+    extensions: [StarterKit],
     onUpdate: ({ editor }) => {
       const description = editor.getHTML()
       dispatch({
-        kind: 'description',
         description,
+        kind: 'description',
       })
     },
   })
@@ -33,9 +33,9 @@ export const StepDescription = ({ state, dispatch }: ReducerProps) => {
 
   return (
     <StepLayout
-      title="Vapaa kuvaus"
-      prevButton={previousButton}
       nextButton={nextButton}
+      prevButton={previousButton}
+      title="Vapaa kuvaus"
     >
       <Box style={{ minHeight: '300px' }}>
         <RichTextEditor editor={editor} id="rte">

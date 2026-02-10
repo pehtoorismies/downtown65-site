@@ -1,0 +1,36 @@
+{
+  "assist": {
+    "includes": ["**", "!**/*.json", "!*.jsonc", "!tailwind.config.ts"]
+  },
+  "extends": "//",
+  "files": {
+    "includes": [
+      "src/**/*.ts",
+      "src/**/*.css",
+      "*.jsonc",
+      "tsconfig*.json",
+      "src/**/*.astro",
+      "*.ts",
+      "*.mjs"
+    ]
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "linter": {
+    "includes": ["**/*.astro"],
+    "rules": {
+      "correctness": {
+        "noUnusedImports": "off",
+        "noUnusedVariables": "off"
+      },
+      "style": {
+        "useConst": "off",
+        "useImportType": "off"
+      }
+    }
+  },
+  "root": false
+}

@@ -54,10 +54,10 @@ const Type = ({ children }: TextContentProps) => {
   return (
     <Badge
       className={classes.type}
-      styles={{ label: { textTransform: 'none' } }}
-      radius="xs"
       color="violet"
       data-testid="event-type"
+      radius="xs"
+      styles={{ label: { textTransform: 'none' } }}
     >
       {children}
     </Badge>
@@ -69,11 +69,11 @@ const Creator = ({ children }: TextContentProps) => {
   return (
     <Badge
       className={classes.areaCreator}
-      styles={{ label: { textTransform: 'none' } }}
-      radius="xs"
       color="dark.2"
-      variant="filled"
       data-testid="event-created-by"
+      radius="xs"
+      styles={{ label: { textTransform: 'none' } }}
+      variant="filled"
     >
       by #{children}
     </Badge>
@@ -84,11 +84,11 @@ Creator.displayName = 'VoucherCreator'
 const Icon = ({ icon }: IconProps) => {
   return (
     <ThemeIcon
-      data-testid="event-race"
       className={classes.areaCompetition}
+      color="grape"
+      data-testid="event-race"
       radius="xs"
       variant="filled"
-      color="grape"
     >
       {icon}
     </ThemeIcon>
@@ -99,18 +99,18 @@ Icon.displayName = 'VoucherIcon'
 const ParticipantCount = ({ count, highlighted }: ParticipantCountProps) => {
   return (
     <Badge
+      className={classes.areaParticipantCount}
       data-testid="event-participant-count"
-      m={0}
-      size="lg"
+      gradient={Gradient.dtPink}
       leftSection={
         <Center>
           <IconUsers size={16} />
         </Center>
       }
+      m={0}
       radius="xs"
+      size="lg"
       variant={highlighted ? 'gradient' : 'filled'}
-      gradient={Gradient.dtPink}
-      className={classes.areaParticipantCount}
     >
       {count}
     </Badge>

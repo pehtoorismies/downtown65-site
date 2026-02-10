@@ -7,6 +7,7 @@ This is a **pnpm monorepo** with a Cloudflare Workers backend and React Router f
 **Structure:**
 - `apps/backend/` - Hono API with OpenAPI, Drizzle ORM (D1), Auth0 JWT, running on Cloudflare Workers
 - `apps/frontend/` - React Router 7 with Mantine UI, SSR via Cloudflare Pages
+- `apps/www/` - Astro static site generator for Sportsteam home page
 - `packages/schema/` - Shared Zod schemas with `.openapi()` extensions for type-safe API contracts
 - `packages/logger/` - Shared logging utility
 
