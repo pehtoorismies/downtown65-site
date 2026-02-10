@@ -41,7 +41,12 @@ app.use('*', async (c, next) => {
 
   if (!configResult.success) {
     console.error('Invalid configuration:', configResult.error.issues)
-    throw new Error('Invalid configuration')
+    return c.json(
+      {
+        message: 'Configuration is invalid. Please see logs for details.',
+      },
+      500,
+    )
   }
   const config = configResult.data
 
