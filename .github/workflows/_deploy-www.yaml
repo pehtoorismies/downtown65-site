@@ -35,7 +35,7 @@ jobs:
               ;;
             staging)
               WRANGLER_ENV=staging
-              DEPLOY_CMD="versions deploy"
+              DEPLOY_CMD="deploy"
               ;;
             production)
               WRANGLER_ENV=production
