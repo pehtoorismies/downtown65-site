@@ -10,8 +10,8 @@ export const jwtToken =
   async (c: Context<{ Bindings: Env }>, next: Next) => {
     const { allowAnon = false } = options
     const middleware = jwk({
-      jwks_uri: (c) => `https://${c.env.AUTH_DOMAIN}/.well-known/jwks.json`,
       allow_anon: allowAnon,
+      jwks_uri: (c) => `https://${c.env.AUTH_DOMAIN}/.well-known/jwks.json`,
     })
     return middleware(c, next)
   }

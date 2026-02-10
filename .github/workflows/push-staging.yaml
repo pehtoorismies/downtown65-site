@@ -1,0 +1,30 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [staging]
+    paths:
+      - "apps/**"
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+jobs:
+  deploy-api:
+    uses: ./.github/workflows/_deploy-api.yaml
+    with:
+      environment: staging
+    secrets: inherit
+
+  deploy-events:
+    uses: ./.github/workflows/_deploy-events.yaml
+    with:
+      environment: staging
+    secrets: inherit
+
+  deploy-www:
+    uses: ./.github/workflows/_deploy-www.yaml
+    with:
+      environment: staging
+    secrets: inherit

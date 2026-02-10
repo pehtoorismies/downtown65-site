@@ -1,7 +1,11 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "entry": ["src/server.ts"],
-  "project": ["src/**/*.ts"],
   "ignore": ["**/*.test.ts", "**/*.spec.ts", "**/*.d.ts", "src/common/test/**"],
-  "ignoreDependencies": ["@downtown65/schema", "@downtown65/logger"]
+  "ignoreDependencies": [
+    "@downtown65/logger",
+    "@downtown65/schema",
+    "@downtown65/wrangler-config"
+  ],
+  "project": ["src/**/*.ts", "scripts/**/*.ts"]
 }

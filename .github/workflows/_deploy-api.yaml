@@ -1,0 +1,129 @@
+name: Deploy API
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+        description: "Environment (pull-request, staging, production)"
+      pr-number:
+        required: false
+        type: number
+        description: "PR number (required for pull-request environment)"
+    outputs:
+      url:
+        description: "The URL of the deployed API"
+        value: ${{ jobs.deploy.outputs.url }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+    environment: ${{ inputs.environment == 'pull-request' && 'development' || 'production' }}
+    outputs:
+      url: ${{ steps.set-url.outputs.url }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Project
+        uses: ./.github/actions/setup-project
+
+      - name: Set environment config
+        id: config
+        run: |
+          case "${{ inputs.environment }}" in
+            pull-request)
+              DB_NAME=pr-${{ inputs.pr-number }}-dt65-events
+              CONFIG_FILE=wrangler.pr.jsonc
+              ;;
+            staging)
+              DB_NAME=staging-dt65-events
+              CONFIG_FILE=wrangler.jsonc
+              ;;
+            production)
+              DB_NAME=production-dt65-events
+              CONFIG_FILE=wrangler.jsonc
+              ;;
+          esac
+
+          echo "database-name=$DB_NAME" >> $GITHUB_OUTPUT
+          echo "config-file=$CONFIG_FILE" >> $GITHUB_OUTPUT
+          echo "wrangler-env=${{ inputs.environment }}" >> $GITHUB_OUTPUT
+
+      - name: Setup D1 Database
+        if: inputs.environment == 'pull-request'
+        id: db-setup
+        uses: ./.github/actions/setup-d1-database
+        with:
+          database-name: ${{ steps.config.outputs.database-name }}
+          cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Generate Wrangler Config
+        if: inputs.environment == 'pull-request'
+        working-directory: apps/api
+        run: |
+          pnpm generate:wrangler-config pr ${{ inputs.pr-number }} ${{ steps.db-setup.outputs.database-id }}
+          echo "Generated ${{ steps.config.outputs.config-file }}:"
+          cat ${{ steps.config.outputs.config-file }}
+
+      - name: Run Migrations
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/api
+          environment: ${{ steps.config.outputs.wrangler-env }}
+          preCommands: ./scripts/drizzle_flatten.sh
+          command: d1 migrations apply ${{ steps.config.outputs.database-name }} --remote --config ${{ steps.config.outputs.config-file }}
+
+      - name: Deploy and Set Secrets
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/api
+          environment: ${{ steps.config.outputs.wrangler-env }}
+          preCommands: |
+            echo "Setting secrets"
+            echo "API_KEY=${{ secrets.DT65_API_KEY }}" > .secrets
+            echo "AUTH_CLIENT_SECRET=${{ secrets.BACKEND_AUTH_CLIENT_SECRET }}" >> .secrets
+            echo "REGISTER_SECRET=${{ secrets.BACKEND_REGISTER_SECRET }}" >> .secrets
+            npx wrangler secret bulk .secrets --env ${{ steps.config.outputs.wrangler-env }} --config ${{ steps.config.outputs.config-file }}
+          command: deploy --config ${{ steps.config.outputs.config-file }}
+
+      - name: Set Url
+        id: set-url
+        uses: ./.github/actions/read-wrangler-url
+        with:
+          config-file: apps/api/${{ steps.config.outputs.config-file }}
+          environment: ${{ inputs.environment }}
+
+      - name: Health Check
+        run: |
+          echo "Waiting for API to be ready..."
+          for i in $(seq 1 10); do
+            if curl -sf "${{ steps.set-url.outputs.url }}/healthz" > /dev/null; then
+              echo "API is ready!"
+              exit 0
+            fi
+            echo "Attempt $i/10 - waiting..."
+            sleep 2
+          done
+          echo "API failed health check"
+          exit 1
+
+      - name: Sync Users
+        run: |
+          curl -X POST "${{ steps.set-url.outputs.url }}/sync/users" \
+            -H "x-api-key: ${{ secrets.DT65_API_KEY }}"
+
+      - name: Summary
+        run: |
+          echo "### API Deployed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** ${{ steps.config.outputs.wrangler-env }}" >> $GITHUB_STEP_SUMMARY
+          echo "API URL: ${{ steps.set-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "[Open API](${{ steps.set-url.outputs.url }})" >> $GITHUB_STEP_SUMMARY

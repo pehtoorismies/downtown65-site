@@ -21,7 +21,7 @@ export const EventButtonContainer = (props: EventButtonProps) => {
       props.dispatch({ kind: 'leaveEvent', me: props.me })
     }
     return (
-      <LeaveEventButton {...props} onClick={leaveEvent} isLoading={false} />
+      <LeaveEventButton {...props} isLoading={false} onClick={leaveEvent} />
     )
   }
 
@@ -29,5 +29,5 @@ export const EventButtonContainer = (props: EventButtonProps) => {
     props.dispatch({ kind: 'joinEvent', me: props.me })
   }
 
-  return <JoinEventButton {...props} onClick={joinEvent} isLoading={false} />
+  return <JoinEventButton {...props} isLoading={false} onClick={joinEvent} />
 }

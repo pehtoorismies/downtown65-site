@@ -1,6 +1,12 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["vite.config.ts", "vitetest.config.ts"],
+  "include": [
+    "vite.config.ts",
+    "vitetest.config.ts",
+    "playwright.config.ts",
+    "e2e"
+  ],
+
   "compilerOptions": {
     "composite": true,
     "strict": true,

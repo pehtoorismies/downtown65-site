@@ -8,11 +8,11 @@ export const UserUpdateParamsSchema = z
       .httpUrl()
       .optional()
       .openapi({ example: 'https://example.com/avatar.jpg' }),
-    subscribeWeeklyEmail: z.boolean().optional().openapi({ example: true }),
     subscribeEventCreationEmail: z
       .boolean()
       .optional()
       .openapi({ example: false }),
+    subscribeWeeklyEmail: z.boolean().optional().openapi({ example: true }),
   })
   .refine((value) => Object.keys(value).length > 0, {
     message: 'At least one field must be provided to update user.',

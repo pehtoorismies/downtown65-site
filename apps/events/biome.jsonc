@@ -1,0 +1,39 @@
+{
+  "extends": "//",
+  "root": false,
+  "files": {
+    "includes": [
+      "app/**/*.ts",
+      "app/**/*.tsx",
+      "*.jsonc",
+      "tsconfig*.json",
+      "scripts/**/*.ts",
+      "*.ts",
+      "app/**/*.css",
+      "workers/**/*.ts",
+      "e2e"
+    ]
+  },
+  "assist": {
+    "includes": ["**", "!*.json", "!*.jsonc", "!worker-configuration.d.ts"]
+  },
+  "overrides": [
+    {
+      "includes": ["app/**/*.css"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noUnknownAtRules": "off",
+            "noDuplicateProperties": "off"
+          }
+        }
+      }
+    }
+  ],
+  "formatter": {
+    "includes": ["**", "!worker-configuration.d.ts"]
+  },
+  "linter": {
+    "includes": ["**", "!worker-configuration.d.ts"]
+  }
+}

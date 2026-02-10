@@ -10,7 +10,6 @@ import {
 import { Link, redirect, useNavigate } from 'react-router'
 import { getApiClient } from '~/api/api-client'
 import { AuthContext } from '~/context/context'
-import { createLogger } from '~/logger/logger.server'
 import { authMiddleware } from '~/middleware/auth-middleware'
 import type { Route } from './+types/route'
 
@@ -28,7 +27,9 @@ const toPage = (page: string | undefined | null) => {
 }
 
 export async function loader({ request, context }: Route.LoaderArgs) {
-  const logger = createLogger({ appContext: 'Frontend: Members Index' })
+  const logger = context.logger.child()
+  logger.withContext({ route: 'members index' })
+
   const authContext = context.get(AuthContext)
   if (!authContext) {
     return redirect('/login')
@@ -40,29 +41,29 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   const { user, accessToken } = authContext
   const apiClient = getApiClient(context.cloudflare.env.API_HOST)
   const { data, error } = await apiClient.GET('/users', {
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      'x-api-key': context.cloudflare.env.API_KEY,
+    },
     params: {
       query: {
-        page,
         limit: '30',
+        page,
       },
-    },
-    headers: {
-      'x-api-key': context.cloudflare.env.API_KEY,
-      authorization: `Bearer ${accessToken}`,
     },
   })
 
   if (error) {
     logger.withError(error).error('Failed to load users list')
     return {
-      user,
-      users: [],
-      userCount: 0,
-      numPages: 0,
       currentPage: 0,
+      numPages: 0,
       perPage: 0,
-      usersOnPage: 0,
       start: 0,
+      user,
+      userCount: 0,
+      users: [],
+      usersOnPage: 0,
     }
   }
 
@@ -76,14 +77,14 @@ export async function loader({ request, context }: Route.LoaderArgs) {
     .withMetadata({ data: { ...data, users: undefined } })
     .debug('Loaded users list')
   return {
-    user,
-    users,
-    userCount: total,
-    numPages: numberPages,
     currentPage,
+    numPages: numberPages,
     perPage: limit,
-    usersOnPage: length,
     start,
+    user,
+    userCount: total,
+    users,
+    usersOnPage: length,
   }
 }
 
@@ -106,8 +107,8 @@ export default function Users({ loaderData }: Route.ComponentProps) {
       <Table.Td>
         <Anchor
           component={Link}
-          to={`/members/${u.nickname}`}
           data-testid={`member-nick-${index}`}
+          to={`/members/${u.nickname}`}
         >
           {u.nickname}
         </Anchor>
@@ -130,23 +131,23 @@ export default function Users({ loaderData }: Route.ComponentProps) {
         </Text>
         {hasPagination && (
           <Pagination
-            withControls={false}
-            total={numPages}
-            value={currentPage}
             my="md"
             onChange={(page) => {
               navigate(`?page=${page}`)
             }}
+            total={numPages}
+            value={currentPage}
+            withControls={false}
           />
         )}
         <Table
-          striped
-          withRowBorders
           highlightOnHover
-          withTableBorder
-          withColumnBorders
           horizontalSpacing="sm"
+          striped
           verticalSpacing="sm"
+          withColumnBorders
+          withRowBorders
+          withTableBorder
         >
           <Table.Thead>
             <Table.Tr>
@@ -158,13 +159,13 @@ export default function Users({ loaderData }: Route.ComponentProps) {
         </Table>
         {hasPagination && (
           <Pagination
-            withControls={false}
-            total={numPages}
-            value={currentPage}
             my="md"
             onChange={(page) => {
               navigate(`?page=${page}`)
             }}
+            total={numPages}
+            value={currentPage}
+            withControls={false}
           />
         )}
         <Text c="dimmed" fw={500} my="sm">

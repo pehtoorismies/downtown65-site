@@ -19,7 +19,7 @@ export const middleware = [redirectAuthenticatedMiddleware]
 export default function ForgotPassword() {
   return (
     <>
-      <Title ta="center" fw={900}>
+      <Title fw={900} ta="center">
         Salasana unohtunut?
       </Title>
       <Text c="dimmed" size="sm" ta="center">
@@ -27,21 +27,21 @@ export default function ForgotPassword() {
         resetoimiseksi.
       </Text>
 
-      <Paper withBorder shadow="md" p={30} radius="md" mt="xl">
+      <Paper mt="xl" p={30} radius="md" shadow="md" withBorder>
         <Form method="post">
           <TextInput
-            name="email"
-            type="email"
             label="Sähköpostiosoitteesi"
+            name="email"
             placeholder="me@downtown65.com"
             required
+            type="email"
           />
           <Group justify="space-between" mt="lg">
             <Anchor
               component={Link}
-              to="/login"
-              size="sm"
               data-testid="to-login"
+              size="sm"
+              to="/login"
             >
               <Center inline>
                 <IconArrowLeft size={12} stroke={1.5} />

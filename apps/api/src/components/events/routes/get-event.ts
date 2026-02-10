@@ -1,78 +1,64 @@
-import { createLogger } from '@downtown65/logger'
 import {
   EventSchema,
-  IDSchema,
   MessageSchema,
+  StringIDSchema,
   ULIDSchema,
 } from '@downtown65/schema'
-import { createRoute } from '@hono/zod-openapi'
-import { z } from 'zod'
+import { createRoute, z } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
-import { type Config, getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { getEventById } from '../db/get-event-by-id'
 import { getEventByULID } from '../db/get-event-by-ULID'
 
-const IDOrULIDSchema = z.object({
-  idOrULID: z
-    .string()
-    .regex(
-      /^(?:\d+|[0-9A-HJKMNP-TV-Z]{26})$/i,
-      'Must be positive integer or ULID',
-    )
-    .openapi({ param: { name: 'idOrULID', in: 'path' }, example: '123' }),
+const IdOrULIDSchema = z.union([StringIDSchema, ULIDSchema])
+
+const ParamsSchema = z.object({
+  idOrULID: IdOrULIDSchema,
 })
 
 const route = createRoute({
   method: 'get',
-  path: '/events/{idOrULID}',
-  security: [{ ApiKeyAuth: [] }],
   middleware: [apiKeyAuth, jwtToken({ allowAnon: true })],
+  path: '/events/{idOrULID}',
   request: {
-    params: IDOrULIDSchema,
+    params: ParamsSchema,
   },
   responses: {
     200: {
-      description: 'Event found',
       content: {
         'application/json': { schema: EventSchema },
       },
+      description: 'Retrieve the event',
     },
     404: {
-      description: 'Event not found',
       content: {
         'application/json': { schema: MessageSchema },
       },
+      description: 'Event not found',
     },
   },
+  security: [{ ApiKeyAuth: [] }],
 })
-
-const getEvent = (idOrULID: string, config: Config) => {
-  if (/^\d+$/.test(idOrULID)) {
-    return getEventById(config, IDSchema.decode(Number(idOrULID)))
-  } else {
-    return getEventByULID(config, ULIDSchema.decode(idOrULID))
-  }
-}
 
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
-    const logger = createLogger({
-      appContext: 'OPENAPI Route: Get Event By ID or ULID',
-    })
+    const ctx = c.get('requestContext')
 
-    const idOrULID = c.req.param('idOrULID')
-    logger.info(`Fetching event by idOrULID ${idOrULID}`)
+    const { idOrULID } = c.req.valid('param')
+    ctx.logger.info(`Fetching event by idOrULID ${idOrULID}`)
 
-    const event = await getEvent(idOrULID, getConfig(c.env))
+    const event =
+      typeof idOrULID === 'number'
+        ? await getEventById(ctx, idOrULID)
+        : await getEventByULID(ctx, idOrULID)
 
-    logger.withMetadata({ event }).debug('Fetched event')
+    ctx.logger.withMetadata({ event }).debug('Fetched event')
 
     if (!event) {
       return c.json({ message: `Event with id ${idOrULID} not found` }, 404)
+    } else {
+      return c.json(EventSchema.parse(event), 200)
     }
-
-    return c.json(EventSchema.parse(event), 200)
   })
 }

@@ -1,16 +1,14 @@
 import { createRoute } from '@hono/zod-openapi'
 import z from 'zod'
 import type { AppAPI } from '~/app-api'
-import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { refreshToken } from '../db/refresh-token'
 import { RefreshTokenParamSchema } from '../shared-schema'
 
 const route = createRoute({
   method: 'post',
-  path: '/auth/refresh-token',
-  security: [{ ApiKeyAuth: [] }],
   middleware: [apiKeyAuth],
+  path: '/auth/refresh-token',
   request: {
     body: {
       content: {
@@ -22,7 +20,6 @@ const route = createRoute({
   },
   responses: {
     200: {
-      description: 'Token refreshed successfully',
       content: {
         'application/json': {
           schema: z.object({
@@ -31,6 +28,7 @@ const route = createRoute({
           }),
         },
       },
+      description: 'Token refreshed successfully',
     },
     // 401: {
     //   $ref: '#/components/responses/UnauthorizedError',
@@ -39,13 +37,15 @@ const route = createRoute({
     //   $ref: '#/components/responses/ValidationError',
     // },
   },
+  security: [{ ApiKeyAuth: [] }],
 })
 
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
+    const ctx = c.get('requestContext')
     const { refreshToken: refreshTokenValue } = c.req.valid('json')
 
-    const refreshedTokens = await refreshToken(getConfig(c.env), {
+    const refreshedTokens = await refreshToken(ctx, {
       refreshToken: refreshTokenValue,
     })
 

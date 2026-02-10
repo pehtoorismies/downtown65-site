@@ -1,7 +1,6 @@
-import { createLogger } from '@downtown65/logger'
 import { eq } from 'drizzle-orm'
+import type { RequestContext } from '~/app-api'
 import { getManagementClient } from '~/common/auth0/client'
-import type { Config } from '~/common/config/config'
 import { getDb } from '~/db/get-db'
 import { users as usersTable } from '~/db/schema'
 import { type UserUpdateParams, UserUpdateParamsSchema } from '../shared-schema'
@@ -23,8 +22,8 @@ const UpdateSchema = UserUpdateParamsSchema.transform((obj) => {
     nickname: obj.nickname,
     picture: obj.picture,
     user_metadata: {
-      subscribeWeeklyEmail: obj.subscribeWeeklyEmail,
       subscribeEventCreationEmail: obj.subscribeEventCreationEmail,
+      subscribeWeeklyEmail: obj.subscribeWeeklyEmail,
     },
   }
 })
@@ -44,19 +43,18 @@ const getUpdateValuesForLocal = (params: UserUpdateParams) => {
 }
 
 export const updateUser = async (
-  config: Config,
+  ctx: RequestContext,
   auth0Sub: string,
   params: UserUpdateParams,
 ) => {
-  const logger = createLogger()
-  const management = await getManagementClient(config)
+  const management = await getManagementClient(ctx.authConfig)
   const parsedParams = UpdateSchema.parse(params)
-  logger.info(
+  ctx.logger.info(
     `Updating user ${auth0Sub} with params: ${JSON.stringify(parsedParams)}`,
   )
   // TODO: handle errors
   const response = await management.users.update(auth0Sub, parsedParams)
-  logger.info(
+  ctx.logger.info(
     `Updated user ${auth0Sub} with params: ${JSON.stringify(response)}`,
   )
 
@@ -65,7 +63,7 @@ export const updateUser = async (
     return true
   }
 
-  const db = getDb(config.D1_DB)
+  const db = getDb(ctx.db)
 
   // just in case, update local user
   await db

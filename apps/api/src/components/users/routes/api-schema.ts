@@ -3,16 +3,16 @@ import z from 'zod'
 
 export const UserAPIResponseSchema = z.object({
   ...UserSchema.shape,
-  name: z.string(),
-  email: z.email(),
   createdAt: ISODateTimeSchema,
+  email: z.email(),
+  name: z.string(),
   updatedAt: ISODateTimeSchema,
 })
 
 export const DetailedUserAPIResponseSchema = UserAPIResponseSchema.extend({
-  roles: z.array(z.string()),
   preferences: z.object({
-    subscribeWeeklyEmail: z.boolean(),
     subscribeEventCreationEmail: z.boolean(),
+    subscribeWeeklyEmail: z.boolean(),
   }),
+  roles: z.array(z.string()),
 })

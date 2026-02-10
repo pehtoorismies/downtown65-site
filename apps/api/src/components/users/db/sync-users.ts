@@ -1,8 +1,7 @@
-import { createLogger } from '@downtown65/logger'
 import { eq } from 'drizzle-orm'
 import z from 'zod'
+import type { RequestContext } from '~/app-api'
 import { getManagementClient } from '~/common/auth0/client'
-import type { Config } from '~/common/config/config'
 import { getDb } from '~/db/get-db'
 import { users as usersTable } from '~/db/schema'
 import { Auth0UserSchema } from './support/auth0-schema'
@@ -10,10 +9,9 @@ import { QUERY_USER_RETURNED_FIELDS } from './support/query-user-returned-fields
 
 const Auth0UserListSchema = z.array(Auth0UserSchema)
 
-export const syncUsers = async (config: Config) => {
-  const management = await getManagementClient(config)
-  const logger = createLogger()
-  logger.info('Listing users from Auth0')
+export const syncUsers = async (ctx: RequestContext) => {
+  const management = await getManagementClient(ctx.authConfig)
+  ctx.logger.info('Listing users from Auth0')
 
   const { response } = await management.users.list({
     fields: QUERY_USER_RETURNED_FIELDS,
@@ -22,7 +20,7 @@ export const syncUsers = async (config: Config) => {
 
   const users = response.users || []
 
-  const db = getDb(config.D1_DB)
+  const db = getDb(ctx.db)
 
   const userList = Auth0UserListSchema.parse(users)
 
@@ -40,7 +38,7 @@ export const syncUsers = async (config: Config) => {
     const isNew = existing.length === 0
 
     if (isNew) {
-      logger
+      ctx.logger
         .withMetadata({ data: user })
         .info(`Creating new user ${user.nickname}`)
       const createdUser = await db
@@ -53,7 +51,7 @@ export const syncUsers = async (config: Config) => {
         .returning({ id: usersTable.id })
       createdUsers.push({ createdUser })
     } else {
-      logger.withMetadata({ data: user }).debug(`User exists already`)
+      ctx.logger.withMetadata({ data: user }).debug(`User exists already`)
       existingUsers.push({ existingUser: existing[0] })
     }
   }

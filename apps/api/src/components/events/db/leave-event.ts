@@ -1,37 +1,35 @@
-import { createLogger } from '@downtown65/logger'
 import { and, eq } from 'drizzle-orm'
 import z from 'zod'
-import type { Config } from '~/common/config/config'
+import type { RequestContext } from '~/app-api'
 import { getDb } from '~/db/get-db'
 import { usersToEvent } from '~/db/schema'
 import type { EventParticipationParams } from '../shared-schema'
 
 const ResponseSchema = z.discriminatedUnion('type', [
-  z.object({ type: z.literal('EventNotFound'), error: z.string() }),
+  z.object({ error: z.string(), type: z.literal('EventNotFound') }),
   z.object({
-    type: z.literal('Success'),
     message: z.string(),
+    type: z.literal('Success'),
   }),
 ])
 
 type Response = z.infer<typeof ResponseSchema>
 
 export const leaveEvent = async (
-  config: Config,
+  ctx: RequestContext,
   input: EventParticipationParams,
 ): Promise<Response> => {
-  const db = getDb(config.D1_DB)
-  const logger = createLogger({ appContext: 'DB joinEvent' })
-  logger.withContext(input)
+  const db = getDb(ctx.db)
+  ctx.logger.withContext(input)
 
-  logger.debug(`Start leaving event`)
+  ctx.logger.debug(`Start leaving event`)
   const user = await db.query.users.findFirst({
     where: {
       auth0Sub: input.userAuth0Sub,
     },
   })
   if (!user) {
-    logger.fatal('User not found when joining event')
+    ctx.logger.fatal('User not found when joining event')
     throw new Error('User not found')
   }
 
@@ -46,18 +44,18 @@ export const leaveEvent = async (
     .returning()
 
   if (result.length === 0) {
-    logger.warn(
+    ctx.logger.warn(
       `No participation record found for user ${user.id} in event ${input.eventId}`,
     )
     return {
-      type: 'Success',
       message: `User was not registered for event ${input.eventId}`,
+      type: 'Success',
     }
   }
 
-  logger.info(`User ${user.id} left event ${input.eventId} successfully`)
+  ctx.logger.info(`User ${user.id} left event ${input.eventId} successfully`)
   return {
-    type: 'Success',
     message: `User left the event ${input.eventId} successfully`,
+    type: 'Success',
   }
 }

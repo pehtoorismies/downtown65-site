@@ -18,18 +18,18 @@ export const EventDescription = ({ description }: EventDescriptionProps) => {
   return (
     <>
       <Divider
-        my="xs"
         label={EVENT_CARD_LABELS.additionalInfo}
         labelPosition="center"
+        my="xs"
       />
       {cleanDescription ? (
-        <Typography p={0} mt="sm">
+        <Typography mt="sm" p={0}>
           {/* TODO: Replace dangerouslySetInnerHTML with proper rich text renderer or sanitization */}
           {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Fix later */}
           <div dangerouslySetInnerHTML={{ __html: cleanDescription }} />
         </Typography>
       ) : (
-        <Text ta="center" p="sm" c="dimmed" fw={400}>
+        <Text c="dimmed" fw={400} p="sm" ta="center">
           {EVENT_CARD_LABELS.noDescription}
         </Text>
       )}

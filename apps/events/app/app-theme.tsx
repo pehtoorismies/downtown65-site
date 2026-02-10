@@ -7,11 +7,11 @@ import {
 
 const appTheme = createTheme({
   breakpoints: {
-    xs: '30em',
-    sm: '48em',
-    md: '64em',
     lg: '74em',
+    md: '64em',
+    sm: '48em',
     xl: '90em',
+    xs: '30em',
   },
   colors: {
     brand: DEFAULT_THEME.colors.blue,
@@ -28,17 +28,17 @@ const appTheme = createTheme({
       '#804B78',
     ],
   },
-  defaultGradient: { from: 'indigo', to: 'cyan', deg: 45 },
-  shadows: {
-    md: '1px 1px 3px rgba(0, 0, 0, .25)',
-    xl: '5px 5px 3px rgba(0, 0, 0, .25)',
-  },
+  defaultGradient: { deg: 45, from: 'indigo', to: 'cyan' },
 
   headings: {
     fontFamily: 'Roboto, sans-serif',
     sizes: {
       h1: { fontSize: '2rem' },
     },
+  },
+  shadows: {
+    md: '1px 1px 3px rgba(0, 0, 0, .25)',
+    xl: '5px 5px 3px rgba(0, 0, 0, .25)',
   },
 })
 

@@ -6,7 +6,7 @@ interface VoucherProps extends PropsWithChildren {}
 
 const VoucherRoot = ({ children }: VoucherProps) => {
   return (
-    <Card withBorder radius="md" shadow="xs">
+    <Card radius="md" shadow="xs" withBorder>
       {children}
     </Card>
   )

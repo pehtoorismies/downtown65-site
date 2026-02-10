@@ -7,6 +7,13 @@
   "preview_urls": false,
   "compatibility_flags": ["nodejs_compat"],
   "env": {
+    "unit-test": {
+      "name": "dt65-events-unit-tests",
+      "vars": {
+        "API_HOST": "http://example.com",
+        "LOG_LEVEL": "silent"
+      }
+    },
     "pull-request": {
       "name": "dt65-events-pr-$PR_NUMBER",
       "routes": [
@@ -19,10 +26,10 @@
         "enabled": true
       },
       "vars": {
-        "API_HOST": "api-pr-$PR_NUMBER.downtown65.com"
+        "API_HOST": "api-pr-$PR_NUMBER.downtown65.com",
+        "LOG_LEVEL": "debug"
       }
     },
-    // Production and staging environments
     "staging": {
       "name": "dt65-events-staging",
       "routes": [
@@ -32,7 +39,8 @@
         }
       ],
       "vars": {
-        "API_HOST": "api-staging.downtown65.com"
+        "API_HOST": "api-staging.downtown65.com",
+        "LOG_LEVEL": "warn"
       }
     },
     "production": {
@@ -44,7 +52,8 @@
         }
       ],
       "vars": {
-        "API_HOST": "api.downtown65.com"
+        "API_HOST": "api.downtown65.com",
+        "LOG_LEVEL": "info"
       }
     }
   }

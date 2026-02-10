@@ -1,4 +1,14 @@
+import type { Logger } from '@downtown65/logger'
 import type { OpenAPIHono } from '@hono/zod-openapi'
+import type { AuthConfig } from './common/config/config'
+
+export interface RequestContext {
+  db: D1Database
+  logger: Logger
+  apiKey: string
+  authConfig: AuthConfig
+  registerSecret: string
+}
 
 type Vars = {
   jwtPayload: {
@@ -11,6 +21,7 @@ type Vars = {
     gty: string
     azp: string
   }
+  requestContext: RequestContext
 }
 
 export type AppAPI = OpenAPIHono<{ Bindings: Env; Variables: Vars }>

@@ -14,16 +14,16 @@ import { Link } from 'react-router'
 const NotFound = () => {
   return (
     <Container p="md">
-      <SimpleGrid spacing={30} cols={{ base: 1, sm: 2 }}>
+      <SimpleGrid cols={{ base: 1, sm: 2 }} spacing={30}>
         <Stack align="center" gap="xs" hiddenFrom="sm">
           <Image
             src="/404.jpg"
             style={{
-              maxWidth: 300,
               margin: 'auto',
+              maxWidth: 300,
             }}
           />
-          <Text c="gray.7" size="sm" component="figcaption">
+          <Text c="gray.7" component="figcaption" size="sm">
             Your support contact
           </Text>
         </Stack>
@@ -37,19 +37,19 @@ const NotFound = () => {
           </Text>
           <Button
             component={Link}
+            data-testid="navigate-home"
+            leftSection={<IconArrowNarrowLeft size={18} />}
+            mt="xl"
+            size="md"
             to="/"
             variant="outline"
-            size="md"
-            mt="xl"
-            leftSection={<IconArrowNarrowLeft size={18} />}
-            data-testid="navigate-home"
           >
             Etusivulle
           </Button>
         </div>
         <Stack align="center" gap="xs" visibleFrom="sm">
           <Image src="/404.jpg" />
-          <Text c="gray.7" size="sm" component="figcaption">
+          <Text c="gray.7" component="figcaption" size="sm">
             Your support contact
           </Text>
         </Stack>

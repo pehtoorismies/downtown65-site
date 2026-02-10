@@ -1,18 +1,15 @@
-import { createLogger } from '@downtown65/logger'
 import { Auth0SubSchema, IDSchema } from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
 import z from 'zod'
 import type { AppAPI } from '~/app-api'
-import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { signup } from '../db/signup'
 import { RegisterParamSchema } from '../shared-schema'
 
 const route = createRoute({
   method: 'post',
-  path: '/auth/signup',
-  security: [{ ApiKeyAuth: [] }],
   middleware: [apiKeyAuth],
+  path: '/auth/signup',
   request: {
     body: {
       content: {
@@ -24,23 +21,22 @@ const route = createRoute({
   },
   responses: {
     201: {
-      description: 'User registered successfully',
       content: {
         'application/json': {
           schema: z.object({
-            id: IDSchema,
             auth0Sub: Auth0SubSchema,
             email: z.email(),
+            id: IDSchema,
             nickname: z.string(),
           }),
         },
       },
+      description: 'User registered successfully',
     },
     // 401: {
     //   $ref: '#/components/responses/UnauthorizedError',
     // },
     409: {
-      description: 'User already exists',
       content: {
         'application/json': {
           schema: z.object({
@@ -48,9 +44,9 @@ const route = createRoute({
           }),
         },
       },
+      description: 'User already exists',
     },
     429: {
-      description: 'Too many requests',
       content: {
         'application/json': {
           schema: z.object({
@@ -58,9 +54,9 @@ const route = createRoute({
           }),
         },
       },
+      description: 'Too many requests',
     },
     500: {
-      description: 'Internal server error',
       content: {
         'application/json': {
           schema: z.object({
@@ -68,29 +64,31 @@ const route = createRoute({
           }),
         },
       },
+      description: 'Internal server error',
     },
     // 422: {
     //   $ref: '#/components/responses/ValidationError',
     // },
   },
+  security: [{ ApiKeyAuth: [] }],
 })
 
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
-    const logger = createLogger({ appContext: 'Route signup' })
+    const ctx = c.get('requestContext')
 
     const input = c.req.valid('json')
 
-    logger.withMetadata(input).debug('Signup attempt')
-    if (input.registerSecret !== c.env.REGISTER_SECRET) {
+    ctx.logger.withMetadata(input).debug('Signup attempt')
+    if (input.registerSecret !== ctx.registerSecret) {
       return c.json({ error: 'Access denied' }, 409)
     }
 
-    const result = await signup(getConfig(c.env), {
+    const result = await signup(ctx, {
       email: input.email,
       name: input.name,
-      password: input.password,
       nickname: input.nickname,
+      password: input.password,
     })
 
     switch (result.type) {
@@ -100,10 +98,12 @@ export const register = (app: AppAPI) => {
         }
 
         if (result.statusCode === 429) {
-          logger.withMetadata(result).info('Signup error 429 Too Many Requests')
+          ctx.logger
+            .withMetadata(result)
+            .info('Signup error 429 Too Many Requests')
           return c.json({ error: result.error }, 429)
         }
-        logger
+        ctx.logger
           .withMetadata(result)
           .error('Signup error 500 Internal Server Error')
         return c.json({ error: result.error }, 500)

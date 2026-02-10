@@ -34,7 +34,7 @@ export const EventButtonContainer = (props: EventButtonProps) => {
       )
     }
     return (
-      <LeaveEventButton {...props} onClick={leaveEvent} isLoading={isLoading} />
+      <LeaveEventButton {...props} isLoading={isLoading} onClick={leaveEvent} />
     )
   }
 
@@ -49,6 +49,6 @@ export const EventButtonContainer = (props: EventButtonProps) => {
   }
 
   return (
-    <JoinEventButton {...props} onClick={joinEvent} isLoading={isLoading} />
+    <JoinEventButton {...props} isLoading={isLoading} onClick={joinEvent} />
   )
 }

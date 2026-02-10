@@ -1,16 +1,14 @@
 import { MessageSchema } from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
-import { getConfig } from '~/common/config/config'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { forgotPassword } from '../db/forgot-password'
 import { ForgotPasswordParamSchema } from '../shared-schema'
 
 const route = createRoute({
   method: 'post',
-  path: '/auth/forgot-password',
-  security: [{ ApiKeyAuth: [] }],
   middleware: [apiKeyAuth],
+  path: '/auth/forgot-password',
   request: {
     body: {
       content: {
@@ -22,12 +20,12 @@ const route = createRoute({
   },
   responses: {
     200: {
-      description: 'Password reset email sent',
       content: {
         'application/json': {
           schema: MessageSchema,
         },
       },
+      description: 'Password reset email sent',
     },
     // 401: {
     //   $ref: '#/components/responses/UnauthorizedError',
@@ -36,12 +34,14 @@ const route = createRoute({
     //   $ref: '#/components/responses/ValidationError',
     // },
   },
+  security: [{ ApiKeyAuth: [] }],
 })
 
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
+    const ctx = c.get('requestContext')
     const { email } = c.req.valid('json')
-    await forgotPassword(getConfig(c.env), { email })
+    await forgotPassword(ctx, { email })
 
     return c.json({ message: 'Password reset email sent' })
   })

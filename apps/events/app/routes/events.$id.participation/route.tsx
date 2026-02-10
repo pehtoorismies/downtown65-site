@@ -1,4 +1,3 @@
-import { createLogger } from '@downtown65/logger'
 import { stringToID } from '@downtown65/schema'
 import { getApiClient } from '~/api/api-client'
 import { AuthContext } from '~/context/context'
@@ -12,9 +11,9 @@ export const action = async ({
   context,
   params,
 }: Route.ActionArgs) => {
-  const logger = createLogger({
-    appContext: 'Event Participation Action',
-  })
+  const logger = context.logger.child()
+  logger.withContext({ route: 'event participation action' })
+
   const eventID = stringToID.decode(params.id)
   logger.withContext({ eventID, method: request.method })
 
@@ -34,12 +33,12 @@ export const action = async ({
   const { accessToken } = authContext
 
   const requestOptions = {
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      'x-api-key': context.cloudflare.env.API_KEY,
+    },
     params: {
       path: { id: stringToID.encode(eventID) },
-    },
-    headers: {
-      'x-api-key': context.cloudflare.env.API_KEY,
-      authorization: `Bearer ${accessToken}`,
     },
   }
 
@@ -55,4 +54,8 @@ export const action = async ({
     return { success: false }
   }
   return { success: true }
+}
+
+export default function ParticipationAction() {
+  return null
 }

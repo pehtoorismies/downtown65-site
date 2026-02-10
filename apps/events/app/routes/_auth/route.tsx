@@ -3,7 +3,7 @@ import { Outlet } from 'react-router'
 
 export default function AuthLayout() {
   return (
-    <Container size={420} py="sm">
+    <Container py="sm" size={420}>
       <Outlet />
     </Container>
   )

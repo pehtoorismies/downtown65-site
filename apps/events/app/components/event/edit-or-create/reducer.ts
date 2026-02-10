@@ -7,12 +7,12 @@ import type { Dispatch } from 'react'
 import type { EventState } from './event-state'
 
 export const ActiveStep = {
-  STEP_EVENT_TYPE: 0,
-  STEP_TITLE: 1,
   STEP_DATE: 2,
-  STEP_TIME: 3,
   STEP_DESCRIPTION: 4,
+  STEP_EVENT_TYPE: 0,
   STEP_PREVIEW: 5,
+  STEP_TIME: 3,
+  STEP_TITLE: 1,
 } as const
 
 export type StepNumber = (typeof ActiveStep)[keyof typeof ActiveStep]
@@ -96,8 +96,8 @@ export const reducer = (state: EventState, action: EventAction): EventState => {
       if (!state.eventType) {
         return {
           ...state,
-          eventType: action.eventType,
           activeStep: ActiveStep.STEP_TITLE,
+          eventType: action.eventType,
         }
       }
       return { ...state, eventType: action.eventType }
@@ -105,10 +105,10 @@ export const reducer = (state: EventState, action: EventAction): EventState => {
     case 'info': {
       return {
         ...state,
-        title: action.title,
-        subtitle: action.subtitle,
-        location: action.location,
         activeStep: action.activeStep,
+        location: action.location,
+        subtitle: action.subtitle,
+        title: action.title,
       }
     }
     case 'step': {

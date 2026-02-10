@@ -20,15 +20,15 @@ export const EventDetails = ({
   const time = timeStart ? `klo ${timeStart}` : ''
 
   return (
-    <Grid align="center" my={2} gutter="xs">
+    <Grid align="center" gutter="xs" my={2}>
       <Grid.Col span={7}>
-        <Text fw={700} mt={2} data-testid="event-subtitle">
+        <Text data-testid="event-subtitle" fw={700} mt={2}>
           {subtitle}
         </Text>
-        <Text size="sm" fw={500} data-testid="event-date">
-          <DateFormat isoDate={dateStart} format="d.M.yyyy" /> {time}
+        <Text data-testid="event-date" fw={500} size="sm">
+          <DateFormat format="d.M.yyyy" isoDate={dateStart} /> {time}
         </Text>
-        <Text size="sm" c="dimmed" fw={400} data-testid="event-location">
+        <Text c="dimmed" data-testid="event-location" fw={400} size="sm">
           {location}
         </Text>
       </Grid.Col>

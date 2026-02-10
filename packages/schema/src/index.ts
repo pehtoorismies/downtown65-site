@@ -1,11 +1,11 @@
-import { isValid as isValidULID } from 'ulidx'
 import { z } from 'zod'
+
 // add .openapi() to zod schemas
 import '@hono/zod-openapi'
 
 export const PaginationQuerySchema = z.object({
-  page: z.string().optional().default('1'),
   limit: z.string().optional().default('10'),
+  page: z.string().optional().default('1'),
 })
 
 export type PaginationQuery = z.infer<typeof PaginationQuerySchema>
@@ -25,15 +25,10 @@ export const IDSchema = z.number().int().positive().openapi({
 })
 export type ID = z.infer<typeof IDSchema>
 
-export const ULIDSchema = z
-  .string()
-  .refine((v) => {
-    return isValidULID(v)
-  }, 'Invalid ULID')
-  .openapi({
-    description: 'ULID string identifier',
-    example: '01KDANZQYE8463VT7K51XTRHTV',
-  })
+export const ULIDSchema = z.ulid().openapi({
+  description: 'ULID string identifier',
+  example: '01KDANZQYE8463VT7K51XTRHTV',
+})
 export type ULID = z.infer<typeof ULIDSchema>
 
 export const StringIDSchema = z
@@ -98,21 +93,21 @@ export const EventTypeEnum = z.enum(EVENT_TYPES)
 export type EventType = z.infer<typeof EventTypeEnum>
 
 export const EventSchema = z.object({
-  id: IDSchema,
-  eventULID: ULIDSchema,
-  title: z.string().min(1).openapi({ example: 'Kaamoshiihto' }),
-  subtitle: z.string().min(1).openapi({ example: 'Lapin taikaa kaamoksessa' }),
+  createdBy: UserSchema,
   dateStart: ISODateSchema.openapi({ example: '2025-01-15' }),
-  timeStart: ISOTimeSchema.nullable().openapi({ example: '14:30' }),
-  eventType: EventTypeEnum.openapi({
-    example: 'MEETING',
-    description: 'Type of the event.',
-  }),
   description: z.string().nullable().openapi({ example: 'Hiihtokisat' }),
+  eventType: EventTypeEnum.openapi({
+    description: 'Type of the event.',
+    example: 'MEETING',
+  }),
+  eventULID: ULIDSchema,
+  id: IDSchema,
   location: z.string().min(1).openapi({ example: 'Hakunila, Vantaa' }),
   participants: ParticipantListSchema,
-  createdBy: UserSchema,
   race: z.boolean().openapi({ example: false }),
+  subtitle: z.string().min(1).openapi({ example: 'Lapin taikaa kaamoksessa' }),
+  timeStart: ISOTimeSchema.nullable().openapi({ example: '14:30' }),
+  title: z.string().min(1).openapi({ example: 'Kaamoshiihto' }),
   // TODO: Add createdAt and updatedAt fields if needed
 })
 export type Event = z.infer<typeof EventSchema>
@@ -121,9 +116,9 @@ export const EventListSchema = z.array(EventSchema)
 export type EventList = z.infer<typeof EventListSchema>
 
 export const EventUpdateSchema = EventSchema.omit({
-  id: true,
-  eventULID: true,
   createdBy: true,
+  eventULID: true,
+  id: true,
   participants: true,
 })
   .partial()
@@ -133,12 +128,12 @@ export const EventUpdateSchema = EventSchema.omit({
 export type EventUpdateInput = z.infer<typeof EventUpdateSchema>
 
 export const EventCreateSchema = EventSchema.omit({
-  id: true,
-  eventULID: true,
   createdBy: true,
+  eventULID: true,
+  id: true,
   participants: true,
 }).extend({
-  includeEventCreator: z.boolean().optional().default(false),
+  includeEventCreator: z.optional(z.boolean().default(false)),
 })
 export type EventCreateInput = z.infer<typeof EventCreateSchema>
 
@@ -180,65 +175,6 @@ export const stringToID = z.codec(
     },
   },
 )
-
-export const isoDateToDate = z.codec(ISODateSchema, z.date(), {
-  decode: (isoDateString, ctx) => {
-    // Expect "YYYY-MM-DD"
-    const [yearStr, monthStr, dayStr] = isoDateString.split('-')
-    const year = Number(yearStr)
-    const month = Number(monthStr)
-    const day = Number(dayStr)
-
-    // Basic numeric checks
-    if (
-      !Number.isInteger(year) ||
-      !Number.isInteger(month) ||
-      !Number.isInteger(day)
-    ) {
-      ctx.issues.push({
-        code: 'invalid_format',
-        format: 'iso_date',
-        input: isoDateString,
-        message: 'Expected YYYY-MM-DD',
-      })
-      return z.NEVER
-    }
-
-    // Construct in local time (month is 0-based)
-    const date = new Date(year, month - 1, day)
-
-    // Strict validation: ensure no rollover happened
-    if (
-      date.getFullYear() !== year ||
-      date.getMonth() !== month - 1 ||
-      date.getDate() !== day
-    ) {
-      ctx.issues.push({
-        code: 'invalid_format',
-        format: 'iso_date',
-        input: isoDateString,
-        message: 'Invalid calendar date',
-      })
-      return z.NEVER
-    }
-
-    return date
-  },
-
-  encode: (date) => {
-    console.error('Encoding date', date.getUTCDate())
-
-    // Format YYYY-MM-DD using UTC components to avoid TZ offsets
-    const y = date.getUTCFullYear()
-    const m = String(date.getUTCMonth() + 1).padStart(2, '0')
-    const d = String(date.getUTCDate()).padStart(2, '0')
-    const _iso = `${y}-${m}-${d}`
-    console.error('_iso', _iso)
-    // Return a branded ISODate string, verified by schema
-    //
-    return ISODateSchema.decode(date.toISOString().substring(0, 10))
-  },
-})
 
 // ============================================
 // Generic

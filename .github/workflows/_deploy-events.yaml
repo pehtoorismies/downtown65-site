@@ -1,0 +1,85 @@
+name: Deploy Events
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+        description: "Environment (pull-request, staging, production)"
+      pr-number:
+        required: false
+        type: number
+        description: "PR number (required for pull-request environment)"
+    outputs:
+      url:
+        description: "The URL of the deployed Events"
+        value: ${{ jobs.deploy.outputs.url }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+    environment: ${{ inputs.environment == 'pull-request' && 'development' || 'production' }}
+    outputs:
+      url: ${{ steps.set-url.outputs.url }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Project
+        uses: ./.github/actions/setup-project
+
+      - name: Generate Wrangler Config
+        if: inputs.environment == 'pull-request'
+        working-directory: apps/events
+        run: |
+          pnpm generate:wrangler-config pr ${{ inputs.pr-number }}
+          echo "Generated wrangler.pr.jsonc:"
+          cat wrangler.pr.jsonc
+
+      - name: Set environment config
+        id: config
+        run: |
+          case "${{ inputs.environment }}" in
+            pull-request)
+              CONFIG_FILE=wrangler.pr.jsonc
+              ;;
+            staging)
+              CONFIG_FILE=wrangler.jsonc
+              ;;
+            production)
+              CONFIG_FILE=wrangler.jsonc
+              ;;
+          esac
+
+          echo "config-file=$CONFIG_FILE" >> $GITHUB_OUTPUT
+          echo "wrangler-env=${{ inputs.environment }}" >> $GITHUB_OUTPUT
+
+      - name: Set Url
+        id: set-url
+        uses: ./.github/actions/read-wrangler-url
+        with:
+          config-file: apps/events/${{ steps.config.outputs.config-file }}
+          environment: ${{ inputs.environment }}
+
+      - name: Deploy and Set Secrets
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/events
+          environment: ${{ steps.config.outputs.wrangler-env }}
+          preCommands: |
+            echo "Setting secrets"
+            echo "API_KEY=${{ secrets.DT65_API_KEY }}" > .secrets
+            echo "COOKIE_SESSION_SECRET=${{ secrets.FRONTEND_COOKIE_SESSION_SECRET }}" >> .secrets
+            npx wrangler secret bulk .secrets --env ${{ steps.config.outputs.wrangler-env }} --config ${{ steps.config.outputs.config-file }}
+            CLOUDFLARE_ENV=${{ steps.config.outputs.wrangler-env }} pnpm run build
+
+      - name: Deploy Summary
+        run: |
+          echo "### Events Deployed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** ${{ steps.config.outputs.wrangler-env }}" >> $GITHUB_STEP_SUMMARY
+          echo "Events URL: ${{ steps.set-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY

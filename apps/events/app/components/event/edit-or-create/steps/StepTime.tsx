@@ -22,14 +22,14 @@ const getHourGradient = (currentValue: number, value?: number) => {
   if (value === currentValue) {
     return Gradient.dtPink
   }
-  return { from: 'blue.5', to: 'blue.5', deg: 45 }
+  return { deg: 45, from: 'blue.5', to: 'blue.5' }
 }
 
 const getMinuteGradient = (currentValue: number, value?: number) => {
   if (value === currentValue) {
     return GradientInverse.dtPink
   }
-  return { from: 'violet.5', to: 'violet.5', deg: 45 }
+  return { deg: 45, from: 'violet.5', to: 'violet.5' }
 }
 
 const getTime = ({ time }: EventState): string => {
@@ -48,7 +48,7 @@ const ResponsiveText = ({ children }: PropsWithChildren) => {
       <Text hiddenFrom="sm" size="sm">
         {children}
       </Text>
-      <Text visibleFrom="sm" size="lg">
+      <Text size="lg" visibleFrom="sm">
         {children}
       </Text>
     </>
@@ -66,11 +66,9 @@ export const StepTime = ({ state, dispatch }: ReducerProps) => {
   const getHoursCol = (hours: number[]) =>
     hours.map((hour) => (
       <Button
+        data-testid={`hour-${hour}`}
         gradient={getHourGradient(hour, state.time.hours)}
-        variant="gradient"
-        radius={radius}
         key={hour}
-        size={size}
         onClick={() => {
           dispatch({
             kind: 'time',
@@ -80,7 +78,9 @@ export const StepTime = ({ state, dispatch }: ReducerProps) => {
             },
           })
         }}
-        data-testid={`hour-${hour}`}
+        radius={radius}
+        size={size}
+        variant="gradient"
       >
         {String(hour).padStart(2, '0')}
       </Button>
@@ -88,12 +88,10 @@ export const StepTime = ({ state, dispatch }: ReducerProps) => {
   const getMinutesCol = (minutes: number[]) =>
     minutes.map((minute) => (
       <Button
-        variant="gradient"
-        gradient={getMinuteGradient(minute, state.time.minutes)}
-        radius={radius}
+        data-testid={`minute-${minute}`}
         disabled={state.time.hours === undefined}
+        gradient={getMinuteGradient(minute, state.time.minutes)}
         key={minute}
-        size={size}
         onClick={() => {
           dispatch({
             kind: 'time',
@@ -103,7 +101,9 @@ export const StepTime = ({ state, dispatch }: ReducerProps) => {
             },
           })
         }}
-        data-testid={`minute-${minute}`}
+        radius={radius}
+        size={size}
+        variant="gradient"
       >
         {String(minute).padStart(2, '0')}
       </Button>
@@ -124,11 +124,11 @@ export const StepTime = ({ state, dispatch }: ReducerProps) => {
 
   return (
     <StepLayout
-      title={`Kellonaika${getTime(state)}`}
       nextButton={nextButton}
       prevButton={previousButton}
+      title={`Kellonaika${getTime(state)}`}
     >
-      <Grid gutter={{ base: 2, xs: 2, sm: 'sm' }} mt="sm">
+      <Grid gutter={{ base: 2, sm: 'sm', xs: 2 }} mt="sm">
         <Grid.Col span={6}>
           <ResponsiveText>Tunnit</ResponsiveText>
         </Grid.Col>
@@ -155,11 +155,9 @@ export const StepTime = ({ state, dispatch }: ReducerProps) => {
       </Grid>
       <Center>
         <Button
+          color="red"
           data-testid="clear-time"
           mt="md"
-          color="red"
-          variant="outline"
-          size={size}
           onClick={() =>
             dispatch({
               kind: 'time',
@@ -169,6 +167,8 @@ export const StepTime = ({ state, dispatch }: ReducerProps) => {
               },
             })
           }
+          size={size}
+          variant="outline"
         >
           Tyhjennä aika
         </Button>

@@ -1,0 +1,2 @@
+The current working directory is: kissa
+You are logged in as: pehtoorismies

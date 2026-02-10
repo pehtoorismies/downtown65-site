@@ -18,70 +18,70 @@ export default function Signup() {
 
   return (
     <>
-      <Title ta="center" fw={900}>
+      <Title fw={900} ta="center">
         Rekisteröidy
       </Title>
-      <Text size="sm" ta="center" mt={5}>
+      <Text mt={5} size="sm" ta="center">
         Rekiteröitymiseen tarvitset seuran jäsenyyden ja liittymistunnuksen.
       </Text>
 
-      <Paper withBorder shadow="md" p={30} mt={30} radius="md">
+      <Paper mt={30} p={30} radius="md" shadow="md" withBorder>
         <Form method="post">
           <TextInput
-            name="email"
-            type="email"
             autoComplete="email"
             label="Sähköposti"
+            name="email"
             placeholder="me@downtown65.com"
             required
+            type="email"
           />
 
           <PasswordInput
-            name="password"
             label="Salasana"
+            mt="md"
+            name="password"
             placeholder="Salasanasi"
             required
-            mt="md"
           />
           <TextInput
-            name="name"
             label="Nimi"
+            mt="md"
+            name="name"
             placeholder="Etunimi Sukunimi"
             required
-            mt="md"
           />
           <TextInput
-            name="nickname"
             description="Tunnus/nickname, näkyy ilmoittautumisissa"
             label="Nickname"
+            mt="md"
+            name="nickname"
             placeholder="setämies72"
             required
-            mt="md"
           />
           <PasswordInput
-            name="registerSecret"
-            label="Rekisteröintitunnus"
             description="Saat tämän seuralta."
+            label="Rekisteröintitunnus"
+            mt="md"
+            name="registerSecret"
             placeholder="supersecret"
             required
-            mt="md"
           />
           <Group justify="flex-end" mt="md">
             <Anchor
               component={Link}
-              to="/login"
-              size="sm"
               data-testid="to-login"
+              size="sm"
+              to="/login"
             >
               Kirjautumiseen
             </Anchor>
           </Group>
           <Button
+            data-testid="submit-signup"
             fullWidth
+            loading={navigation.state === 'submitting'}
             mt="xl"
             type="submit"
-            loading={navigation.state === 'submitting'}
-            data-testid="submit-signup"
           >
             Rekisteröidy
           </Button>

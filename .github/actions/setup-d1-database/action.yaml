@@ -47,12 +47,12 @@ runs:
           echo "$CREATE_OUTPUT"
           # Extract database_id from the JSON snippet in the output
           DB_ID=$(echo "$CREATE_OUTPUT" | grep -oP '"database_id":\s*"\K[^"]+')
-          
+
           if [ -z "$DB_ID" ]; then
             echo "Failed to extract database ID from output"
             exit 1
           fi
-          
+
           echo "database-id=$DB_ID" >> $GITHUB_OUTPUT
           echo "Created database with ID: $DB_ID"
         fi

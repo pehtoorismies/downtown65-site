@@ -1,0 +1,30 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/**"
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy-api:
+    uses: ./.github/workflows/_deploy-api.yaml
+    with:
+      environment: production
+    secrets: inherit
+
+  deploy-events:
+    uses: ./.github/workflows/_deploy-events.yaml
+    with:
+      environment: production
+    secrets: inherit
+
+  deploy-www:
+    uses: ./.github/workflows/_deploy-www.yaml
+    with:
+      environment: production
+    secrets: inherit

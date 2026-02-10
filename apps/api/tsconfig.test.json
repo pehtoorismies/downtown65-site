@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "types": [
+      "@cloudflare/vitest-pool-workers",
+      "node",
+      "./worker-configuration.d.ts"
+    ]
+  },
+  "include": ["src", "**/*.spec.ts", "test-env.d.ts", "playwright.config.ts"]
+}

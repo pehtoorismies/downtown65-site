@@ -26,78 +26,78 @@ const EVENT_DATA_MAP: Record<
 > = {
   CYCLING: {
     eventText: 'Pyöräily',
-    imageUrl: '/event-images/cycling.jpg',
     icon: IconBike,
+    imageUrl: '/event-images/cycling.jpg',
   },
   ICE_HOCKEY: {
     eventText: 'Lätkä',
-    imageUrl: '/event-images/hockey.jpg',
     icon: IconIceSkating,
+    imageUrl: '/event-images/hockey.jpg',
   },
   KARONKKA: {
     eventText: 'Karonkka',
-    imageUrl: '/event-images/karonkka.jpg',
     icon: IconBottle,
+    imageUrl: '/event-images/karonkka.jpg',
   },
   MEETING: {
     eventText: 'Kokous',
-    imageUrl: '/event-images/meeting.jpg',
     icon: IconArmchair,
+    imageUrl: '/event-images/meeting.jpg',
   },
   NORDIC_WALKING: {
     eventText: 'Sauvakävely',
-    imageUrl: '/event-images/nordicwalking.jpg',
     icon: IconTrekking,
+    imageUrl: '/event-images/nordicwalking.jpg',
   },
   ORIENTEERING: {
     eventText: 'Suunnistus',
-    imageUrl: '/event-images/orienteering.jpg',
     icon: IconMap,
+    imageUrl: '/event-images/orienteering.jpg',
   },
   OTHER: {
     eventText: 'Muu',
-    imageUrl: '/event-images/other.jpg',
     icon: IconRecycle,
+    imageUrl: '/event-images/other.jpg',
   },
   RUNNING: {
     eventText: 'Juoksu',
-    imageUrl: '/event-images/running.jpg',
     icon: IconRun,
+    imageUrl: '/event-images/running.jpg',
   },
   SKIING: {
     eventText: 'Hiihto',
-    imageUrl: '/event-images/skiing.jpg',
     icon: IconSnowflake,
+    imageUrl: '/event-images/skiing.jpg',
   },
   SPINNING: {
     eventText: 'Spinning',
-    imageUrl: '/event-images/spinning.jpg',
     icon: IconBrandZwift,
+    imageUrl: '/event-images/spinning.jpg',
   },
   SWIMMING: {
     eventText: 'Uinti',
-    imageUrl: '/event-images/swimming.jpg',
     icon: IconSwimming,
+    imageUrl: '/event-images/swimming.jpg',
   },
   TRACK_RUNNING: {
     eventText: 'Ratajuoksu',
-    imageUrl: '/event-images/trackrunning.jpg',
     icon: IconTrack,
+    imageUrl: '/event-images/trackrunning.jpg',
   },
   TRAIL_RUNNING: {
     eventText: 'Polkujuoksu',
-    imageUrl: '/event-images/trailrunning.jpg',
     icon: IconTrees,
+    imageUrl: '/event-images/trailrunning.jpg',
   },
   TRIATHLON: {
     eventText: 'Triathlon',
-    imageUrl: '/event-images/triathlon.jpg',
     icon: IconTriangleInverted,
+    imageUrl: '/event-images/triathlon.jpg',
   },
   ULTRAS: {
     eventText: 'Ultras',
-    imageUrl: '/event-images/ultras.jpg',
     icon: IconSparkles,
+    imageUrl: '/event-images/ultras.jpg',
   },
 }
 

@@ -8,9 +8,10 @@ import { register as registerPutUser } from './put-user'
 
 export const registerRoutes = (app: AppAPI): void => {
   registerGetUsers(app)
-  registerGetUser(app)
+  // Register /users/me BEFORE /users/{nickname} to avoid pattern matching issues
   registerGetMe(app)
+  registerGetUser(app)
   registerPutMe(app)
-  registerSyncUsers(app)
   registerPutUser(app)
+  registerSyncUsers(app)
 }

@@ -54,8 +54,8 @@ export function Layout({ children }: PropsWithChildren<Route.ComponentProps>) {
       <head>
         <meta charSet="utf-8" />
         <meta
-          name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1"
+          name="viewport"
         />
         <ColorSchemeScript />
         <Meta />
@@ -64,26 +64,26 @@ export function Layout({ children }: PropsWithChildren<Route.ComponentProps>) {
       <body>
         <AppTheme>
           <AppShell
-            header={{ height: { base: 60, md: 70, lg: 80 } }}
+            header={{ height: { base: 60, lg: 80, md: 70 } }}
             navbar={{
-              width: 300,
               breakpoint: 'sm',
               collapsed: { desktop: true, mobile: !navigationOpened },
+              width: 300,
             }}
             padding="xs"
           >
             <AppShell.Header>
               {user && (
                 <LoggedInNavigation
-                  user={user}
-                  toggle={toggle}
                   close={close}
                   navigationOpened={navigationOpened}
+                  toggle={toggle}
+                  user={user}
                 />
               )}
               {!user && <LoggedOutNavigation />}
             </AppShell.Header>
-            <AppShell.Navbar py="md" p="sm">
+            <AppShell.Navbar p="sm" py="md">
               <Navbar close={close} />
             </AppShell.Navbar>
             <AppShell.Main>{children}</AppShell.Main>
@@ -117,11 +117,11 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <Container component="main" pt="xl" p="md" mx="auto">
+    <Container component="main" mx="auto" p="md" pt="xl">
       <Title>{message}</Title>
       <Text>{details}</Text>
       {stack && (
-        <Box component="pre" w="100%" style={{ overflowX: 'auto' }} p="md">
+        <Box component="pre" p="md" style={{ overflowX: 'auto' }} w="100%">
           <Code>{stack}</Code>
         </Box>
       )}

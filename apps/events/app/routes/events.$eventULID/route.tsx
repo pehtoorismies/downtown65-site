@@ -11,7 +11,6 @@ import { getApiClient } from '~/api/api-client'
 import { EventCard } from '~/components/event/EventCard'
 import { getEventTypeData } from '~/components/event/get-event-type-data'
 import { AuthContext } from '~/context/context'
-import { createLogger } from '~/logger/logger.server'
 import { authMiddleware } from '~/middleware/auth-middleware'
 import type { Route } from './+types/route'
 import { DeleteModal } from './DeleteModal'
@@ -36,35 +35,37 @@ export const meta = ({ loaderData, location }: Route.MetaArgs) => {
       title: event.title,
     },
     {
-      property: 'og:type',
       content: 'website',
+      property: 'og:type',
     },
 
     {
-      property: 'og:url',
       content: `${origin}${location.pathname}`,
+      property: 'og:url',
     },
     {
-      property: 'og:title',
       content: `${event.title}`,
+      property: 'og:title',
     },
     {
-      property: 'og:description',
       content: `${event.dateStart} - ${event.subtitle}`,
+      property: 'og:description',
     },
     {
-      property: 'og:image',
       content: `${origin}${typeData.imageUrl}`,
+      property: 'og:image',
     },
     {
-      property: 'og:image:type',
       content: 'image/jpg',
+      property: 'og:image:type',
     },
   ]
 }
 
 export const action = async ({ request, context }: Route.ActionArgs) => {
-  const logger = createLogger({ appContext: 'Frontend Delete Event Action' })
+  const logger = context.logger.child()
+  logger.withContext({ route: 'DELETE events' })
+
   if (request.method !== 'DELETE') {
     throw new Error(`Unsupported request method ${request.method}`)
   }
@@ -84,12 +85,12 @@ export const action = async ({ request, context }: Route.ActionArgs) => {
   const { accessToken } = authContext
   const apiClient = getApiClient(context.cloudflare.env.API_HOST)
   const { error } = await apiClient.DELETE('/events/{id}', {
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      'x-api-key': context.cloudflare.env.API_KEY,
+    },
     params: {
       path: { id: stringToID.encode(eventIdDecoded) },
-    },
-    headers: {
-      'x-api-key': context.cloudflare.env.API_KEY,
-      authorization: `Bearer ${accessToken}`,
     },
   })
 
@@ -106,14 +107,14 @@ export async function loader({ context, params }: Route.LoaderArgs) {
 
   const apiClient = getApiClient(context.cloudflare.env.API_HOST)
   const { error, data } = await apiClient.GET('/events/{idOrULID}', {
-    params: {
-      path: { idOrULID: params.eventULID },
-    },
     headers: {
-      'x-api-key': context.cloudflare.env.API_KEY,
       authorization: authContext
         ? `Bearer ${authContext.accessToken}`
         : undefined,
+      'x-api-key': context.cloudflare.env.API_KEY,
+    },
+    params: {
+      path: { idOrULID: params.eventULID },
     },
   })
 
@@ -141,47 +142,47 @@ export default function GetEvent({ loaderData }: Route.ComponentProps) {
   return (
     <>
       <DeleteModal
-        opened={opened}
-        onCloseModal={onCloseModal}
-        eventTitle={event.title}
         eventId={event.id}
+        eventTitle={event.title}
+        onCloseModal={onCloseModal}
+        opened={opened}
       />
 
       <Container p={{ base: 1, sm: 'xs' }}>
         <EventBreadcrumbs title={event.title} />
         <EventCard event={event} me={me}>
           <EventButtonContainer
-            participants={event.participants}
-            me={me}
             eventId={event.id}
+            me={me}
+            participants={event.participants}
           />
         </EventCard>
         <Divider
-          mt="xl"
-          size="sm"
-          variant="dashed"
-          labelPosition="center"
           label={
             <>
               <IconAlertTriangleFilled size={12} />
               <Box ml={5}>Modification zone</Box>
             </>
           }
+          labelPosition="center"
+          mt="xl"
+          size="sm"
+          variant="dashed"
         />
-        <Group justify="center" my="sm" gap="xl">
+        <Group gap="xl" justify="center" my="sm">
           <Button
             component={Link}
-            to={`/events/${event.id}/edit/`}
-            rightSection={<IconPencil size={18} />}
             data-testid="modify-event-btn"
+            rightSection={<IconPencil size={18} />}
+            to={`/events/${event.id}/edit/`}
           >
             Muokkaa
           </Button>
           <Button
             color="grape"
+            data-testid="delete-event-btn"
             onClick={() => setOpened(true)}
             rightSection={<IconCircleOff size={18} />}
-            data-testid="delete-event-btn"
           >
             Poista tapahtuma
           </Button>

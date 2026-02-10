@@ -1,0 +1,19 @@
+{
+  "extends": "//",
+  "root": false,
+  "files": {
+    "includes": [
+      "src/**/*.ts",
+      "scripts/**/*.ts",
+      "*.ts",
+      "*.jsonc",
+      "tsconfig*.json",
+      "!worker-configuration.d.ts",
+      "!wrangler.local.jsonc",
+      "!wrangler.pr.jsonc"
+    ]
+  },
+  "assist": {
+    "includes": ["**", "!**/*.json", "!*.jsonc"]
+  }
+}

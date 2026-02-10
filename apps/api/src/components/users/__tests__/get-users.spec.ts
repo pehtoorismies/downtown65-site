@@ -1,0 +1,139 @@
+import { env as testEnv } from 'cloudflare:test'
+import { beforeEach, describe, expect, it } from 'vitest'
+import {
+  resetAuth0Mock,
+  seedAuth0Users,
+  setAuth0Error,
+} from '~/common/test/auth0-fixtures'
+import { clearDatabase } from '~/common/test/db-helpers'
+import { authenticatedRequest } from '~/common/test/request-helpers'
+import { getDb } from '~/db/get-db'
+import app from '~/server'
+
+interface UsersResponse {
+  length: number
+  limit: number
+  start: number
+  total: number
+  users: Array<{
+    nickname: string
+    name: string
+    email: string
+  }>
+}
+
+describe('GET /users', () => {
+  const db = getDb(testEnv.D1_DB)
+
+  beforeEach(async () => {
+    await clearDatabase(db)
+    resetAuth0Mock()
+  })
+
+  it('returns paginated list of users', async () => {
+    seedAuth0Users(15)
+
+    const res = await authenticatedRequest(
+      app,
+      testEnv,
+      '/users?page=1&limit=10',
+      'GET',
+    )
+
+    expect(res.status).toBe(200)
+    const data = await res.json<UsersResponse>()
+    expect(data.users).toHaveLength(10)
+    expect(data.total).toBe(16) // 15 seeded + 1 default
+    expect(data.limit).toBe(10)
+    expect(data.start).toBe(0)
+  })
+
+  it('returns second page of users', async () => {
+    seedAuth0Users(15)
+
+    const res = await authenticatedRequest(
+      app,
+      testEnv,
+      '/users?page=2&limit=10',
+      'GET',
+    )
+
+    expect(res.status).toBe(200)
+    const data = await res.json<UsersResponse>()
+    expect(data.users).toHaveLength(6) // Remaining users
+    expect(data.start).toBe(10)
+  })
+
+  it('uses default pagination when not specified', async () => {
+    seedAuth0Users(5)
+
+    const res = await authenticatedRequest(app, testEnv, '/users', 'GET')
+
+    expect(res.status).toBe(200)
+    const data = await res.json<UsersResponse>()
+    expect(data.limit).toBe(10)
+    expect(data.users).toHaveLength(6) // 5 seeded + 1 default
+  })
+
+  it('returns empty users array when no users exist', async () => {
+    // Reset mock and clear default user
+    resetAuth0Mock()
+    // Clear auth0 mock state manually for this test
+    const { auth0MockState } = await import('~/common/test/auth0-mock')
+    auth0MockState.users.clear()
+
+    const res = await authenticatedRequest(app, testEnv, '/users', 'GET')
+
+    expect(res.status).toBe(200)
+    const data = await res.json<UsersResponse>()
+    expect(data.users).toHaveLength(0)
+    expect(data.total).toBe(0)
+  })
+
+  it('returns user data with correct structure', async () => {
+    const res = await authenticatedRequest(app, testEnv, '/users', 'GET')
+
+    expect(res.status).toBe(200)
+    const data = await res.json<UsersResponse>()
+    expect(data.users).toHaveLength(1)
+
+    const user = data.users[0]
+    expect(user).toMatchObject({
+      email: expect.any(String),
+      name: expect.any(String),
+      nickname: expect.any(String),
+    })
+  })
+
+  it('returns 500 when Auth0 API fails', async () => {
+    setAuth0Error('list', {
+      message: 'Service temporarily unavailable',
+      statusCode: 503,
+    })
+
+    const res = await authenticatedRequest(app, testEnv, '/users', 'GET')
+
+    expect(res.status).toBe(500)
+  })
+
+  describe('authentication requirements', () => {
+    it('returns 401 when API key is missing', async () => {
+      const res = await app.request('/users', { method: 'GET' }, testEnv)
+
+      expect(res.status).toBe(401)
+    })
+
+    it('returns 401 when JWT token is missing', async () => {
+      const res = await app.request(
+        '/users',
+        {
+          headers: { 'x-api-key': testEnv.API_KEY },
+          method: 'GET',
+        },
+        testEnv,
+      )
+
+      expect(res.status).toBe(401)
+    })
+  })
+})

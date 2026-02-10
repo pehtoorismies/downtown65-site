@@ -39,29 +39,29 @@ export const EventCard = ({
   return (
     <Voucher>
       <EventHeader
-        title={title}
+        count={count}
+        creatorNickname={createdBy.nickname}
         eventText={eventText}
         imageUrl={imageUrl}
-        creatorNickname={createdBy.nickname}
-        count={count}
         meAttending={meAttending}
         race={race}
+        title={title}
       />
       <Voucher.Content>
         <EventDetails
-          subtitle={subtitle}
           dateStart={dateStart}
-          timeStart={timeStart}
           location={location}
+          subtitle={subtitle}
+          timeStart={timeStart}
         >
           {children}
         </EventDetails>
         <Divider
-          my="xs"
           label={EVENT_CARD_LABELS.participants}
           labelPosition="center"
+          my="xs"
         />
-        <Participants participants={participants} me={me} />
+        <Participants me={me} participants={participants} />
         <EventDescription description={description} />
       </Voucher.Content>
     </Voucher>

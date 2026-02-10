@@ -1,0 +1,25 @@
+name: Read Wrangler URL
+description: "Extract the deployment URL from a Wrangler JSONC config file"
+
+inputs:
+  config-file:
+    description: "Path to the Wrangler JSONC config file"
+    required: true
+  environment:
+    description: "Environment name (pull-request, staging, production)"
+    required: true
+
+outputs:
+  url:
+    description: "The full deployment URL (https://...)"
+    value: ${{ steps.read-url.outputs.url }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Read URL from Wrangler config
+      id: read-url
+      shell: bash
+      run: |
+        DOMAIN=$(cat ${{ inputs.config-file }} | sed 's/^ *\/\/.*//' | jq -r ".env.\"${{ inputs.environment }}\".routes[0].pattern")
+        echo "url=https://$DOMAIN" >> $GITHUB_OUTPUT
