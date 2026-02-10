@@ -5,6 +5,7 @@ on:
     types: [closed]
     paths:
       - "apps/**"
+      - "packages/**"
 
 jobs:
   cleanup-pr-api:
@@ -24,7 +25,7 @@ jobs:
           preCommands: |
             pnpm generate:wrangler-config pr ${{ github.event.pull_request.number }} 00000000-0000-0000-0000-000000000000
             npx wrangler d1 delete pr-${{ github.event.pull_request.number }}-dt65-events -y
-          command: delete -c wrangler.pr.jsonc
+          command: delete --config wrangler.pr.jsonc
 
   cleanup-pr-events:
     runs-on: ubuntu-22.04
@@ -41,4 +42,4 @@ jobs:
           environment: pull-request
           workingDirectory: apps/events
           preCommands: pnpm generate:wrangler-config pr ${{ github.event.pull_request.number }}
-          command: delete -c wrangler.pr.jsonc
+          command: delete --config wrangler.pr.jsonc
