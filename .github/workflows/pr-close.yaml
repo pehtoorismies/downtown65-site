@@ -7,8 +7,7 @@ on:
       - "apps/**"
 
 jobs:
-  cleanup-database:
-    if: inputs.app == 'api'
+  cleanup-pr-api:
     runs-on: ubuntu-22.04
     environment: development
     steps:
@@ -27,7 +26,7 @@ jobs:
             npx wrangler d1 delete pr-${{ github.event.pull_request.number }}-dt65-events -y
           command: delete -c wrangler.pr.jsonc
 
-  cleanup-deployment:
+  cleanup-pr-events:
     runs-on: ubuntu-22.04
     environment: development
     steps:
