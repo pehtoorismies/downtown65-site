@@ -56,7 +56,7 @@
         "AUTH_CLIENT_ID": "uPu5NUyP1yaGw2IAC0B1KeCgbX3FaNzz",
         "AUTH_DOMAIN": "prod-dt65.eu.auth0.com",
         "AUTH_AUDIENCE": "https://graphql-api.downtown65.com/",
-        "LOG_LEVEL": "warning"
+        "LOG_LEVEL": "warn"
       },
       "d1_databases": [
         {
