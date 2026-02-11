@@ -13,55 +13,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  determine-apps:
-    runs-on: ubuntu-22.04
-    outputs:
-      api: ${{ steps.changed-apps.outputs.api }}
-      events: ${{ steps.changed-apps.outputs.events }}
-      www: ${{ steps.changed-apps.outputs.www }}
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Determine changed apps
-        id: changed-apps
-        run: |
-          CHANGED_FILES=$(git diff --name-only origin/staging...)
-          echo "Changed files:"
-          echo "$CHANGED_FILES"
-
-          # Check if any packages changed
-          PACKAGES_CHANGED=$(echo "$CHANGED_FILES" | grep -q '^packages/' && echo "true" || echo "false")
-          echo "Packages changed: $PACKAGES_CHANGED"
-
-          # Get changed apps
-          CHANGED_APPS=$(echo "$CHANGED_FILES" | grep -o '^apps/[^/]*' | sort -u | sed 's|apps/||')
-          echo "Changed apps: $CHANGED_APPS"
-
-          # If packages changed, deploy all apps
-          if [ "$PACKAGES_CHANGED" = "true" ]; then
-            echo "Packages changed - marking all apps for deployment"
-            echo "api=true" >> $GITHUB_OUTPUT
-            echo "events=true" >> $GITHUB_OUTPUT
-            echo "www=true" >> $GITHUB_OUTPUT
-          else
-            echo "api=false" >> $GITHUB_OUTPUT
-            echo "events=false" >> $GITHUB_OUTPUT
-            echo "www=false" >> $GITHUB_OUTPUT
-
-            for app in $CHANGED_APPS; do
-              echo "$app=true" >> $GITHUB_OUTPUT
-            done
-          fi
-
   quality-checks:
     uses: ./.github/workflows/quality-checks.yaml
     secrets: inherit
 
   deploy-api:
-    needs: [determine-apps, quality-checks]
-    # Always deploy API when any app changes (Events and WWW depend on it)
+    needs: [quality-checks]
     uses: ./.github/workflows/_deploy-api.yaml
     with:
       environment: pull-request
@@ -69,8 +26,7 @@ jobs:
     secrets: inherit
 
   deploy-events:
-    needs: [determine-apps, quality-checks, deploy-api]
-    if: needs.determine-apps.outputs.events == 'true'
+    needs: [quality-checks, deploy-api]
     uses: ./.github/workflows/_deploy-events.yaml
     with:
       environment: pull-request
@@ -78,8 +34,7 @@ jobs:
     secrets: inherit
 
   deploy-www:
-    needs: [determine-apps, quality-checks, deploy-api]
-    if: needs.determine-apps.outputs.www == 'true'
+    needs: [quality-checks, deploy-api]
     uses: ./.github/workflows/_deploy-www.yaml
     with:
       environment: pull-request
