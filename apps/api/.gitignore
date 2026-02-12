@@ -23,3 +23,4 @@ seed_data_tmp/
 wrangler.local.jsonc
 wrangler.pr.jsonc
 .envrc
+.import
