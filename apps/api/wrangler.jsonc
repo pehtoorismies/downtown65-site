@@ -62,7 +62,7 @@
         {
           "binding": "D1_DB",
           "database_name": "staging-dt65-events",
-          "database_id": "554a46eb-7563-4511-950c-32c6e29140a5",
+          "database_id": "6513942e-fd09-493e-b0ac-8c6fe640b7a6",
           "migrations_dir": "drizzle_flat"
         }
       ]
