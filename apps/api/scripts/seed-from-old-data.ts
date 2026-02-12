@@ -219,7 +219,7 @@ const generateEventInsertStatements = (
       `'${escapeSQL(event.eventULID)}'`,
       `'${escapeSQL(event.title)}'`,
       `'${escapeSQL(event.subtitle)}'`,
-      event.description ? `'${escapeSQL(event.description)}'` : "''",
+      event.description ? `'${escapeSQL(event.description)}'` : 'NULL',
       `'${event.eventType}'`,
       `'${event.dateStart}'`,
       event.timeStart ? `'${event.timeStart}'` : 'NULL',
@@ -246,7 +246,10 @@ const generateParticipantInsertStatements = (
 
   statements.push('-- Participant seed data (users_to_events)')
   let totalParticipants = 0
-  let skippedParticipants = 0
+  const skippedAuth0Subs = new Map<
+    string,
+    { events: { title: string; ulid: string }[] }
+  >()
 
   // Events are sorted by createdAt, so eventId = index + 1
   for (let i = 0; i < events.length; i++) {
@@ -254,12 +257,23 @@ const generateParticipantInsertStatements = (
     const eventId = i + 1
 
     // Skip events whose creator wasn't found (they were skipped in event inserts)
-    if (!userIdMap.has(event.createdBy.id)) continue
+    if (!userIdMap.has(event.createdBy.id)) {
+      throw new Error(
+        `Event "${event.title}" has creator "${event.createdBy.id}" which is missing from users. This should have been caught during event insert generation.`,
+      )
+    }
 
     for (const participant of event.participants) {
       const userId = userIdMap.get(participant.auth0Sub)
       if (!userId) {
-        skippedParticipants++
+        const existing = skippedAuth0Subs.get(participant.auth0Sub)
+        if (existing) {
+          existing.events.push({ title: event.title, ulid: event.eventULID })
+        } else {
+          skippedAuth0Subs.set(participant.auth0Sub, {
+            events: [{ title: event.title, ulid: event.eventULID }],
+          })
+        }
         continue
       }
 
@@ -270,10 +284,16 @@ const generateParticipantInsertStatements = (
     }
   }
 
-  if (skippedParticipants > 0) {
+  if (skippedAuth0Subs.size > 0) {
     console.warn(
-      `Skipped ${skippedParticipants} participants (auth0Sub not found in users)`,
+      `Skipped participants with unknown auth0Sub (${skippedAuth0Subs.size} unique):`,
     )
+    for (const [sub, { events }] of skippedAuth0Subs) {
+      console.warn(`  ${sub}`)
+      for (const e of events) {
+        console.warn(`    - ${e.title} (${e.ulid})`)
+      }
+    }
   }
 
   statements.unshift(`-- Total participants: ${totalParticipants}`)
@@ -319,8 +339,8 @@ const main = async () => {
       participantInserts,
     ].join('\n')
 
-    const outputPath = './seed-data/seed.sql'
-    fs.mkdirSync('./seed-data', { recursive: true })
+    const outputPath = './seed_data_tmp/seed.sql'
+    fs.mkdirSync('./seed_data_tmp', { recursive: true })
     fs.writeFileSync(outputPath, sqlContent, 'utf-8')
 
     console.log(`Generated SQL file: ${outputPath}`)
