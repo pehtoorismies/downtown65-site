@@ -20,7 +20,7 @@
     "seed:remote": "wrangler d1 execute $npm_config_db --env=$npm_config_env --file=./seed-data/seed.sql",
     "test": "vitest run",
     "typecheck": "tsc -b --noEmit",
-    "temporary-script": "tsx scripts/seed-from-csv.ts"
+    "temporary-script": "tsx scripts/seed-from-old-data.ts"
   },
   "dependencies": {
     "@downtown65/logger": "workspace:*",
