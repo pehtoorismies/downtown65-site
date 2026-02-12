@@ -20,6 +20,7 @@ type Vars = {
     scope: string
     gty: string
     azp: string
+    permissions?: string[]
   }
   requestContext: RequestContext
 }
