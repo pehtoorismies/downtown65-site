@@ -115,6 +115,7 @@ jobs:
           exit 1
 
       - name: Sync Users
+        if: inputs.environment == 'pull-request'
         run: |
           curl -X POST "${{ steps.set-url.outputs.url }}/sync/users" \
             -H "x-api-key: ${{ secrets.DT65_API_KEY }}"
