@@ -47,12 +47,10 @@ describe('GET /events/{idOrULID}', () => {
         '/events/999999',
         'GET',
       )
-
       expect(res.status).toBe(404)
       const body = await res.json()
       expect(body).toEqual({ message: 'Event with id 999999 not found' })
     })
-
     it('returns 404 for non-existent ULID', async () => {
       const nonExistentULID = '01KGQB74XVBEBXXT2H8VW2BSD1'
       const res = await authenticatedRequest(
@@ -61,7 +59,6 @@ describe('GET /events/{idOrULID}', () => {
         `/events/${nonExistentULID}`,
         'GET',
       )
-
       expect(res.status).toBe(404)
       const body = await res.json()
       expect(body).toEqual({

@@ -7,7 +7,7 @@ import { createRoute, z } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
-import { getEventById } from '../db/get-event-by-id'
+import { getEvent } from '../db/get-event'
 import { updateEvent } from '../db/update-event'
 
 const ParamsSchema = z.object({
@@ -57,7 +57,7 @@ export const register = (app: AppAPI) => {
     const eventData = c.req.valid('json')
 
     // Check if event exists
-    const existingEvent = await getEventById(ctx, eventId)
+    const existingEvent = await getEvent(ctx, eventId)
     if (!existingEvent) {
       return c.json({ message: 'Event not found' }, 404)
     }

@@ -8,8 +8,7 @@ import { createRoute, z } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
-import { getEventById } from '../db/get-event-by-id'
-import { getEventByULID } from '../db/get-event-by-ULID'
+import { getEvent } from '../db/get-event'
 
 const IdOrULIDSchema = z.union([StringIDSchema, ULIDSchema])
 
@@ -48,10 +47,7 @@ export const register = (app: AppAPI) => {
     const { idOrULID } = c.req.valid('param')
     ctx.logger.info(`Fetching event by idOrULID ${idOrULID}`)
 
-    const event =
-      typeof idOrULID === 'number'
-        ? await getEventById(ctx, idOrULID)
-        : await getEventByULID(ctx, idOrULID)
+    const event = await getEvent(ctx, idOrULID)
 
     ctx.logger.withMetadata({ event }).debug('Fetched event')
 
