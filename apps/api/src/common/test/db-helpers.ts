@@ -113,10 +113,12 @@ export async function createTestParticipation(
   db: DB,
   userId: number,
   eventId: number,
+  createdAt?: string,
 ): Promise<void> {
   await db.insert(usersToEvent).values({
     eventId,
     userId,
+    ...(createdAt && { createdAt }),
   })
 }
 
