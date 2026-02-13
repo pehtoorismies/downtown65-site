@@ -1,7 +1,6 @@
 import type { Event, ID, ULID } from '@downtown65/schema'
 import { EventSchema } from '@downtown65/schema'
-import { eq, sql } from 'drizzle-orm'
-
+import { asc, eq, sql } from 'drizzle-orm'
 import type { RequestContext } from '~/app-api'
 import { getDb } from '~/db/get-db'
 import { users, usersToEvent } from '~/db/schema'
@@ -43,6 +42,7 @@ export const getEvent = async (
     .from(usersToEvent)
     .innerJoin(users, eq(usersToEvent.userId, users.id))
     .where(eq(usersToEvent.eventId, event.id))
+    .orderBy(asc(usersToEvent.createdAt))
 
   return EventSchema.decode({
     ...event,
