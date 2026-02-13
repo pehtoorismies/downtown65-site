@@ -1,17 +1,20 @@
-import type { Event, ULID } from '@downtown65/schema'
+import type { Event, ID, ULID } from '@downtown65/schema'
 import { EventSchema } from '@downtown65/schema'
+
 import type { RequestContext } from '~/app-api'
 import { getDb } from '~/db/get-db'
 
-export const getEventByULID = async (
+export const getEvent = async (
   ctx: RequestContext,
-  eventULID: ULID,
+  idOrUlid: ID | ULID,
 ): Promise<Event | undefined> => {
   const db = getDb(ctx.db)
 
+  const queryField = typeof idOrUlid === 'number' ? 'id' : 'eventULID'
+
   const event = await db.query.events.findFirst({
     where: {
-      eventULID,
+      [queryField]: idOrUlid,
     },
     with: {
       createdBy: true,
@@ -19,7 +22,7 @@ export const getEventByULID = async (
     },
   })
 
-  ctx.logger.withMetadata({ event }).debug('Queried event by ULID')
+  ctx.logger.withMetadata({ event }).debug(`Queried event by ${queryField}`)
 
   if (!event) {
     return undefined

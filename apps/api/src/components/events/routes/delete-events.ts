@@ -5,7 +5,7 @@ import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { getUserId } from '~/components/users/db/get-user-id'
 import { deleteEvent } from '../db/delete-event'
-import { getEventById } from '../db/get-event-by-id'
+import { getEvent } from '../db/get-event'
 
 const ParamsSchema = z.object({
   id: StringIDSchema,
@@ -47,7 +47,7 @@ export const register = (app: AppAPI) => {
     ctx.logger.info(`Deleting event with ID ${id}`)
 
     // Check if event exists
-    const existingEvent = await getEventById(ctx, id)
+    const existingEvent = await getEvent(ctx, id)
     if (!existingEvent) {
       return c.json({ code: 404, message: 'Event not found' }, 404)
     }
