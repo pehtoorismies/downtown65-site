@@ -47,7 +47,7 @@ export const register = (app: AppAPI) => {
     ctx.logger.info(`Deleting event with ID ${id}`)
 
     // Check if event exists
-    const existingEvent = await getEvent(ctx, id)
+    const existingEvent = await getEvent(ctx, id, false)
     if (!existingEvent) {
       return c.json({ code: 404, message: 'Event not found' }, 404)
     }

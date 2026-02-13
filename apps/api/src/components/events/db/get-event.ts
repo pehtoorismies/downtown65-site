@@ -8,6 +8,7 @@ import { users, usersToEvent } from '~/db/schema'
 export const getEvent = async (
   ctx: RequestContext,
   idOrUlid: ID | ULID,
+  includeParticipants: boolean = true,
 ): Promise<Event | undefined> => {
   const db = getDb(ctx.db)
 
@@ -26,6 +27,13 @@ export const getEvent = async (
 
   if (!event) {
     return undefined
+  }
+
+  if (!includeParticipants) {
+    return EventSchema.decode({
+      ...event,
+      participants: [],
+    })
   }
 
   // HACK - Drizzle doesn't support joinedAt in query
