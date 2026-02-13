@@ -47,7 +47,7 @@ export const meta: Route.MetaFunction = () => {
   return [
     { title: 'Downtown65 Events' },
     {
-      content: 'Events calendar for Downtown 65 Endurance ry',
+      content: 'Events App for Downtown 65 Endurance ry',
       name: 'description',
     },
     { content: '#da532c', name: 'msapplication-TileColor' },
