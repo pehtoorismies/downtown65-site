@@ -149,6 +149,7 @@ describe('GET /events/{idOrULID}', () => {
 
     it('includes participants list', async () => {
       const creator = await createTestUser(db, { nickname: 'creator' })
+
       const participant1 = await createTestUser(db, {
         nickname: 'participant1',
       })
@@ -160,9 +161,25 @@ describe('GET /events/{idOrULID}', () => {
       })
 
       const event = await createTestEvent(db, { creatorId: creator.id })
-      await createTestParticipation(db, participant2.id, event.id)
-      await createTestParticipation(db, participant3.id, event.id)
-      await createTestParticipation(db, participant1.id, event.id)
+
+      await createTestParticipation(
+        db,
+        participant1.id,
+        event.id,
+        '2028-01-15 10:00:00',
+      )
+      await createTestParticipation(
+        db,
+        participant2.id,
+        event.id,
+        '2025-01-14 11:00:00',
+      )
+      await createTestParticipation(
+        db,
+        participant3.id,
+        event.id,
+        '2024-01-12 12:00:00',
+      )
 
       const res = await authenticatedRequest(
         app,
@@ -175,20 +192,19 @@ describe('GET /events/{idOrULID}', () => {
       const body = await res.json<Event>()
       expect(body.participants).toHaveLength(3)
 
-      // notice order
       expect(body.participants[0]).toEqual(
         expect.objectContaining({
-          id: participant2.id,
+          id: participant3.id,
           joinedAt: expect.any(String),
-          nickname: 'participant2',
+          nickname: 'participant3',
         }),
       )
 
       expect(body.participants[1]).toEqual(
         expect.objectContaining({
-          id: participant3.id,
+          id: participant2.id,
           joinedAt: expect.any(String),
-          nickname: 'participant3',
+          nickname: 'participant2',
         }),
       )
 
