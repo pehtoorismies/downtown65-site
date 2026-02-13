@@ -192,10 +192,14 @@ describe('GET /events/{idOrULID}', () => {
       const body = await res.json<Event>()
       expect(body.participants).toHaveLength(3)
 
+      expect(body.participants[0].joinedAt).toBe('2024-01-12T12:00:00Z')
+
+      expect(body.participants[0].joinedAt).toBe('2024-01-12T12:00:00Z')
+
       expect(body.participants[0]).toEqual(
         expect.objectContaining({
           id: participant3.id,
-          joinedAt: expect.any(String),
+          joinedAt: '2024-01-12T12:00:00Z',
           nickname: 'participant3',
         }),
       )
@@ -203,7 +207,7 @@ describe('GET /events/{idOrULID}', () => {
       expect(body.participants[1]).toEqual(
         expect.objectContaining({
           id: participant2.id,
-          joinedAt: expect.any(String),
+          joinedAt: '2025-01-14T11:00:00Z',
           nickname: 'participant2',
         }),
       )
@@ -211,7 +215,7 @@ describe('GET /events/{idOrULID}', () => {
       expect(body.participants[2]).toEqual(
         expect.objectContaining({
           id: participant1.id,
-          joinedAt: expect.any(String),
+          joinedAt: '2028-01-15T10:00:00Z',
           nickname: 'participant1',
         }),
       )
