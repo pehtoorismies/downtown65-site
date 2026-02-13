@@ -43,6 +43,49 @@ export const loader = async ({ context }: Route.LoaderArgs) => {
   }
 }
 
+export const meta: Route.MetaFunction = () => {
+  return [
+    { title: 'Downtown65 Events' },
+    {
+      content: 'Events calendar for Downtown 65 Endurance ry',
+      name: 'description',
+    },
+    { content: '#da532c', name: 'msapplication-TileColor' },
+    { content: '#ffffff', name: 'theme-color' },
+  ]
+}
+
+export const links: Route.LinksFunction = () => {
+  return [
+    {
+      href: '/apple-touch-icon.png',
+      rel: 'apple-touch-icon',
+      sizes: '180x180',
+    },
+    {
+      href: '/favicon-32x32.png',
+      rel: 'icon',
+      sizes: '32x32',
+      type: 'image/png',
+    },
+    {
+      href: '/favicon-16x16.png',
+      rel: 'icon',
+      sizes: '16x16',
+      type: 'image/png',
+    },
+    {
+      href: '/site.webmanifest',
+      rel: 'manifest',
+    },
+    {
+      color: '#5bbad5',
+      href: '/safari-pinned-tab.svg',
+      rel: 'mask-icon',
+    },
+  ]
+}
+
 export function Layout({ children }: PropsWithChildren<Route.ComponentProps>) {
   const data = useRouteLoaderData('root')
   const user = (data?.user as User) ?? null
