@@ -155,10 +155,14 @@ describe('GET /events/{idOrULID}', () => {
       const participant2 = await createTestUser(db, {
         nickname: 'participant2',
       })
+      const participant3 = await createTestUser(db, {
+        nickname: 'participant3',
+      })
 
       const event = await createTestEvent(db, { creatorId: creator.id })
-      await createTestParticipation(db, participant1.id, event.id)
       await createTestParticipation(db, participant2.id, event.id)
+      await createTestParticipation(db, participant3.id, event.id)
+      await createTestParticipation(db, participant1.id, event.id)
 
       const res = await authenticatedRequest(
         app,
@@ -169,20 +173,31 @@ describe('GET /events/{idOrULID}', () => {
 
       expect(res.status).toBe(200)
       const body = await res.json<Event>()
-      expect(body.participants).toHaveLength(2)
-      expect(body.participants).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            id: participant1.id,
-            joinedAt: expect.any(String),
-            nickname: 'participant1',
-          }),
-          expect.objectContaining({
-            id: participant2.id,
-            joinedAt: expect.any(String),
-            nickname: 'participant2',
-          }),
-        ]),
+      expect(body.participants).toHaveLength(3)
+
+      // notice order
+      expect(body.participants[0]).toEqual(
+        expect.objectContaining({
+          id: participant2.id,
+          joinedAt: expect.any(String),
+          nickname: 'participant2',
+        }),
+      )
+
+      expect(body.participants[1]).toEqual(
+        expect.objectContaining({
+          id: participant3.id,
+          joinedAt: expect.any(String),
+          nickname: 'participant3',
+        }),
+      )
+
+      expect(body.participants[2]).toEqual(
+        expect.objectContaining({
+          id: participant1.id,
+          joinedAt: expect.any(String),
+          nickname: 'participant1',
+        }),
       )
     })
 
