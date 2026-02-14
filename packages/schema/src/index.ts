@@ -44,6 +44,7 @@ export type ISODate = z.infer<typeof ISODateSchema>
 export const ISOTimeSchema = z.iso.time({ precision: -1 }).brand<'ISOTime'>()
 export type ISOTime = z.infer<typeof ISOTimeSchema>
 export const ISODateTimeSchema = z.iso.datetime().brand<'ISODateTime'>()
+export type ISODateTime = z.infer<typeof ISODateTimeSchema>
 
 // ============================================
 // Dates and Times
