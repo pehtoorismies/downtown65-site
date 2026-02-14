@@ -8,6 +8,7 @@ export const getUserByNickname = async (
   ctx: RequestContext,
   nickname: string,
 ) => {
+  const logger = ctx.logger.child()
   const management = await getManagementClient(ctx.authConfig)
 
   const { data } = await management.users.list({
@@ -16,9 +17,18 @@ export const getUserByNickname = async (
     sort: 'created_at:1',
   })
 
+  logger
+    .withMetadata({ auth0Results: data, nickname })
+    .debug('Queried Auth0 for user by nickname')
+
+  if (data.length === 0) {
+    return undefined
+  }
+
   if (data.length > 1) {
     throw new Error('Multiple users found with the same nickname')
   }
+
   const auth0User = Auth0UserSchema.parse(data[0])
 
   const id = await getUserId(ctx, auth0User.auth0Sub)

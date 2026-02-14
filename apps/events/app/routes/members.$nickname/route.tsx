@@ -14,9 +14,12 @@ import { IconArrowNarrowLeft } from '@tabler/icons-react'
 import {
   isRouteErrorResponse,
   Link,
+  redirect,
   useLoaderData,
   useRouteError,
 } from 'react-router'
+import { getApiClient } from '~/api/api-client'
+import { AuthContext } from '~/context/context'
 import { authMiddleware } from '~/middleware/auth-middleware'
 import { ProfileBox } from '../../components/ProfileBox'
 import type { Route } from './+types/route'
@@ -24,18 +27,47 @@ import notFoundProfileImage from './not-found.jpg'
 
 export const middleware = [authMiddleware()]
 
-export function loader({ params }: Route.LoaderArgs) {
+export async function loader({ params, context }: Route.LoaderArgs) {
+  const authContext = context.get(AuthContext)
+  if (!authContext) {
+    return redirect('/login')
+  }
+
+  const { accessToken } = authContext
+  const apiClient = getApiClient(context.cloudflare.env.API_HOST)
+  const { data, error } = await apiClient.GET('/users/{nickname}', {
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      'x-api-key': context.cloudflare.env.API_KEY,
+    },
+    params: {
+      path: { nickname: params.nickname },
+    },
+  })
+
+  if (error) {
+    const status = error.code ?? 500
+    const statusText =
+      status === 404 ? 'User not found' : 'Failed to load user data'
+    throw new Response(statusText, { status })
+  }
+
   return {
-    email: 'response.user.email',
-    name: 'Nimi Sukunimi',
-    nickname: params.nickname,
-    picture: 'https://example.com/avatar.jpg',
+    createdAt: data.createdAt,
+    email: data.email,
+    name: data.name,
+    nickname: data.nickname,
+    picture: data.picture,
   }
 }
 
 export default function MemberPage() {
-  const { picture, name, email, nickname } = useLoaderData()
-  const createdAt = 'käyttäjä luotu: 01.01.2020'
+  const { picture, name, email, nickname, createdAt } = useLoaderData()
+  const date = new Date(createdAt)
+  const formattedDate = Number.isNaN(date.getTime())
+    ? 'N/A'
+    : date.toLocaleDateString('fi-FI')
+  const createdAtText = `käyttäjä luotu: ${formattedDate}`
   return (
     <>
       <Container fluid mt={75}>
@@ -68,7 +100,7 @@ export default function MemberPage() {
           fz="sm"
           ta="center"
         >
-          {createdAt}
+          {createdAtText}
         </Text>
 
         <Center mt="xl">

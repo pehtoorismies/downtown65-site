@@ -77,7 +77,7 @@ describe('GET /users/{nickname}', () => {
       'GET',
     )
 
-    expect(res.status).toBe(500) // Zod parse error when data[0] is undefined
+    expect(res.status).toBe(404)
   })
 
   it('returns 500 when Auth0 user exists but no local user', async () => {
