@@ -28,10 +28,10 @@ export const updateUser = async (
   const localUpdateValues = getUpdateValuesForLocal(params)
   if (!localUpdateValues) {
     const user = await db.query.users.findFirst({
-      columns: { auth0Sub: true },
+      columns: { sub: true },
       where: { id },
     })
-    return user?.auth0Sub ?? null
+    return user?.sub ?? null
   }
 
   const user = await db
@@ -41,7 +41,7 @@ export const updateUser = async (
     .returning()
 
   if (user.length === 1) {
-    return user[0].auth0Sub
+    return user[0].sub
   }
   return null
 }

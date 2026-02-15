@@ -29,7 +29,7 @@ const ParticipantEntrySchema = z
       })
       .passthrough(),
   })
-  .transform((o) => ({ auth0Sub: o.M.id, joinedAt: o.M.joinedAt }))
+  .transform((o) => ({ joinedAt: o.M.joinedAt, sub: o.M.id }))
 
 const ParticipantsSchema = z
   .object({
@@ -82,10 +82,10 @@ const UserSchema = z
     Picture: z.string(),
   })
   .transform((obj) => ({
-    auth0Sub: obj.Id,
     createdAt: obj['Created At'],
     nickname: obj.Nickname,
     picture: obj.Picture,
+    sub: obj.Id,
   }))
 
 type ParsedUser = z.infer<typeof UserSchema> & { id: number }
@@ -188,7 +188,7 @@ const generateUserInsertStatements = (users: ParsedUser[]): string => {
 
   for (const user of users) {
     statements.push(
-      `INSERT INTO users (auth0Sub, nickname, picture) VALUES ('${escapeSQL(user.auth0Sub)}', '${escapeSQL(user.nickname)}', '${escapeSQL(user.picture)}');`,
+      `INSERT INTO users (sub, nickname, picture) VALUES ('${escapeSQL(user.sub)}', '${escapeSQL(user.nickname)}', '${escapeSQL(user.picture)}');`,
     )
   }
 
@@ -246,7 +246,7 @@ const generateParticipantInsertStatements = (
 
   statements.push('-- Participant seed data (users_to_events)')
   let totalParticipants = 0
-  const skippedAuth0Subs = new Map<
+  const skippedSubs = new Map<
     string,
     { events: { title: string; ulid: string }[] }
   >()
@@ -264,13 +264,13 @@ const generateParticipantInsertStatements = (
     }
 
     for (const participant of event.participants) {
-      const userId = userIdMap.get(participant.auth0Sub)
+      const userId = userIdMap.get(participant.sub)
       if (!userId) {
-        const existing = skippedAuth0Subs.get(participant.auth0Sub)
+        const existing = skippedSubs.get(participant.sub)
         if (existing) {
           existing.events.push({ title: event.title, ulid: event.eventULID })
         } else {
-          skippedAuth0Subs.set(participant.auth0Sub, {
+          skippedSubs.set(participant.sub, {
             events: [{ title: event.title, ulid: event.eventULID }],
           })
         }
@@ -284,11 +284,11 @@ const generateParticipantInsertStatements = (
     }
   }
 
-  if (skippedAuth0Subs.size > 0) {
+  if (skippedSubs.size > 0) {
     console.warn(
-      `Skipped participants with unknown auth0Sub (${skippedAuth0Subs.size} unique):`,
+      `Skipped participants with unknown sub (${skippedSubs.size} unique):`,
     )
-    for (const [sub, { events }] of skippedAuth0Subs) {
+    for (const [sub, { events }] of skippedSubs) {
       console.warn(`  ${sub}`)
       for (const e of events) {
         console.warn(`    - ${e.title} (${e.ulid})`)
@@ -308,7 +308,7 @@ const main = async () => {
     const users = await readUsersFromFile('.import/users/users.json')
     console.log(`Parsed ${users.length} users`)
 
-    const userIdMap = new Map(users.map((u) => [u.auth0Sub, u.id]))
+    const userIdMap = new Map(users.map((u) => [u.sub, u.id]))
 
     // Read events
     const events = await readEventsFromImportDir('.import')

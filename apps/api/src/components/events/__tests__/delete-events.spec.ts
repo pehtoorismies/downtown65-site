@@ -16,7 +16,7 @@ const app = createApp({ userService: createMockUserService() })
 
 /**
  * The JWT mock (jwk-mock.ts) uses 'auth0|user-123' as the sub for authenticated requests.
- * To test authorization, we need to create users with matching auth0Sub values.
+ * To test authorization, we need to create users with matching sub values.
  */
 const MOCK_JWT_AUTH0_SUB = 'auth0|user-123'
 
@@ -30,7 +30,7 @@ describe('DELETE /events/{id}', () => {
   describe('when event does not exist', () => {
     it('returns 404 for non-existent event', async () => {
       // Create a user that matches the JWT mock so authentication succeeds
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
 
       const res = await authenticatedRequest(
         app,
@@ -48,12 +48,12 @@ describe('DELETE /events/{id}', () => {
   describe('authorization', () => {
     it('returns 403 when user is not the event creator', async () => {
       // Create the authenticated user (matches JWT mock)
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
 
       // Create a different user who owns the event
       const eventCreator = await createTestUser(db, {
-        auth0Sub: 'auth0|other-user',
         nickname: 'eventowner',
+        sub: 'auth0|other-user',
       })
       const event = await createTestEvent(db, {
         creatorId: eventCreator.id,
@@ -78,7 +78,7 @@ describe('DELETE /events/{id}', () => {
     it('returns 403 when authenticated user does not exist in database', async () => {
       // Create a different user who owns the event (not matching JWT mock)
       const eventCreator = await createTestUser(db, {
-        auth0Sub: 'auth0|other-user',
+        sub: 'auth0|other-user',
       })
       const event = await createTestEvent(db, { creatorId: eventCreator.id })
 
@@ -104,8 +104,8 @@ describe('DELETE /events/{id}', () => {
     it('deletes event when user is the creator', async () => {
       // Create user that matches the JWT mock
       const creator = await createTestUser(db, {
-        auth0Sub: MOCK_JWT_AUTH0_SUB,
         nickname: 'creator',
+        sub: MOCK_JWT_AUTH0_SUB,
       })
       const event = await createTestEvent(db, {
         creatorId: creator.id,
@@ -130,7 +130,7 @@ describe('DELETE /events/{id}', () => {
 
     it('returns empty body on successful deletion', async () => {
       const creator = await createTestUser(db, {
-        auth0Sub: MOCK_JWT_AUTH0_SUB,
+        sub: MOCK_JWT_AUTH0_SUB,
       })
       const event = await createTestEvent(db, { creatorId: creator.id })
 
@@ -148,7 +148,7 @@ describe('DELETE /events/{id}', () => {
 
     it('deletes event with participants', async () => {
       const creator = await createTestUser(db, {
-        auth0Sub: MOCK_JWT_AUTH0_SUB,
+        sub: MOCK_JWT_AUTH0_SUB,
       })
       const participant1 = await createTestUser(db, {
         nickname: 'participant1',
@@ -182,7 +182,7 @@ describe('DELETE /events/{id}', () => {
 
     it('does not affect other events when deleting one', async () => {
       const creator = await createTestUser(db, {
-        auth0Sub: MOCK_JWT_AUTH0_SUB,
+        sub: MOCK_JWT_AUTH0_SUB,
       })
       const eventToDelete = await createTestEvent(db, {
         creatorId: creator.id,
@@ -213,7 +213,7 @@ describe('DELETE /events/{id}', () => {
   describe('authentication requirements', () => {
     it('returns 401 when API key is missing', async () => {
       const creator = await createTestUser(db, {
-        auth0Sub: MOCK_JWT_AUTH0_SUB,
+        sub: MOCK_JWT_AUTH0_SUB,
       })
       const event = await createTestEvent(db, { creatorId: creator.id })
 
@@ -228,7 +228,7 @@ describe('DELETE /events/{id}', () => {
 
     it('returns 401 when JWT token is missing', async () => {
       const creator = await createTestUser(db, {
-        auth0Sub: MOCK_JWT_AUTH0_SUB,
+        sub: MOCK_JWT_AUTH0_SUB,
       })
       const event = await createTestEvent(db, { creatorId: creator.id })
 

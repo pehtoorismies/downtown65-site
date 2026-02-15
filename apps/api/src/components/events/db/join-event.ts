@@ -25,7 +25,7 @@ export const joinEvent = async (
   ctx.logger.info(`Start joining event`)
   const user = await db.query.users.findFirst({
     where: {
-      auth0Sub: input.sub,
+      sub: input.sub,
     },
   })
   if (!user) {

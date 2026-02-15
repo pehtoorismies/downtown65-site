@@ -11,7 +11,7 @@ import type { DB } from '~/db/get-db'
 import { events, users, usersToEvent } from '~/db/schema'
 
 export interface CreateUserOptions {
-  auth0Sub?: string
+  sub?: string
   nickname?: string
   picture?: string
 }
@@ -54,7 +54,7 @@ export async function createTestUser(
   options: CreateUserOptions = {},
 ): Promise<typeof users.$inferSelect> {
   const timestamp = Date.now()
-  const auth0Sub = options.auth0Sub || `auth0|test-${timestamp}`
+  const sub = options.sub || `auth0|test-${timestamp}`
   const nickname = options.nickname || `testuser-${timestamp}`
   const picture =
     options.picture || `https://example.com/avatar-${timestamp}.jpg`
@@ -62,9 +62,9 @@ export async function createTestUser(
   const [created] = await db
     .insert(users)
     .values({
-      auth0Sub,
       nickname,
       picture,
+      sub,
     })
     .returning()
 

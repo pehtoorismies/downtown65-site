@@ -1,34 +1,7 @@
 import { type ID, IDSchema } from '@downtown65/schema'
-import z from 'zod'
 import type { RequestContext } from '~/app-api'
 import { getDb } from '~/db/get-db'
 import { users as usersTable } from '~/db/schema'
-
-const LocalUserSchema = z.object({
-  nickname: z.string(),
-  picture: z.httpUrl(),
-  sub: z.string(),
-})
-
-type LocalUser = z.infer<typeof LocalUserSchema>
-
-const createLocalUser = async (ctx: RequestContext, values: LocalUser) => {
-  const db = getDb(ctx.db)
-  try {
-    const result = await db
-      .insert(usersTable)
-      .values({
-        ...values,
-        auth0Sub: values.sub,
-      })
-      .returning({ id: usersTable.id })
-    return result[0].id
-  } catch (error: unknown) {
-    ctx.logger.withError(error).error('Error during local user creation')
-
-    return null
-  }
-}
 
 type RegisterParams = {
   nickname: string
@@ -40,11 +13,17 @@ export const signup = async (
   ctx: RequestContext,
   params: RegisterParams,
 ): Promise<ID | null> => {
-  const localUserId = await createLocalUser(ctx, LocalUserSchema.decode(params))
+  const db = getDb(ctx.db)
 
-  if (!localUserId) {
+  try {
+    const result = await db
+      .insert(usersTable)
+      .values(params)
+      .returning({ id: usersTable.id })
+    return IDSchema.parse(result[0].id)
+  } catch (error: unknown) {
+    ctx.logger.withError(error).error('Error during local user creation')
+
     return null
   }
-
-  return IDSchema.parse(localUserId)
 }

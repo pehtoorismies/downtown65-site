@@ -42,7 +42,7 @@ export const auth0MockState = {
     this.errors.update = null
     this.errors.create = null
   },
-  // Users database - keyed by user_id (auth0Sub)
+  // Users database - keyed by user_id (sub)
   users: new Map<string, MockAuth0User>(),
 }
 

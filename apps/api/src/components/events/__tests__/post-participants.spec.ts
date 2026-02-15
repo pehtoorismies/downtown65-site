@@ -29,7 +29,7 @@ describe('POST /events/{id}/participants/me', () => {
   describe('successful participation', () => {
     it('adds user as participant and returns success message', async () => {
       const user = await createTestUser(db, {
-        auth0Sub: MOCK_JWT_AUTH0_SUB,
+        sub: MOCK_JWT_AUTH0_SUB,
       })
       const creator = await createTestUser(db, { nickname: 'creator' })
       const event = await createTestEvent(db, { creatorId: creator.id })
@@ -50,7 +50,7 @@ describe('POST /events/{id}/participants/me', () => {
 
     it('creates participation record in database', async () => {
       const user = await createTestUser(db, {
-        auth0Sub: MOCK_JWT_AUTH0_SUB,
+        sub: MOCK_JWT_AUTH0_SUB,
       })
       const creator = await createTestUser(db, { nickname: 'creator' })
       const event = await createTestEvent(db, { creatorId: creator.id })
@@ -72,7 +72,7 @@ describe('POST /events/{id}/participants/me', () => {
 
     it('allows creator to join their own event', async () => {
       const creator = await createTestUser(db, {
-        auth0Sub: MOCK_JWT_AUTH0_SUB,
+        sub: MOCK_JWT_AUTH0_SUB,
       })
       const event = await createTestEvent(db, { creatorId: creator.id })
 
@@ -94,7 +94,7 @@ describe('POST /events/{id}/participants/me', () => {
   describe('when user is already a participant', () => {
     it('returns 200 with already-joined message', async () => {
       const user = await createTestUser(db, {
-        auth0Sub: MOCK_JWT_AUTH0_SUB,
+        sub: MOCK_JWT_AUTH0_SUB,
       })
       const creator = await createTestUser(db, { nickname: 'creator' })
       const event = await createTestEvent(db, { creatorId: creator.id })
@@ -116,7 +116,7 @@ describe('POST /events/{id}/participants/me', () => {
 
     it('does not create duplicate participation record', async () => {
       const user = await createTestUser(db, {
-        auth0Sub: MOCK_JWT_AUTH0_SUB,
+        sub: MOCK_JWT_AUTH0_SUB,
       })
       const creator = await createTestUser(db, { nickname: 'creator' })
       const event = await createTestEvent(db, { creatorId: creator.id })
@@ -138,7 +138,7 @@ describe('POST /events/{id}/participants/me', () => {
 
   describe('when event does not exist', () => {
     it('returns 404 for non-existent event', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
 
       const res = await authenticatedRequest(
         app,
@@ -156,7 +156,7 @@ describe('POST /events/{id}/participants/me', () => {
 
     it('does not create participation record for non-existent event', async () => {
       const user = await createTestUser(db, {
-        auth0Sub: MOCK_JWT_AUTH0_SUB,
+        sub: MOCK_JWT_AUTH0_SUB,
       })
 
       await authenticatedRequest(
@@ -176,7 +176,7 @@ describe('POST /events/{id}/participants/me', () => {
   describe('multiple events', () => {
     it('allows user to join multiple events', async () => {
       const user = await createTestUser(db, {
-        auth0Sub: MOCK_JWT_AUTH0_SUB,
+        sub: MOCK_JWT_AUTH0_SUB,
       })
       const creator = await createTestUser(db, { nickname: 'creator' })
       const event1 = await createTestEvent(db, {
@@ -214,7 +214,7 @@ describe('POST /events/{id}/participants/me', () => {
   describe('authentication requirements', () => {
     it('returns 401 when API key is missing', async () => {
       const user = await createTestUser(db, {
-        auth0Sub: MOCK_JWT_AUTH0_SUB,
+        sub: MOCK_JWT_AUTH0_SUB,
       })
       const event = await createTestEvent(db, { creatorId: user.id })
 
@@ -229,7 +229,7 @@ describe('POST /events/{id}/participants/me', () => {
 
     it('returns 401 when JWT token is missing', async () => {
       const user = await createTestUser(db, {
-        auth0Sub: MOCK_JWT_AUTH0_SUB,
+        sub: MOCK_JWT_AUTH0_SUB,
       })
       const event = await createTestEvent(db, { creatorId: user.id })
 

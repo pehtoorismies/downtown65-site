@@ -31,8 +31,8 @@ describe('GET /users/{nickname}', () => {
     })
 
     await createTestUser(db, {
-      auth0Sub: 'auth0|found-user',
       nickname: 'found-user',
+      sub: 'auth0|found-user',
     })
 
     const res = await authenticatedRequest(
@@ -54,8 +54,8 @@ describe('GET /users/{nickname}', () => {
 
   it('returns the default test user by nickname', async () => {
     await createTestUser(db, {
-      auth0Sub: 'auth0|user-123',
       nickname: 'test-user',
+      sub: 'auth0|user-123',
     })
 
     const res = await authenticatedRequest(
@@ -102,8 +102,8 @@ describe('GET /users/{nickname}', () => {
     // Create local user so the parallel DB query resolves quickly
     // and doesn't leak past the test boundary
     await createTestUser(db, {
-      auth0Sub: 'auth0|any-user',
       nickname: 'any-user',
+      sub: 'auth0|any-user',
     })
 
     setUserServiceError('getBySub', {

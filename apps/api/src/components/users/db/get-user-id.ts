@@ -10,7 +10,7 @@ export const getUserId = async (
   const localUser = await db.query.users.findFirst({
     columns: { id: true },
     where: {
-      auth0Sub: sub,
+      sub,
     },
   })
   return !localUser ? undefined : localUser.id

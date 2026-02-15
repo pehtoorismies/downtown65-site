@@ -1,17 +1,12 @@
 import { z } from 'zod'
 
-export const Auth0UserSchema = z
-  .object({
-    email: z.string(),
-    name: z.string(),
-    nickname: z.string(),
-    picture: z.string(),
-    sub: z.string(),
-  })
-  .transform(({ sub, ...rest }) => ({
-    auth0Sub: sub,
-    ...rest,
-  }))
+export const Auth0UserSchema = z.object({
+  email: z.string(),
+  name: z.string(),
+  nickname: z.string(),
+  picture: z.string(),
+  sub: z.string(),
+})
 
 const Auth0TokensBaseSchema = z.object({
   access_token: z.string(),

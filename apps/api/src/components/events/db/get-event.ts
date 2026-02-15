@@ -29,15 +29,9 @@ export const getEvent = async (
     return undefined
   }
 
-  const { auth0Sub: sub, ...createdByRest } = event.createdBy
-  const mappedEvent = {
-    ...event,
-    createdBy: { ...createdByRest, sub },
-  }
-
   if (!includeParticipants) {
     return EventSchema.decode({
-      ...mappedEvent,
+      ...event,
       participants: [],
     })
   }
@@ -51,7 +45,7 @@ export const getEvent = async (
       joinedAt: sql<string>`replace(${usersToEvent.createdAt}, ' ', 'T') || 'Z'`,
       nickname: users.nickname,
       picture: users.picture,
-      sub: users.auth0Sub,
+      sub: users.sub,
     })
     .from(usersToEvent)
     .innerJoin(users, eq(usersToEvent.userId, users.id))
@@ -59,7 +53,7 @@ export const getEvent = async (
     .orderBy(asc(usersToEvent.createdAt))
 
   return EventSchema.decode({
-    ...mappedEvent,
+    ...event,
     participants: participantRows,
   })
 }

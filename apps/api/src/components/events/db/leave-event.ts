@@ -25,7 +25,7 @@ export const leaveEvent = async (
   ctx.logger.debug(`Start leaving event`)
   const user = await db.query.users.findFirst({
     where: {
-      auth0Sub: input.sub,
+      sub: input.sub,
     },
   })
   if (!user) {

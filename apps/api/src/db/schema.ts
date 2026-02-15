@@ -25,12 +25,12 @@ export const events = sqliteTable(
 export const users = sqliteTable(
   'users',
   (t) => ({
-    auth0Sub: t.text().notNull().unique(), // Link to Auth0
     id: t.integer('id').primaryKey({ autoIncrement: true }),
     nickname: t.text().notNull().unique(),
     picture: t.text().notNull(),
+    sub: t.text().notNull().unique(), // Link to UserService like Auth0 sub
   }),
-  (table) => [index('users_auth0Sub_idx').on(table.auth0Sub)],
+  (table) => [index('users_sub_idx').on(table.sub)],
 )
 
 export const usersToEvent = sqliteTable(

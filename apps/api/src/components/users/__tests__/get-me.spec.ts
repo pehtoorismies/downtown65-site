@@ -24,8 +24,8 @@ describe('GET /users/me', () => {
 
   it('returns the authenticated user with local user existing', async () => {
     await createTestUser(db, {
-      auth0Sub: 'auth0|user-123',
       nickname: 'test-user',
+      sub: 'auth0|user-123',
     })
 
     const res = await authenticatedRequest(app, testEnv, '/users/me', 'GET')
@@ -49,8 +49,8 @@ describe('GET /users/me', () => {
     mockState.reset()
 
     await createTestUser(db, {
-      auth0Sub: 'auth0|user-123',
       nickname: 'test-user',
+      sub: 'auth0|user-123',
     })
 
     const res = await authenticatedRequest(app, testEnv, '/users/me', 'GET')
@@ -69,8 +69,8 @@ describe('GET /users/me', () => {
     // Create local user so the parallel DB query resolves quickly
     // and doesn't leak past the test boundary
     await createTestUser(db, {
-      auth0Sub: 'auth0|user-123',
       nickname: 'test-user',
+      sub: 'auth0|user-123',
     })
 
     setUserServiceError('getBySub', {

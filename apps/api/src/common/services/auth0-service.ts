@@ -4,12 +4,6 @@ import { z } from 'zod'
 import type { AuthConfig } from '~/common/config/config'
 import type { SaasUserService } from './saas-user-service'
 
-// const Auth0SubSchema = z.string().startsWith('auth0|').openapi({
-//   description: 'Auth0 Subject Identifier',
-//   example: 'auth0|1234567890',
-// })
-// export type Auth0Sub = z.infer<typeof Auth0SubSchema>
-
 const Auth0UserSchema = z
   .object({
     app_metadata: z.object({

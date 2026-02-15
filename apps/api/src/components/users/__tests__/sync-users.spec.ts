@@ -53,8 +53,8 @@ describe('POST /sync/users', () => {
 
     // Create one user locally first
     await createTestUser(db, {
-      auth0Sub: seeded[0].sub,
       nickname: seeded[0].nickname,
+      sub: seeded[0].sub,
     })
 
     const res = await makeRequest(app, testEnv, '/sync/users', {
@@ -77,8 +77,8 @@ describe('POST /sync/users', () => {
   it('skips all users when all exist locally', async () => {
     // Create the default user locally
     await createTestUser(db, {
-      auth0Sub: 'auth0|user-123',
       nickname: 'test-user',
+      sub: 'auth0|user-123',
     })
 
     const res = await makeRequest(app, testEnv, '/sync/users', {

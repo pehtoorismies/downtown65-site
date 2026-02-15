@@ -13,7 +13,7 @@ export const createEvent = async (
 
   const localUser = await db.query.users.findFirst({
     where: {
-      auth0Sub: creatorSub,
+      sub: creatorSub,
     },
   })
 

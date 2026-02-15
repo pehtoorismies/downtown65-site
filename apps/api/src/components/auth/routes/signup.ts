@@ -110,7 +110,7 @@ export const register = (app: AppAPI) => {
 
     if (!id) {
       ctx.logger
-        .withMetadata({ auth0Sub: result.user.sub })
+        .withMetadata({ sub: result.user.sub })
         .error(
           'Failed to create local user after successful Auth0 user creation',
         )

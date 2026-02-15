@@ -23,7 +23,7 @@ export const createUsers = async (
     const existing = await db
       .select({ id: usersTable.id })
       .from(usersTable)
-      .where(eq(usersTable.auth0Sub, user.sub))
+      .where(eq(usersTable.sub, user.sub))
       .limit(1)
 
     const isNew = existing.length === 0
@@ -34,11 +34,7 @@ export const createUsers = async (
         .info(`Creating new user ${user.nickname}`)
       const createdUser = await db
         .insert(usersTable)
-        .values({
-          auth0Sub: user.sub,
-          nickname: user.nickname,
-          picture: user.picture,
-        })
+        .values(user)
         .returning({ id: usersTable.id })
       createdUsers.push({ createdUser })
     } else {

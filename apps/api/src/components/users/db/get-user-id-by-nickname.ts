@@ -8,7 +8,7 @@ export const getUserIdByNickname = async (
   const db = getDb(ctx.db)
 
   const localUser = await db.query.users.findFirst({
-    columns: { auth0Sub: true, id: true },
+    columns: { id: true, sub: true },
     where: {
       nickname,
     },

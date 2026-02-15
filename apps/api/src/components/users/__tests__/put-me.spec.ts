@@ -24,8 +24,8 @@ describe('PUT /users/me', () => {
 
   it('updates user nickname in local database', async () => {
     const localUser = await createTestUser(db, {
-      auth0Sub: 'auth0|user-123',
       nickname: 'old-nickname',
+      sub: 'auth0|user-123',
     })
 
     const res = await authenticatedRequest(app, testEnv, '/users/me', 'PUT', {
@@ -46,8 +46,8 @@ describe('PUT /users/me', () => {
 
   it('updates picture in local database', async () => {
     const localUser = await createTestUser(db, {
-      auth0Sub: 'auth0|user-123',
       picture: 'https://example.com/old-avatar.jpg',
+      sub: 'auth0|user-123',
     })
 
     const newPicture = 'https://example.com/new-avatar.jpg'
@@ -67,8 +67,8 @@ describe('PUT /users/me', () => {
 
   it('returns 200 when updating name (not stored locally)', async () => {
     await createTestUser(db, {
-      auth0Sub: 'auth0|user-123',
       nickname: 'test-user',
+      sub: 'auth0|user-123',
     })
 
     const res = await authenticatedRequest(app, testEnv, '/users/me', 'PUT', {
