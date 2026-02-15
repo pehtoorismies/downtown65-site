@@ -113,20 +113,6 @@ export function clearUserServiceError(method: ErrorConfig['method']) {
 
 export function createMockUserService(): SaasUserService {
   return {
-    getByNickname: async (nickname) => {
-      throwIfError('getByNickname')
-      const matches = Array.from(mockState.users.values()).filter(
-        (u) => u.nickname === nickname,
-      )
-
-      if (matches.length === 0) {
-        return null
-      }
-      if (matches.length > 1) {
-        throw new Error('Multiple users found with the same nickname')
-      }
-      return matches[0]
-    },
     getBySub: async (sub) => {
       throwIfError('getBySub')
       return mockState.users.get(sub) ?? null

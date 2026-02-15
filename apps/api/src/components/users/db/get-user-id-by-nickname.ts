@@ -8,7 +8,7 @@ export const getUserIdByNickname = async (
   const db = getDb(ctx.db)
 
   const localUser = await db.query.users.findFirst({
-    columns: { id: true },
+    columns: { auth0Sub: true, id: true },
     where: {
       nickname,
     },
@@ -18,5 +18,5 @@ export const getUserIdByNickname = async (
     return null
   }
 
-  return localUser.id
+  return localUser
 }

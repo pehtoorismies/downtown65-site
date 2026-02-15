@@ -79,23 +79,47 @@ export const createAuth0UserService = (
   }
 
   return {
-    getByNickname: async (nickname) => {
-      const management = await getManagementClient()
-      const { data } = await management.users.list({
-        fields: QUERY_USER_RETURNED_FIELDS,
-        q: `nickname:${nickname}`,
-        sort: 'created_at:1',
-      })
+    createUser: async (params) => {
+      try {
+        const management = await getManagementClient()
+        const auth0User = await management.users.create({
+          // TODO: handle with Auth0 Roles.
+          app_metadata: { role: params.role },
+          connection: 'Username-Password-Authentication',
+          email: params.email,
+          email_verified: false,
+          name: params.name,
+          nickname: params.nickname,
+          password: params.password,
+          user_metadata: {
+            subscribeEventCreationEmail: true,
+            subscribeWeeklyEmail: true,
+          },
+          verify_email: true,
+        })
 
-      if (data.length === 0) {
-        return null
+        return {
+          type: 'Success',
+          user: Auth0UserSchema.parse(auth0User),
+        }
+      } catch (error: unknown) {
+        if (
+          error instanceof Error &&
+          'statusCode' in error &&
+          (error as { statusCode: number }).statusCode === 400
+        ) {
+          return {
+            error: 'User with the same email or nickname already exists',
+            statusCode: 400,
+            type: 'Error',
+          }
+        }
+        return {
+          error: 'An unknown error occurred during user creation',
+          statusCode: 500,
+          type: 'Error',
+        }
       }
-
-      if (data.length > 1) {
-        throw new Error('Multiple users found with the same nickname')
-      }
-
-      return Auth0UserSchema.parse(data[0])
     },
 
     getBySub: async (sub) => {

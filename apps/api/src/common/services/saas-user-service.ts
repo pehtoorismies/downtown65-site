@@ -32,9 +32,30 @@ type UpdateUserParams = {
   }
 }
 
+type CreateUserParams = {
+  nickname: string
+  name: string
+  email: string
+  password: string
+  role: 'USER' | 'ADMIN'
+}
+
+type CreateUserError = {
+  type: 'Error'
+  error: string
+  statusCode: number
+}
+
+type CreateUserSuccess = {
+  type: 'Success'
+  user: SaasUser
+}
+
+type CreateUserResult = CreateUserError | CreateUserSuccess
+
 export interface SaasUserService {
-  getByNickname: (nickname: string) => Promise<SaasUser | null>
   getBySub: (sub: string) => Promise<SaasUser | null>
   paginatedList: (page: number, limit: number) => Promise<ListedSaasUsers>
   update: (sub: string, params: UpdateUserParams) => Promise<void>
+  createUser: (params: CreateUserParams) => Promise<CreateUserResult>
 }
