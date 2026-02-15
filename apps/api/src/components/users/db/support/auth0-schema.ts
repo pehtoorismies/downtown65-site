@@ -30,11 +30,3 @@ export const Auth0UserSchema = z
     roles: [user.app_metadata.role],
     updatedAt: user.created_at,
   }))
-
-export const Auth0UserListResponseSchema = z.object({
-  length: z.number(),
-  limit: z.number(),
-  start: z.number(),
-  total: z.number(),
-  users: z.array(Auth0UserSchema),
-})

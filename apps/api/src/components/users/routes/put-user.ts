@@ -10,6 +10,18 @@ import { jwtToken } from '~/common/middleware/jwt'
 import { updateUser } from '../db/update-user'
 import { UserUpdateParamsSchema } from '../shared-schema'
 
+const UpdateSchema = UserUpdateParamsSchema.transform((obj) => {
+  return {
+    name: obj.name,
+    nickname: obj.nickname,
+    picture: obj.picture,
+    subscriptions: {
+      eventCreationEmail: obj.subscribeEventCreationEmail,
+      weeklyEmail: obj.subscribeWeeklyEmail,
+    },
+  }
+})
+
 const ParamsSchema = z.object({
   auth0Sub: Auth0SubSchema,
 })
@@ -38,18 +50,12 @@ const route = createRoute({
       },
       description: 'User updated successfully',
     },
-    // 401: {
-    //   $ref: '#/components/responses/UnauthorizedError',
-    // },
     404: {
       content: {
         'application/json': { schema: APIErrorResponseSchema },
       },
       description: 'User not found',
     },
-    // 422: {
-    //   $ref: '#/components/responses/ValidationError',
-    // },
   },
   security: [{ ApiKeyAuth: [], BearerToken: [] }],
 })
@@ -60,14 +66,20 @@ export const register = (app: AppAPI) => {
     const userParams = c.req.valid('json')
     const { auth0Sub } = c.req.valid('param')
 
-    const updated = await updateUser(ctx, auth0Sub, userParams)
+    const parsedParams = UpdateSchema.parse(userParams)
 
-    if (!updated) {
-      return c.json(
-        { code: 404, message: `User with sub ${auth0Sub} not found` },
-        404,
-      )
-    }
+    // TODO: no error hanling here
+    await Promise.all([
+      ctx.userService.update(auth0Sub, parsedParams),
+      updateUser(ctx, auth0Sub, userParams),
+    ])
+
+    // if (!updated) {
+    //   return c.json(
+    //     { code: 404, message: `User with sub ${auth0Sub} not found` },
+    //     404,
+    //   )
+    // }
     return c.json({ message: 'User updated successfully' }, 200)
   })
 }

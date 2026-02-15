@@ -29,18 +29,6 @@ const route = createRoute({
       },
       description: 'User updated successfully',
     },
-    // 401: {
-    //   $ref: '#/components/responses/UnauthorizedError',
-    // },
-    // 404: {
-    //   description: 'User not found',
-    //   content: {
-    //     'application/json': { schema: ErrorResponseSchema },
-    //   },
-    // },
-    // 422: {
-    //   $ref: '#/components/responses/ValidationError',
-    // },
   },
   security: [{ ApiKeyAuth: [], BearerToken: [] }],
 })
