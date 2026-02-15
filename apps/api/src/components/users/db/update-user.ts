@@ -1,3 +1,4 @@
+import type { ID } from '@downtown65/schema'
 import { eq } from 'drizzle-orm'
 import type { RequestContext } from '~/app-api'
 import { getDb } from '~/db/get-db'
@@ -20,21 +21,27 @@ const getUpdateValuesForLocal = (params: UserUpdateParams) => {
 
 export const updateUser = async (
   ctx: RequestContext,
-  auth0Sub: string,
+  id: ID,
   params: UserUpdateParams,
 ) => {
+  const db = getDb(ctx.db)
   const localUpdateValues = getUpdateValuesForLocal(params)
   if (!localUpdateValues) {
-    return true
+    const user = await db.query.users.findFirst({
+      columns: { auth0Sub: true },
+      where: { id },
+    })
+    return user?.auth0Sub ?? null
   }
 
-  const db = getDb(ctx.db)
-
-  await db
+  const user = await db
     .update(usersTable)
     .set(localUpdateValues)
-    .where(eq(usersTable.auth0Sub, auth0Sub))
+    .where(eq(usersTable.id, id))
     .returning()
 
-  return true
+  if (user.length === 1) {
+    return user[0].auth0Sub
+  }
+  return null
 }

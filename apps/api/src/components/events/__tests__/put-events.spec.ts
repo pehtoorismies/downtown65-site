@@ -10,9 +10,12 @@ import {
   createTestEvent,
   createTestUser,
 } from '~/common/test/db-helpers'
+import { createMockUserService } from '~/common/test/mock-user-service'
 import { authenticatedRequest } from '~/common/test/request-helpers'
 import { getDb } from '~/db/get-db'
-import app from '~/server'
+import { createApp } from '~/server'
+
+const app = createApp({ userService: createMockUserService() })
 
 /**
  * The JWT mock (jwk-mock.ts) uses 'auth0|user-123' as the sub for authenticated requests.

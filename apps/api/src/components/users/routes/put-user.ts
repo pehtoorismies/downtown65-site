@@ -1,6 +1,6 @@
 import {
   APIErrorResponseSchema,
-  Auth0SubSchema,
+  IDSchema,
   MessageSchema,
 } from '@downtown65/schema'
 import { createRoute, z } from '@hono/zod-openapi'
@@ -23,14 +23,14 @@ const UpdateSchema = UserUpdateParamsSchema.transform((obj) => {
 })
 
 const ParamsSchema = z.object({
-  auth0Sub: Auth0SubSchema,
+  id: IDSchema,
 })
 
 const route = createRoute({
   description: 'Update the authenticated user information',
   method: 'put',
   middleware: [apiKeyAuth, jwtToken()],
-  path: '/users/{auth0Sub}',
+  path: '/users/{id}',
   request: {
     body: {
       content: {
@@ -64,22 +64,18 @@ export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
     const ctx = c.get('requestContext')
     const userParams = c.req.valid('json')
-    const { auth0Sub } = c.req.valid('param')
+    const { id } = c.req.valid('param')
 
+    // TODO: no error hanling here / check parsing
     const parsedParams = UpdateSchema.parse(userParams)
 
+    const sub = await updateUser(ctx, id, userParams)
+    if (!sub) {
+      return c.json({ code: 404, message: `User with id ${id} not found` }, 404)
+    }
     // TODO: no error hanling here
-    await Promise.all([
-      ctx.userService.update(auth0Sub, parsedParams),
-      updateUser(ctx, auth0Sub, userParams),
-    ])
+    await ctx.userService.update(sub, parsedParams)
 
-    // if (!updated) {
-    //   return c.json(
-    //     { code: 404, message: `User with sub ${auth0Sub} not found` },
-    //     404,
-    //   )
-    // }
     return c.json({ message: 'User updated successfully' }, 200)
   })
 }

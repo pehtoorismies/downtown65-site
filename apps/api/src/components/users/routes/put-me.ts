@@ -1,10 +1,23 @@
-import { MessageSchema } from '@downtown65/schema'
+import { APIErrorResponseSchema, MessageSchema } from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
+import { getUserId } from '../db/get-user-id'
 import { updateUser } from '../db/update-user'
 import { UserUpdateParamsSchema } from '../shared-schema'
+
+const UpdateSchema = UserUpdateParamsSchema.transform((obj) => {
+  return {
+    name: obj.name,
+    nickname: obj.nickname,
+    picture: obj.picture,
+    subscriptions: {
+      eventCreationEmail: obj.subscribeEventCreationEmail,
+      weeklyEmail: obj.subscribeWeeklyEmail,
+    },
+  }
+})
 
 const route = createRoute({
   description: 'Update the authenticated user information',
@@ -29,6 +42,12 @@ const route = createRoute({
       },
       description: 'User updated successfully',
     },
+    500: {
+      content: {
+        'application/json': { schema: APIErrorResponseSchema },
+      },
+      description: 'Internal server error',
+    },
   },
   security: [{ ApiKeyAuth: [], BearerToken: [] }],
 })
@@ -39,11 +58,20 @@ export const register = (app: AppAPI) => {
     const userParams = c.req.valid('json')
     const { sub } = c.get('jwtPayload')
 
-    const updated = await updateUser(ctx, sub, userParams)
+    // TODO: no error hanling here / check parsing
+    const parsedParams = UpdateSchema.parse(userParams)
 
-    if (!updated) {
-      throw new Error(`User with sub ${sub} not found`)
+    const id = await getUserId(ctx, sub)
+
+    if (!id) {
+      return c.json(
+        { code: 500, message: `User with sub ${sub} not found` },
+        500,
+      )
     }
+
+    await updateUser(ctx, id, userParams)
+    await ctx.userService.update(sub, parsedParams)
 
     return c.json({ message: 'User updated successfully' }, 200)
   })
