@@ -1,30 +1,33 @@
 import { env as testEnv } from 'cloudflare:test'
 import { beforeEach, describe, expect, it } from 'vitest'
-import {
-  addAuth0User,
-  resetAuth0Mock,
-  setAuth0Error,
-} from '~/common/test/auth0-fixtures'
 import { clearDatabase, createTestUser } from '~/common/test/db-helpers'
+import {
+  addUser,
+  createMockUserService,
+  resetMockUserService,
+  setUserServiceError,
+} from '~/common/test/mock-user-service'
 import { authenticatedRequest } from '~/common/test/request-helpers'
 import { getDb } from '~/db/get-db'
-import app from '~/server'
+import { createApp } from '~/server'
+
+const mockUserService = createMockUserService()
+const app = createApp({ userService: mockUserService })
 
 describe('GET /users/{nickname}', () => {
   const db = getDb(testEnv.D1_DB)
 
   beforeEach(async () => {
     await clearDatabase(db)
-    resetAuth0Mock()
+    resetMockUserService()
   })
 
   it('returns user by nickname', async () => {
-    // Create matching Auth0 and local users
-    addAuth0User({
+    addUser({
       email: 'found@example.com',
       name: 'Found User',
       nickname: 'found-user',
-      user_id: 'auth0|found-user',
+      sub: 'auth0|found-user',
     })
 
     await createTestUser(db, {
@@ -50,7 +53,6 @@ describe('GET /users/{nickname}', () => {
   })
 
   it('returns the default test user by nickname', async () => {
-    // The default Auth0 mock user has nickname 'test-user'
     await createTestUser(db, {
       auth0Sub: 'auth0|user-123',
       nickname: 'test-user',
@@ -69,7 +71,7 @@ describe('GET /users/{nickname}', () => {
     expect(user.email).toBe('test@example.com')
   })
 
-  it('returns 404 when user not found in Auth0', async () => {
+  it('returns 404 when user not found in service', async () => {
     const res = await authenticatedRequest(
       app,
       testEnv,
@@ -80,11 +82,10 @@ describe('GET /users/{nickname}', () => {
     expect(res.status).toBe(404)
   })
 
-  it('returns 500 when Auth0 user exists but no local user', async () => {
-    // Auth0 user exists but no local user record
-    addAuth0User({
+  it('returns 500 when service user exists but no local user', async () => {
+    addUser({
       nickname: 'orphan-user',
-      user_id: 'auth0|orphan-user',
+      sub: 'auth0|orphan-user',
     })
 
     const res = await authenticatedRequest(
@@ -94,13 +95,19 @@ describe('GET /users/{nickname}', () => {
       'GET',
     )
 
-    // Per the implementation, this throws an error
     expect(res.status).toBe(500)
   })
 
-  it('returns 500 when Auth0 API fails', async () => {
-    setAuth0Error('list', {
-      message: 'Auth0 unavailable',
+  it('returns 500 when user service fails', async () => {
+    // Create local user so the parallel DB query resolves quickly
+    // and doesn't leak past the test boundary
+    await createTestUser(db, {
+      auth0Sub: 'auth0|any-user',
+      nickname: 'any-user',
+    })
+
+    setUserServiceError('getByNickname', {
+      message: 'Service unavailable',
       statusCode: 503,
     })
 

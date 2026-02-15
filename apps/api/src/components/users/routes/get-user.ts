@@ -48,10 +48,20 @@ export const register = (app: AppAPI) => {
     const ctx = c.get('requestContext')
     const { nickname } = c.req.valid('param')
 
-    const [user, userId] = await Promise.all([
+    const [userResult, userIdResult] = await Promise.allSettled([
       ctx.userService.getByNickname(nickname),
       getUserIdByNickname(ctx, nickname),
     ])
+
+    if (userResult.status === 'rejected') {
+      throw userResult.reason
+    }
+    if (userIdResult.status === 'rejected') {
+      throw userIdResult.reason
+    }
+
+    const user = userResult.value
+    const userId = userIdResult.value
 
     if (!user) {
       return c.json({ code: 404, message: 'User not found' }, 404)

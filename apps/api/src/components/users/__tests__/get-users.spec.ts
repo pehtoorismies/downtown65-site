@@ -1,14 +1,19 @@
 import { env as testEnv } from 'cloudflare:test'
 import { beforeEach, describe, expect, it } from 'vitest'
-import {
-  resetAuth0Mock,
-  seedAuth0Users,
-  setAuth0Error,
-} from '~/common/test/auth0-fixtures'
 import { clearDatabase } from '~/common/test/db-helpers'
+import {
+  createMockUserService,
+  mockState,
+  resetMockUserService,
+  seedUsers,
+  setUserServiceError,
+} from '~/common/test/mock-user-service'
 import { authenticatedRequest } from '~/common/test/request-helpers'
 import { getDb } from '~/db/get-db'
-import app from '~/server'
+import { createApp } from '~/server'
+
+const mockUserService = createMockUserService()
+const app = createApp({ userService: mockUserService })
 
 interface UsersResponse {
   length: number
@@ -27,11 +32,11 @@ describe('GET /users', () => {
 
   beforeEach(async () => {
     await clearDatabase(db)
-    resetAuth0Mock()
+    resetMockUserService()
   })
 
   it('returns paginated list of users', async () => {
-    seedAuth0Users(15)
+    seedUsers(15)
 
     const res = await authenticatedRequest(
       app,
@@ -49,7 +54,7 @@ describe('GET /users', () => {
   })
 
   it('returns second page of users', async () => {
-    seedAuth0Users(15)
+    seedUsers(15)
 
     const res = await authenticatedRequest(
       app,
@@ -65,7 +70,7 @@ describe('GET /users', () => {
   })
 
   it('uses default pagination when not specified', async () => {
-    seedAuth0Users(5)
+    seedUsers(5)
 
     const res = await authenticatedRequest(app, testEnv, '/users', 'GET')
 
@@ -76,11 +81,7 @@ describe('GET /users', () => {
   })
 
   it('returns empty users array when no users exist', async () => {
-    // Reset mock and clear default user
-    resetAuth0Mock()
-    // Clear auth0 mock state manually for this test
-    const { auth0MockState } = await import('~/common/test/auth0-mock')
-    auth0MockState.users.clear()
+    mockState.reset()
 
     const res = await authenticatedRequest(app, testEnv, '/users', 'GET')
 
@@ -105,8 +106,8 @@ describe('GET /users', () => {
     })
   })
 
-  it('returns 500 when Auth0 API fails', async () => {
-    setAuth0Error('list', {
+  it('returns 500 when user service fails', async () => {
+    setUserServiceError('paginatedList', {
       message: 'Service temporarily unavailable',
       statusCode: 503,
     })

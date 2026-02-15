@@ -35,10 +35,20 @@ export const register = (app: AppAPI) => {
     const ctx = c.get('requestContext')
     const { sub } = c.get('jwtPayload')
 
-    const [user, userId] = await Promise.all([
+    const [userResult, userIdResult] = await Promise.allSettled([
       ctx.userService.getBySub(sub),
       getUserId(ctx, sub),
     ])
+
+    if (userResult.status === 'rejected') {
+      throw userResult.reason
+    }
+    if (userIdResult.status === 'rejected') {
+      throw userIdResult.reason
+    }
+
+    const user = userResult.value
+    const userId = userIdResult.value
 
     if (!user) {
       return c.json(

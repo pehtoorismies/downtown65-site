@@ -10,7 +10,7 @@ type ErrorConfig = {
   message: string
 }
 
-const mockState = {
+export const mockState = {
   errors: {
     getByNickname: null as { statusCode: number; message: string } | null,
     getBySub: null as { statusCode: number; message: string } | null,

@@ -1,15 +1,19 @@
 import { env as testEnv } from 'cloudflare:test'
 import { beforeEach, describe, expect, it } from 'vitest'
-import {
-  getAllAuth0MockUsers,
-  resetAuth0Mock,
-  seedAuth0Users,
-  setAuth0Error,
-} from '~/common/test/auth0-fixtures'
 import { clearDatabase, createTestUser } from '~/common/test/db-helpers'
+import {
+  createMockUserService,
+  mockState,
+  resetMockUserService,
+  seedUsers,
+  setUserServiceError,
+} from '~/common/test/mock-user-service'
 import { makeRequest } from '~/common/test/request-helpers'
 import { getDb } from '~/db/get-db'
-import app from '~/server'
+import { createApp } from '~/server'
+
+const mockUserService = createMockUserService()
+const app = createApp({ userService: mockUserService })
 
 interface SyncResponse {
   createdUsers: number
@@ -21,13 +25,12 @@ describe('POST /sync/users', () => {
 
   beforeEach(async () => {
     await clearDatabase(db)
-    resetAuth0Mock()
+    resetMockUserService()
   })
 
-  it('syncs Auth0 users to local database', async () => {
-    seedAuth0Users(3)
+  it('syncs users to local database', async () => {
+    seedUsers(3)
 
-    // API key only route - no JWT needed
     const res = await makeRequest(app, testEnv, '/sync/users', {
       headers: {
         'x-api-key': testEnv.API_KEY || 'test-api-key',
@@ -46,12 +49,12 @@ describe('POST /sync/users', () => {
   })
 
   it('skips users that already exist locally', async () => {
-    const auth0Users = seedAuth0Users(3)
+    const seeded = seedUsers(3)
 
     // Create one user locally first
     await createTestUser(db, {
-      auth0Sub: auth0Users[0].user_id,
-      nickname: auth0Users[0].nickname,
+      auth0Sub: seeded[0].sub,
+      nickname: seeded[0].nickname,
     })
 
     const res = await makeRequest(app, testEnv, '/sync/users', {
@@ -72,15 +75,11 @@ describe('POST /sync/users', () => {
   })
 
   it('skips all users when all exist locally', async () => {
-    const auth0Users = getAllAuth0MockUsers()
-
-    // Create all Auth0 users locally
-    for (const auth0User of auth0Users) {
-      await createTestUser(db, {
-        auth0Sub: auth0User.user_id,
-        nickname: auth0User.nickname,
-      })
-    }
+    // Create the default user locally
+    await createTestUser(db, {
+      auth0Sub: 'auth0|user-123',
+      nickname: 'test-user',
+    })
 
     const res = await makeRequest(app, testEnv, '/sync/users', {
       headers: {
@@ -95,10 +94,8 @@ describe('POST /sync/users', () => {
     expect(body.existingUsers).toBe(1) // Default user
   })
 
-  it('handles empty Auth0 users list', async () => {
-    // Clear all Auth0 mock users
-    const { auth0MockState } = await import('~/common/test/auth0-mock')
-    auth0MockState.users.clear()
+  it('handles empty users list', async () => {
+    mockState.reset()
 
     const res = await makeRequest(app, testEnv, '/sync/users', {
       headers: {
@@ -113,9 +110,9 @@ describe('POST /sync/users', () => {
     expect(body.existingUsers).toBe(0)
   })
 
-  it('returns 500 when Auth0 API fails', async () => {
-    setAuth0Error('list', {
-      message: 'Auth0 unavailable',
+  it('returns 500 when user service fails', async () => {
+    setUserServiceError('paginatedList', {
+      message: 'Service unavailable',
       statusCode: 500,
     })
 
@@ -137,7 +134,6 @@ describe('POST /sync/users', () => {
     })
 
     it('does not require JWT token (API key only)', async () => {
-      // Only API key, no JWT - should still work
       const res = await makeRequest(app, testEnv, '/sync/users', {
         headers: {
           'x-api-key': testEnv.API_KEY || 'test-api-key',
