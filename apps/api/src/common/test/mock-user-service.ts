@@ -5,22 +5,22 @@ import type {
 } from '~/common/services/saas-user-service'
 
 type ErrorConfig = {
-  method: 'getBySub' | 'getByNickname' | 'paginatedList' | 'update'
+  method: 'getBySub' | 'paginatedList' | 'update' | 'createUser'
   statusCode: number
   message: string
 }
 
 export const mockState = {
   errors: {
-    getByNickname: null as { statusCode: number; message: string } | null,
+    createUser: null as { statusCode: number; message: string } | null,
     getBySub: null as { statusCode: number; message: string } | null,
     paginatedList: null as { statusCode: number; message: string } | null,
     update: null as { statusCode: number; message: string } | null,
   },
   reset() {
     this.users.clear()
+    this.errors.createUser = null
     this.errors.getBySub = null
-    this.errors.getByNickname = null
     this.errors.paginatedList = null
     this.errors.update = null
   },
@@ -113,6 +113,27 @@ export function clearUserServiceError(method: ErrorConfig['method']) {
 
 export function createMockUserService(): SaasUserService {
   return {
+    createUser: async (params) => {
+      throwIfError('createUser')
+      const existingUser = Array.from(mockState.users.values()).find(
+        (u) => u.email === params.email,
+      )
+      if (existingUser) {
+        return {
+          error: 'User with the same email or nickname already exists',
+          statusCode: 400,
+          type: 'Error',
+        }
+      }
+      const user = createMockUser({
+        email: params.email,
+        name: params.name,
+        nickname: params.nickname,
+      })
+      mockState.users.set(user.sub, user)
+      return { type: 'Success', user }
+    },
+
     getBySub: async (sub) => {
       throwIfError('getBySub')
       return mockState.users.get(sub) ?? null
