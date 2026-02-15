@@ -10,9 +10,8 @@ export const UserAPIResponseSchema = z.object({
 })
 
 export const DetailedUserAPIResponseSchema = UserAPIResponseSchema.extend({
-  preferences: z.object({
-    subscribeEventCreationEmail: z.boolean(),
-    subscribeWeeklyEmail: z.boolean(),
+  subscriptions: z.object({
+    eventCreationEmail: z.boolean(),
+    weeklyEmail: z.boolean(),
   }),
-  roles: z.array(z.string()),
 })

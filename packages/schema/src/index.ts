@@ -50,10 +50,10 @@ export type ISODateTime = z.infer<typeof ISODateTimeSchema>
 // Dates and Times
 // ============================================
 export const UserSchema = z.object({
-  auth0Sub: Auth0SubSchema,
   id: IDSchema,
   nickname: z.string().min(1).openapi({ example: 'ada' }),
   picture: z.httpUrl(),
+  sub: z.string(),
 })
 export type User = z.infer<typeof UserSchema>
 

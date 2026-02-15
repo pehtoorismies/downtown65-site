@@ -3,7 +3,7 @@ import { createRoute, z } from '@hono/zod-openapi'
 import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
-import { getUserByNickname } from '../db/get-user-by-nickname'
+import { getUserIdByNickname } from '../db/get-user-id-by-nickname'
 import { DetailedUserAPIResponseSchema } from './api-schema'
 
 // import { getUserByNickname } from '../db/get-user-by-nic
@@ -33,9 +33,12 @@ const route = createRoute({
       },
       description: 'User not found',
     },
-    // 422: {
-    //   $ref: '#/components/responses/ValidationError',
-    // },
+    500: {
+      content: {
+        'application/json': { schema: APIErrorResponseSchema },
+      },
+      description: 'Internal server error',
+    },
   },
   security: [{ ApiKeyAuth: [], BearerToken: [] }],
 })
@@ -44,11 +47,27 @@ export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
     const ctx = c.get('requestContext')
     const { nickname } = c.req.valid('param')
-    const user = await getUserByNickname(ctx, nickname)
+
+    const [user, userId] = await Promise.all([
+      ctx.userService.getByNickname(nickname),
+      getUserIdByNickname(ctx, nickname),
+    ])
 
     if (!user) {
       return c.json({ code: 404, message: 'User not found' }, 404)
     }
-    return c.json(user, 200)
+    if (!userId) {
+      return c.json(
+        { code: 500, message: 'User not found in the database' },
+        500,
+      )
+    }
+
+    const body = DetailedUserAPIResponseSchema.parse({
+      ...user,
+      id: userId,
+    })
+
+    return c.json(body, 200)
   })
 }
