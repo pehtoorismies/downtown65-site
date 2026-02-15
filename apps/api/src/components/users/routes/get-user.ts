@@ -4,7 +4,7 @@ import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { getUserIdByNickname } from '../db/get-user-id-by-nickname'
-import { DetailedUserAPIResponseSchema } from './api-response-schema'
+import { UserAPIResponseSchema } from './api-response-schema'
 
 // import { getUserByNickname } from '../db/get-user-by-nic
 
@@ -22,7 +22,7 @@ const route = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: DetailedUserAPIResponseSchema,
+          schema: UserAPIResponseSchema,
         },
       },
       description: 'User information',
@@ -73,7 +73,7 @@ export const register = (app: AppAPI) => {
       )
     }
 
-    const body = DetailedUserAPIResponseSchema.parse({
+    const body = UserAPIResponseSchema.parse({
       ...user,
       id: userId,
     })

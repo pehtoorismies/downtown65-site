@@ -4,7 +4,7 @@ import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { getUserId } from '../db/get-user-id'
-import { DetailedUserAPIResponseSchema } from './api-response-schema'
+import { UserAPIResponseSchema } from './api-response-schema'
 
 const route = createRoute({
   description: "Get the authenticated user's information",
@@ -15,7 +15,7 @@ const route = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: DetailedUserAPIResponseSchema,
+          schema: UserAPIResponseSchema,
         },
       },
       description: 'User information',
@@ -63,7 +63,7 @@ export const register = (app: AppAPI) => {
       )
     }
 
-    const body = DetailedUserAPIResponseSchema.parse({
+    const body = UserAPIResponseSchema.parse({
       ...user,
       id: userId,
     })

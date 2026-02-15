@@ -1,17 +1,17 @@
-import { ISODateTimeSchema, UserSchema } from '@downtown65/schema'
+import { IDSchema, ISODateTimeSchema } from '@downtown65/schema'
 import z from 'zod'
 
 export const UserAPIResponseSchema = z.object({
-  ...UserSchema.shape,
   createdAt: ISODateTimeSchema,
   email: z.email(),
+  id: IDSchema,
   name: z.string(),
-  updatedAt: ISODateTimeSchema,
-})
-
-export const DetailedUserAPIResponseSchema = UserAPIResponseSchema.extend({
+  nickname: z.string().min(1).openapi({ example: 'ada' }),
+  picture: z.httpUrl(),
+  sub: z.string(),
   subscriptions: z.object({
     eventCreationEmail: z.boolean(),
     weeklyEmail: z.boolean(),
   }),
+  updatedAt: ISODateTimeSchema,
 })

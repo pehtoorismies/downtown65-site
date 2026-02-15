@@ -23,7 +23,9 @@ const route = createRoute({
             limit: z.number(),
             start: z.number(),
             total: z.number(),
-            users: z.array(UserAPIResponseSchema.omit({ id: true })),
+            users: z.array(
+              UserAPIResponseSchema.omit({ id: true, subscriptions: true }),
+            ),
           }),
         },
       },
