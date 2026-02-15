@@ -4,7 +4,7 @@ import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { getUserId } from '../db/get-user-id'
-import { UserAPIResponseSchema } from './api-response-schema'
+import { UserAPIResponseSchema } from './user-api-response-schema'
 
 const route = createRoute({
   description: "Get the authenticated user's information",

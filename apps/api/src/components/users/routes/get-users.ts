@@ -4,7 +4,7 @@ import z from 'zod'
 import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
-import { UserAPIResponseSchema } from './api-response-schema'
+import { UserAPIResponseSchema } from './user-api-response-schema'
 
 const route = createRoute({
   description: 'Get all users',

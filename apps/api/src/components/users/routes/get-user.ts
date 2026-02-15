@@ -4,7 +4,7 @@ import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { getUserIdByNickname } from '../db/get-user-id-by-nickname'
-import { UserAPIResponseSchema } from './api-response-schema'
+import { UserAPIResponseSchema } from './user-api-response-schema'
 
 // import { getUserByNickname } from '../db/get-user-by-nic
 
