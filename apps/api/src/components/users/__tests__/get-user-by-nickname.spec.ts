@@ -106,7 +106,7 @@ describe('GET /users/{nickname}', () => {
       nickname: 'any-user',
     })
 
-    setUserServiceError('getByNickname', {
+    setUserServiceError('getBySub', {
       message: 'Service unavailable',
       statusCode: 503,
     })
