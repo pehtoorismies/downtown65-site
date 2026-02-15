@@ -50,10 +50,12 @@ export const login = async (
       throw new Error('User not found locally after successful authentication')
     }
 
+    const { auth0Sub: sub, ...rest } = localUser
+
     return {
       tokens: auth0.tokens,
       type: 'Success',
-      user: localUser,
+      user: { ...rest, sub },
     }
   } catch (error) {
     ctx.logger.withError(error as Error).error('Unknown error during login')
