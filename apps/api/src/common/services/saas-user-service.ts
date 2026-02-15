@@ -1,6 +1,6 @@
 import type { ISODateTime } from '@downtown65/schema'
 
-type User = {
+export type SaasUser = {
   sub: string
   nickname: string
   name: string
@@ -14,12 +14,12 @@ type User = {
   }
 }
 
-type ListedUsers = {
+type ListedSaasUsers = {
   length: number
   limit: number
   start: number
   total: number
-  users: User[]
+  users: SaasUser[]
 }
 
 type UpdateUserParams = {
@@ -33,8 +33,8 @@ type UpdateUserParams = {
 }
 
 export interface SaasUserService {
-  getByNickname: (nickname: string) => Promise<User | null>
-  getBySub: (sub: string) => Promise<User | null>
-  paginatedList: (page: number, limit: number) => Promise<ListedUsers>
+  getByNickname: (nickname: string) => Promise<SaasUser | null>
+  getBySub: (sub: string) => Promise<SaasUser | null>
+  paginatedList: (page: number, limit: number) => Promise<ListedSaasUsers>
   update: (sub: string, params: UpdateUserParams) => Promise<void>
 }

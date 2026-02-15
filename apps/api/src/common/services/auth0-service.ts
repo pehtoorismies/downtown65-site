@@ -2,7 +2,7 @@ import { Auth0SubSchema, ISODateTimeSchema } from '@downtown65/schema'
 import { AuthenticationClient, ManagementClient } from 'auth0'
 import { z } from 'zod'
 import type { AuthConfig } from '~/common/config/config'
-import type { SaasUserService } from './SaasUserService'
+import type { SaasUserService } from './saas-user-service'
 
 const Auth0UserSchema = z
   .object({
