@@ -4,8 +4,7 @@ import z from 'zod'
 import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
-import { listUsers } from '../db/list-users'
-import { UserAPIResponseSchema } from './api-schema'
+import { UserAPIResponseSchema } from './api-response-schema'
 
 const route = createRoute({
   description: 'Get all users',
@@ -30,9 +29,6 @@ const route = createRoute({
       },
       description: 'List of all users',
     },
-    // 401: {
-    //   $ref: '#/components/responses/UnauthorizedError',
-    // },
   },
   security: [{ ApiKeyAuth: [], BearerToken: [] }],
 })
@@ -58,13 +54,20 @@ export const register = (app: AppAPI) => {
     const { page, limit } = c.req.valid('query')
 
     ctx.logger
-      .withMetadata({ data: { limit, page } })
+      .withMetadata({
+        data: {
+          limit,
+          page,
+          toValidPage: toValidPage(page),
+          validLimit: toValidLimit(limit),
+        },
+      })
       .debug('Handling request to get users')
 
-    const paginatedUsers = await listUsers(ctx, {
-      limit: toValidLimit(limit),
-      page: toValidPage(page),
-    })
+    const paginatedUsers = await ctx.userService.paginatedList(
+      toValidPage(page),
+      toValidLimit(limit),
+    )
 
     return c.json(paginatedUsers, 200)
   })
