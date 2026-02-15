@@ -103,7 +103,7 @@ export default function Users({ loaderData }: Route.ComponentProps) {
   const hasPagination = userCount > perPage
 
   const rows = users.map((u, index) => (
-    <Table.Tr key={u.auth0Sub}>
+    <Table.Tr key={u.sub}>
       <Table.Td>
         <Anchor
           component={Link}

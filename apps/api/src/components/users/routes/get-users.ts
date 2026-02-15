@@ -1,10 +1,14 @@
-import { PaginationQuerySchema } from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
 import z from 'zod'
 import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
 import { UserAPIResponseSchema } from './user-api-response-schema'
+
+export const PaginationQuerySchema = z.object({
+  limit: z.string().optional().default('10'),
+  page: z.string().optional().default('1'),
+})
 
 const route = createRoute({
   description: 'Get all users',

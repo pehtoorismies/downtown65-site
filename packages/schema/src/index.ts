@@ -3,22 +3,9 @@ import { z } from 'zod'
 // add .openapi() to zod schemas
 import '@hono/zod-openapi'
 
-export const PaginationQuerySchema = z.object({
-  limit: z.string().optional().default('10'),
-  page: z.string().optional().default('1'),
-})
-
-export type PaginationQuery = z.infer<typeof PaginationQuerySchema>
-
 // ============================================
 // IDs
 // ============================================
-export const Auth0SubSchema = z.string().startsWith('auth0|').openapi({
-  description: 'Auth0 Subject Identifier',
-  example: 'auth0|1234567890',
-})
-export type Auth0Sub = z.infer<typeof Auth0SubSchema>
-
 export const IDSchema = z.number().int().positive().openapi({
   description: 'Positive integer ID',
   example: 1212121,

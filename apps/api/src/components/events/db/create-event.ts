@@ -1,4 +1,4 @@
-import type { Auth0Sub, EventCreateInput, ULID } from '@downtown65/schema'
+import type { EventCreateInput, ULID } from '@downtown65/schema'
 import { ulid } from 'ulidx'
 import type { RequestContext } from '~/app-api'
 import { getDb } from '~/db/get-db'
@@ -7,13 +7,13 @@ import { events, usersToEvent } from '~/db/schema'
 export const createEvent = async (
   ctx: RequestContext,
   input: EventCreateInput,
-  creatorAuth0Sub: Auth0Sub,
+  creatorSub: string,
 ): Promise<ULID> => {
   const db = getDb(ctx.db)
 
   const localUser = await db.query.users.findFirst({
     where: {
-      auth0Sub: creatorAuth0Sub,
+      auth0Sub: creatorSub,
     },
   })
 

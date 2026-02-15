@@ -1,8 +1,14 @@
-import { Auth0SubSchema, ISODateTimeSchema } from '@downtown65/schema'
+import { ISODateTimeSchema } from '@downtown65/schema'
 import { AuthenticationClient, ManagementClient } from 'auth0'
 import { z } from 'zod'
 import type { AuthConfig } from '~/common/config/config'
 import type { SaasUserService } from './saas-user-service'
+
+// const Auth0SubSchema = z.string().startsWith('auth0|').openapi({
+//   description: 'Auth0 Subject Identifier',
+//   example: 'auth0|1234567890',
+// })
+// export type Auth0Sub = z.infer<typeof Auth0SubSchema>
 
 const Auth0UserSchema = z
   .object({
@@ -27,7 +33,7 @@ const Auth0UserSchema = z
     name: user.name,
     nickname: user.nickname,
     picture: user.picture,
-    sub: Auth0SubSchema.parse(user.user_id),
+    sub: user.user_id,
     subscriptions: {
       eventCreationEmail: user.user_metadata.subscribeEventCreationEmail,
       weeklyEmail: user.user_metadata.subscribeWeeklyEmail,

@@ -42,7 +42,7 @@ export const register = (app: AppAPI) => {
 
     const result = await joinEvent(ctx, {
       eventId,
-      userAuth0Sub: user.sub,
+      sub: user.sub,
     })
 
     switch (result.type) {

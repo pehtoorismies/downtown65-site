@@ -1,13 +1,13 @@
-import { Auth0SubSchema, type ID, IDSchema } from '@downtown65/schema'
+import { type ID, IDSchema } from '@downtown65/schema'
 import z from 'zod'
 import type { RequestContext } from '~/app-api'
 import { getDb } from '~/db/get-db'
 import { users as usersTable } from '~/db/schema'
 
 const LocalUserSchema = z.object({
-  auth0Sub: Auth0SubSchema,
   nickname: z.string(),
   picture: z.httpUrl(),
+  sub: z.string(),
 })
 
 type LocalUser = z.infer<typeof LocalUserSchema>
@@ -17,7 +17,10 @@ const createLocalUser = async (ctx: RequestContext, values: LocalUser) => {
   try {
     const result = await db
       .insert(usersTable)
-      .values(values)
+      .values({
+        ...values,
+        auth0Sub: values.sub,
+      })
       .returning({ id: usersTable.id })
     return result[0].id
   } catch (error: unknown) {
@@ -37,13 +40,7 @@ export const signup = async (
   ctx: RequestContext,
   params: RegisterParams,
 ): Promise<ID | null> => {
-  const localUserId = await createLocalUser(
-    ctx,
-    LocalUserSchema.decode({
-      ...params,
-      auth0Sub: params.sub,
-    }),
-  )
+  const localUserId = await createLocalUser(ctx, LocalUserSchema.decode(params))
 
   if (!localUserId) {
     return null

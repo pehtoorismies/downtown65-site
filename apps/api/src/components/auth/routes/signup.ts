@@ -1,4 +1,4 @@
-import { Auth0SubSchema, IDSchema } from '@downtown65/schema'
+import { IDSchema } from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
 import z from 'zod'
 import type { AppAPI } from '~/app-api'
@@ -24,10 +24,10 @@ const route = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            auth0Sub: Auth0SubSchema,
             email: z.email(),
             id: IDSchema,
             nickname: z.string(),
+            sub: z.string(),
           }),
         },
       },
@@ -119,10 +119,10 @@ export const register = (app: AppAPI) => {
 
     return c.json(
       {
-        auth0Sub: Auth0SubSchema.parse(result.user.sub),
         email: input.email,
         id,
         nickname: input.nickname,
+        sub: result.user.sub,
       },
       201,
     )
