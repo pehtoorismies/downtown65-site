@@ -2,7 +2,7 @@ import { env as testEnv } from 'cloudflare:test'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { clearDatabase, createTestUser } from '~/common/test/db-helpers'
 import {
-  addUser,
+  addSaasUser,
   createMockUserService,
   resetMockUserService,
   setUserServiceError,
@@ -23,7 +23,7 @@ describe('GET /users/{nickname}', () => {
   })
 
   it('returns user by nickname', async () => {
-    addUser({
+    addSaasUser({
       email: 'found@example.com',
       name: 'Found User',
       nickname: 'found-user',
@@ -83,7 +83,7 @@ describe('GET /users/{nickname}', () => {
   })
 
   it('returns 500 when service user exists but no local user', async () => {
-    addUser({
+    addSaasUser({
       nickname: 'orphan-user',
       sub: 'auth0|orphan-user',
     })

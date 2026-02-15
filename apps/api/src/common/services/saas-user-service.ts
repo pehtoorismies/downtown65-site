@@ -55,6 +55,7 @@ type CreateUserResult = CreateUserError | CreateUserSuccess
 
 export interface SaasUserService {
   getBySub: (sub: string) => Promise<SaasUser | null>
+  getByNickname: (nickname: string) => Promise<SaasUser | null>
   paginatedList: (page: number, limit: number) => Promise<ListedSaasUsers>
   update: (sub: string, params: UpdateUserParams) => Promise<void>
   createUser: (params: CreateUserParams) => Promise<CreateUserResult>

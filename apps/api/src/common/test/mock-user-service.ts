@@ -5,7 +5,12 @@ import type {
 } from '~/common/services/saas-user-service'
 
 type ErrorConfig = {
-  method: 'getBySub' | 'paginatedList' | 'update' | 'createUser'
+  method:
+    | 'getBySub'
+    | 'paginatedList'
+    | 'update'
+    | 'createUser'
+    | 'getByNickname'
   statusCode: number
   message: string
 }
@@ -13,6 +18,7 @@ type ErrorConfig = {
 export const mockState = {
   errors: {
     createUser: null as { statusCode: number; message: string } | null,
+    getByNickname: null as { statusCode: number; message: string } | null,
     getBySub: null as { statusCode: number; message: string } | null,
     paginatedList: null as { statusCode: number; message: string } | null,
     update: null as { statusCode: number; message: string } | null,
@@ -22,6 +28,7 @@ export const mockState = {
     this.errors.createUser = null
     this.errors.getBySub = null
     this.errors.paginatedList = null
+    this.errors.getByNickname = null
     this.errors.update = null
   },
   users: new Map<string, SaasUser>(),
@@ -80,7 +87,7 @@ export function seedUsers(count: number): SaasUser[] {
   return users
 }
 
-export function addUser(overrides: Partial<SaasUser> = {}): SaasUser {
+export function addSaasUser(overrides: Partial<SaasUser> = {}): SaasUser {
   const user = createMockUser(overrides)
   mockState.users.set(user.sub, user)
   return user
@@ -132,6 +139,21 @@ export function createMockUserService(): SaasUserService {
       })
       mockState.users.set(user.sub, user)
       return { type: 'Success', user }
+    },
+
+    getByNickname: async (nickname) => {
+      throwIfError('getByNickname')
+      const matches = Array.from(mockState.users.values()).filter(
+        (u) => u.nickname === nickname,
+      )
+
+      if (matches.length === 0) {
+        return null
+      }
+      if (matches.length > 1) {
+        throw new Error('Multiple users found with the same nickname')
+      }
+      return matches[0]
     },
 
     getBySub: async (sub) => {

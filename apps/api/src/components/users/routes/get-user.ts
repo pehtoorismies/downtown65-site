@@ -6,8 +6,6 @@ import { jwtToken } from '~/common/middleware/jwt'
 import { getUserIdByNickname } from '../db/get-user-id-by-nickname'
 import { UserAPIResponseSchema } from './user-api-response-schema'
 
-// import { getUserByNickname } from '../db/get-user-by-nic
-
 const route = createRoute({
   description: "Get user's information by nickname",
   method: 'get',
@@ -48,24 +46,45 @@ export const register = (app: AppAPI) => {
     const ctx = c.get('requestContext')
     const { nickname } = c.req.valid('param')
 
-    const user = await getUserIdByNickname(ctx, nickname)
-    if (!user) {
-      return c.json(
-        {
-          code: 500,
-          message: `User with ${nickname} not found in the database`,
-        },
-        500,
-      )
+    const [userResult, userIdResult] = await Promise.allSettled([
+      ctx.userService.getByNickname(nickname),
+      getUserIdByNickname(ctx, nickname),
+    ])
+
+    if (userResult.status === 'rejected') {
+      throw userResult.reason
+    }
+    if (userIdResult.status === 'rejected') {
+      throw userIdResult.reason
     }
 
-    const saasUser = await ctx.userService.getBySub(user.auth0Sub)
+    const saasUser = userResult.value
+    const user = userIdResult.value
+
+    if (!saasUser && !user) {
+      return c.json(
+        {
+          code: 404,
+          message: `User with ${nickname} not found`,
+        },
+        404,
+      )
+    }
 
     if (!saasUser) {
       return c.json(
         {
           code: 500,
           message: `User with ${nickname} not found in the Auth0 SaasUserService`,
+        },
+        500,
+      )
+    }
+    if (!user) {
+      return c.json(
+        {
+          code: 500,
+          message: `User with ${nickname} not found in the local database`,
         },
         500,
       )

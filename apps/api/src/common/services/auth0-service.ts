@@ -122,6 +122,25 @@ export const createAuth0UserService = (
       }
     },
 
+    getByNickname: async (nickname) => {
+      const management = await getManagementClient()
+      const { data } = await management.users.list({
+        fields: QUERY_USER_RETURNED_FIELDS,
+        q: `nickname:${nickname}`,
+        sort: 'created_at:1',
+      })
+
+      if (data.length === 0) {
+        return null
+      }
+
+      if (data.length > 1) {
+        throw new Error('Multiple users found with the same nickname')
+      }
+
+      return Auth0UserSchema.parse(data[0])
+    },
+
     getBySub: async (sub) => {
       const management = await getManagementClient()
       try {
