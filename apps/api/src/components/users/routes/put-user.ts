@@ -1,6 +1,6 @@
 import {
   APIErrorResponseSchema,
-  Auth0SubSchema,
+  IDSchema,
   MessageSchema,
 } from '@downtown65/schema'
 import { createRoute, z } from '@hono/zod-openapi'
@@ -10,15 +10,27 @@ import { jwtToken } from '~/common/middleware/jwt'
 import { updateUser } from '../db/update-user'
 import { UserUpdateParamsSchema } from '../shared-schema'
 
+const UpdateSchema = UserUpdateParamsSchema.transform((obj) => {
+  return {
+    name: obj.name,
+    nickname: obj.nickname,
+    picture: obj.picture,
+    subscriptions: {
+      eventCreationEmail: obj.subscribeEventCreationEmail,
+      weeklyEmail: obj.subscribeWeeklyEmail,
+    },
+  }
+})
+
 const ParamsSchema = z.object({
-  auth0Sub: Auth0SubSchema,
+  id: IDSchema,
 })
 
 const route = createRoute({
   description: 'Update the authenticated user information',
   method: 'put',
   middleware: [apiKeyAuth, jwtToken()],
-  path: '/users/{auth0Sub}',
+  path: '/users/{id}',
   request: {
     body: {
       content: {
@@ -38,18 +50,12 @@ const route = createRoute({
       },
       description: 'User updated successfully',
     },
-    // 401: {
-    //   $ref: '#/components/responses/UnauthorizedError',
-    // },
     404: {
       content: {
         'application/json': { schema: APIErrorResponseSchema },
       },
       description: 'User not found',
     },
-    // 422: {
-    //   $ref: '#/components/responses/ValidationError',
-    // },
   },
   security: [{ ApiKeyAuth: [], BearerToken: [] }],
 })
@@ -58,16 +64,18 @@ export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
     const ctx = c.get('requestContext')
     const userParams = c.req.valid('json')
-    const { auth0Sub } = c.req.valid('param')
+    const { id } = c.req.valid('param')
 
-    const updated = await updateUser(ctx, auth0Sub, userParams)
+    // TODO: no error hanling here / check parsing
+    const parsedParams = UpdateSchema.parse(userParams)
 
-    if (!updated) {
-      return c.json(
-        { code: 404, message: `User with sub ${auth0Sub} not found` },
-        404,
-      )
+    const sub = await updateUser(ctx, id, userParams)
+    if (!sub) {
+      return c.json({ code: 404, message: `User with id ${id} not found` }, 404)
     }
+    // TODO: no error hanling here
+    await ctx.userService.update(sub, parsedParams)
+
     return c.json({ message: 'User updated successfully' }, 200)
   })
 }

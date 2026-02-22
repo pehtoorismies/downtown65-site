@@ -39,13 +39,13 @@ export const getEvent = async (
   // HACK - Drizzle doesn't support joinedAt in query
   const participantRows = await db
     .select({
-      auth0Sub: users.auth0Sub,
       id: users.id,
       // SQLite's `CURRENT_TIMESTAMP` format (`2025-01-15 14:30:00`)
       // but  Participant expects ISO format (`2025-01-15T14:30:00Z`), so we replace the space with 'T' and append 'Z'
       joinedAt: sql<string>`replace(${usersToEvent.createdAt}, ' ', 'T') || 'Z'`,
       nickname: users.nickname,
       picture: users.picture,
+      sub: users.sub,
     })
     .from(usersToEvent)
     .innerJoin(users, eq(usersToEvent.userId, users.id))

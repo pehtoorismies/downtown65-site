@@ -1,4 +1,4 @@
-import { Auth0SubSchema, IDSchema } from '@downtown65/schema'
+import { IDSchema } from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
 import z from 'zod'
 import type { AppAPI } from '~/app-api'
@@ -24,18 +24,15 @@ const route = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            auth0Sub: Auth0SubSchema,
             email: z.email(),
             id: IDSchema,
             nickname: z.string(),
+            sub: z.string(),
           }),
         },
       },
       description: 'User registered successfully',
     },
-    // 401: {
-    //   $ref: '#/components/responses/UnauthorizedError',
-    // },
     409: {
       content: {
         'application/json': {
@@ -66,9 +63,6 @@ const route = createRoute({
       },
       description: 'Internal server error',
     },
-    // 422: {
-    //   $ref: '#/components/responses/ValidationError',
-    // },
   },
   security: [{ ApiKeyAuth: [] }],
 })
@@ -84,34 +78,53 @@ export const register = (app: AppAPI) => {
       return c.json({ error: 'Access denied' }, 409)
     }
 
-    const result = await signup(ctx, {
+    const result = await ctx.userService.createUser({
       email: input.email,
       name: input.name,
       nickname: input.nickname,
       password: input.password,
+      role: 'USER',
     })
 
-    switch (result.type) {
-      case 'Error': {
-        if (result.statusCode === 409) {
-          return c.json({ error: result.error }, 409)
-        }
-
-        if (result.statusCode === 429) {
-          ctx.logger
-            .withMetadata(result)
-            .info('Signup error 429 Too Many Requests')
-          return c.json({ error: result.error }, 429)
-        }
+    if (result.type === 'Error') {
+      if (result.statusCode === 409) {
+        return c.json({ error: result.error }, 409)
+      }
+      if (result.statusCode === 429) {
         ctx.logger
           .withMetadata(result)
-          .error('Signup error 500 Internal Server Error')
-        return c.json({ error: result.error }, 500)
+          .info('Signup error 429 Too Many Requests')
+        return c.json({ error: result.error }, 429)
       }
-
-      case 'Success': {
-        return c.json(result.user, 201)
-      }
+      ctx.logger
+        .withMetadata(result)
+        .error('Signup error 500 Internal Server Error')
+      return c.json({ error: result.error }, 500)
     }
+
+    const id = await signup(ctx, {
+      nickname: input.nickname,
+      picture: result.user.picture,
+      sub: result.user.sub,
+    })
+
+    if (!id) {
+      ctx.logger
+        .withMetadata({ sub: result.user.sub })
+        .error(
+          'Failed to create local user after successful Auth0 user creation',
+        )
+      return c.json({ error: 'Failed to create local user' }, 500)
+    }
+
+    return c.json(
+      {
+        email: input.email,
+        id,
+        nickname: input.nickname,
+        sub: result.user.sub,
+      },
+      201,
+    )
   })
 }

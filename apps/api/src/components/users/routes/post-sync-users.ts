@@ -2,7 +2,7 @@ import { createRoute } from '@hono/zod-openapi'
 import z from 'zod'
 import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
-import { syncUsers } from '../db/sync-users'
+import { createUsers } from '../db/create-users'
 
 const route = createRoute({
   description: 'Sync all users with external auth provider',
@@ -28,8 +28,8 @@ const route = createRoute({
 export const register = (app: AppAPI) => {
   app.openapi(route, async (c) => {
     const ctx = c.get('requestContext')
-    const updated = await syncUsers(ctx)
-
-    return c.json(updated, 200)
+    const list = await ctx.userService.paginatedList(1, 50)
+    const result = await createUsers(ctx, list.users)
+    return c.json(result, 200)
   })
 }

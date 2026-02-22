@@ -6,9 +6,12 @@ import {
 } from '@downtown65/schema'
 import { assert, beforeEach, describe, expect, it } from 'vitest'
 import { clearDatabase, createTestUser } from '~/common/test/db-helpers'
+import { createMockUserService } from '~/common/test/mock-user-service'
 import { authenticatedRequest } from '~/common/test/request-helpers'
 import { getDb } from '~/db/get-db'
-import app from '~/server'
+import { createApp } from '~/server'
+
+const app = createApp({ userService: createMockUserService() })
 
 /**
  * The JWT mock (jwk-mock.ts) uses 'auth0|user-123' as the sub for authenticated requests.
@@ -35,7 +38,7 @@ describe('POST /events', () => {
 
   describe('successful event creation', () => {
     it('creates event and returns eventULID', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
 
       const res = await authenticatedRequest(
         app,
@@ -52,7 +55,7 @@ describe('POST /events', () => {
 
     it('creates event in database with correct data', async () => {
       const creator = await createTestUser(db, {
-        auth0Sub: MOCK_JWT_AUTH0_SUB,
+        sub: MOCK_JWT_AUTH0_SUB,
       })
 
       const res = await authenticatedRequest(
@@ -83,7 +86,7 @@ describe('POST /events', () => {
     })
 
     it('creates event with null description', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
 
       const eventData: EventCreateInput = {
         ...validEventData,
@@ -107,7 +110,7 @@ describe('POST /events', () => {
     })
 
     it('creates event with null timeStart', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
 
       const eventData: EventCreateInput = {
         ...validEventData,
@@ -131,7 +134,7 @@ describe('POST /events', () => {
     })
 
     it('creates race event', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
 
       const eventData: EventCreateInput = {
         ...validEventData,
@@ -161,7 +164,7 @@ describe('POST /events', () => {
   describe('includeEventCreator flag', () => {
     it('does not add creator as participant when includeEventCreator is false', async () => {
       const creator = await createTestUser(db, {
-        auth0Sub: MOCK_JWT_AUTH0_SUB,
+        sub: MOCK_JWT_AUTH0_SUB,
       })
 
       const eventData: EventCreateInput = {
@@ -191,7 +194,7 @@ describe('POST /events', () => {
 
     it('does not add creator as participant when includeEventCreator is omitted (defaults to false)', async () => {
       const creator = await createTestUser(db, {
-        auth0Sub: MOCK_JWT_AUTH0_SUB,
+        sub: MOCK_JWT_AUTH0_SUB,
       })
 
       const res = await authenticatedRequest(
@@ -216,7 +219,7 @@ describe('POST /events', () => {
 
     it('adds creator as participant when includeEventCreator is true', async () => {
       const creator = await createTestUser(db, {
-        auth0Sub: MOCK_JWT_AUTH0_SUB,
+        sub: MOCK_JWT_AUTH0_SUB,
       })
 
       const eventData: EventCreateInput = {
@@ -249,7 +252,7 @@ describe('POST /events', () => {
 
   describe('different event types', () => {
     it('creates KARONKKA event', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
 
       const eventData: EventCreateInput = {
         ...validEventData,
@@ -273,7 +276,7 @@ describe('POST /events', () => {
     })
 
     it('creates CYCLING event', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
 
       const eventData: EventCreateInput = {
         ...validEventData,
@@ -299,7 +302,7 @@ describe('POST /events', () => {
 
   describe('authentication requirements', () => {
     it('returns 401 when API key is missing', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
 
       const res = await app.request('/events', { method: 'POST' }, testEnv)
 
@@ -307,7 +310,7 @@ describe('POST /events', () => {
     })
 
     it('returns 401 when JWT token is missing', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
 
       const res = await app.request(
         '/events',
@@ -328,7 +331,7 @@ describe('POST /events', () => {
 
   describe('validation', () => {
     it('returns 422 when required fields are missing', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
 
       const invalidData = {
         title: 'Event without required fields',
@@ -346,7 +349,7 @@ describe('POST /events', () => {
     })
 
     it('returns 422 when title is empty', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
 
       const invalidData: EventCreateInput = {
         ...validEventData,
@@ -365,7 +368,7 @@ describe('POST /events', () => {
     })
 
     it('returns 422 when location is empty', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
 
       const invalidData: EventCreateInput = {
         ...validEventData,

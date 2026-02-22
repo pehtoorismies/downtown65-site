@@ -22,6 +22,7 @@ export const getEvents = async (ctx: RequestContext): Promise<EventList> => {
   const withJoinedAt = result.map((event) => {
     return {
       ...event,
+      createdBy: event.createdBy,
       participants: event.participants.map((p) => {
         return {
           ...p,

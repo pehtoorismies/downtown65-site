@@ -33,19 +33,18 @@ export const login = async (
       return auth0
     }
 
-    const { auth0Sub } = Auth0UserSchema.parse(jwtDecode(auth0.tokens.idToken))
+    const { sub } = Auth0UserSchema.parse(jwtDecode(auth0.tokens.idToken))
 
     const db = getDb(ctx.db)
     const localUser = await db.query.users.findFirst({
       where: {
-        auth0Sub,
+        sub,
       },
     })
 
     if (!localUser) {
-      // TODO: insert if not found
       ctx.logger.fatal(
-        `User not found locally after successful authentication: ${auth0Sub}`,
+        `User not found locally after successful authentication: ${sub}`,
       )
       throw new Error('User not found locally after successful authentication')
     }

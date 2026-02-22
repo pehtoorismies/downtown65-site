@@ -3,22 +3,9 @@ import { z } from 'zod'
 // add .openapi() to zod schemas
 import '@hono/zod-openapi'
 
-export const PaginationQuerySchema = z.object({
-  limit: z.string().optional().default('10'),
-  page: z.string().optional().default('1'),
-})
-
-export type PaginationQuery = z.infer<typeof PaginationQuerySchema>
-
 // ============================================
 // IDs
 // ============================================
-export const Auth0SubSchema = z.string().startsWith('auth0|').openapi({
-  description: 'Auth0 Subject Identifier',
-  example: 'auth0|1234567890',
-})
-export type Auth0Sub = z.infer<typeof Auth0SubSchema>
-
 export const IDSchema = z.number().int().positive().openapi({
   description: 'Positive integer ID',
   example: 1212121,
@@ -44,15 +31,16 @@ export type ISODate = z.infer<typeof ISODateSchema>
 export const ISOTimeSchema = z.iso.time({ precision: -1 }).brand<'ISOTime'>()
 export type ISOTime = z.infer<typeof ISOTimeSchema>
 export const ISODateTimeSchema = z.iso.datetime().brand<'ISODateTime'>()
+export type ISODateTime = z.infer<typeof ISODateTimeSchema>
 
 // ============================================
 // Dates and Times
 // ============================================
 export const UserSchema = z.object({
-  auth0Sub: Auth0SubSchema,
   id: IDSchema,
   nickname: z.string().min(1).openapi({ example: 'ada' }),
   picture: z.httpUrl(),
+  sub: z.string(),
 })
 export type User = z.infer<typeof UserSchema>
 

@@ -10,9 +10,12 @@ import {
   createTestEvent,
   createTestUser,
 } from '~/common/test/db-helpers'
+import { createMockUserService } from '~/common/test/mock-user-service'
 import { authenticatedRequest } from '~/common/test/request-helpers'
 import { getDb } from '~/db/get-db'
-import app from '~/server'
+import { createApp } from '~/server'
+
+const app = createApp({ userService: createMockUserService() })
 
 /**
  * The JWT mock (jwk-mock.ts) uses 'auth0|user-123' as the sub for authenticated requests.
@@ -28,7 +31,7 @@ describe('PUT /events/{id}', () => {
 
   describe('successful event update', () => {
     it('updates event title and returns success message', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
       const creator = await createTestUser(db, { nickname: 'creator' })
       const event = await createTestEvent(db, {
         creatorId: creator.id,
@@ -53,7 +56,7 @@ describe('PUT /events/{id}', () => {
     })
 
     it('updates event in database', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
       const creator = await createTestUser(db, { nickname: 'creator' })
       const event = await createTestEvent(db, {
         creatorId: creator.id,
@@ -80,7 +83,7 @@ describe('PUT /events/{id}', () => {
     })
 
     it('updates multiple fields at once', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
       const creator = await createTestUser(db, { nickname: 'creator' })
       const event = await createTestEvent(db, {
         creatorId: creator.id,
@@ -113,7 +116,7 @@ describe('PUT /events/{id}', () => {
     })
 
     it('updates only specified fields, leaving others unchanged', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
       const creator = await createTestUser(db, { nickname: 'creator' })
       const event = await createTestEvent(db, {
         creatorId: creator.id,
@@ -144,7 +147,7 @@ describe('PUT /events/{id}', () => {
     })
 
     it('updates event date and time', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
       const creator = await createTestUser(db, { nickname: 'creator' })
       const event = await createTestEvent(db, {
         creatorId: creator.id,
@@ -174,7 +177,7 @@ describe('PUT /events/{id}', () => {
     })
 
     it('updates event type', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
       const creator = await createTestUser(db, { nickname: 'creator' })
       const event = await createTestEvent(db, {
         creatorId: creator.id,
@@ -201,7 +204,7 @@ describe('PUT /events/{id}', () => {
     })
 
     it('updates description to null', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
       const creator = await createTestUser(db, { nickname: 'creator' })
       const event = await createTestEvent(db, {
         creatorId: creator.id,
@@ -228,7 +231,7 @@ describe('PUT /events/{id}', () => {
     })
 
     it('updates timeStart to null', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
       const creator = await createTestUser(db, { nickname: 'creator' })
       const event = await createTestEvent(db, {
         creatorId: creator.id,
@@ -257,7 +260,7 @@ describe('PUT /events/{id}', () => {
 
   describe('when event does not exist', () => {
     it('returns 404 for non-existent event', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
 
       const updateData: EventUpdateInput = {
         title: 'Updated Title',
@@ -279,7 +282,7 @@ describe('PUT /events/{id}', () => {
 
   describe('validation', () => {
     it('returns 422 when no fields provided', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
       const creator = await createTestUser(db, { nickname: 'creator' })
       const event = await createTestEvent(db, { creatorId: creator.id })
 
@@ -297,7 +300,7 @@ describe('PUT /events/{id}', () => {
     })
 
     it('returns 422 when title is empty string', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
       const creator = await createTestUser(db, { nickname: 'creator' })
       const event = await createTestEvent(db, { creatorId: creator.id })
 
@@ -317,7 +320,7 @@ describe('PUT /events/{id}', () => {
     })
 
     it('returns 422 when location is empty string', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
       const creator = await createTestUser(db, { nickname: 'creator' })
       const event = await createTestEvent(db, { creatorId: creator.id })
 
@@ -337,7 +340,7 @@ describe('PUT /events/{id}', () => {
     })
 
     it('returns 422 when subtitle is empty string', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
       const creator = await createTestUser(db, { nickname: 'creator' })
       const event = await createTestEvent(db, { creatorId: creator.id })
 
@@ -359,7 +362,7 @@ describe('PUT /events/{id}', () => {
 
   describe('authentication requirements', () => {
     it('returns 401 when API key is missing', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
       const creator = await createTestUser(db, { nickname: 'creator' })
       const event = await createTestEvent(db, { creatorId: creator.id })
 
@@ -373,7 +376,7 @@ describe('PUT /events/{id}', () => {
     })
 
     it('returns 401 when JWT token is missing', async () => {
-      await createTestUser(db, { auth0Sub: MOCK_JWT_AUTH0_SUB })
+      await createTestUser(db, { sub: MOCK_JWT_AUTH0_SUB })
       const creator = await createTestUser(db, { nickname: 'creator' })
       const event = await createTestEvent(db, { creatorId: creator.id })
 

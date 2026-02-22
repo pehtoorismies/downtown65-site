@@ -7,6 +7,7 @@ import {
   createTestParticipation,
   createTestUser,
 } from '~/common/test/db-helpers'
+import { createMockUserService } from '~/common/test/mock-user-service'
 import {
   authenticatedRequest,
   makeRequest,
@@ -14,7 +15,9 @@ import {
 import type { HttpMethod } from '~/common/test/types'
 import { getDb } from '~/db/get-db'
 import { events } from '~/db/schema'
-import app from '~/server'
+import { createApp } from '~/server'
+
+const app = createApp({ userService: createMockUserService() })
 
 /**
  * Makes a request with API key only (no JWT token).

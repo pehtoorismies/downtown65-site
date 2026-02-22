@@ -1,78 +1,86 @@
 import { env as testEnv } from 'cloudflare:test'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { resetAuth0Mock, setAuth0Error } from '~/common/test/auth0-fixtures'
 import { clearDatabase, createTestUser } from '~/common/test/db-helpers'
+import {
+  createMockUserService,
+  mockState,
+  resetMockUserService,
+  setUserServiceError,
+} from '~/common/test/mock-user-service'
 import { authenticatedRequest } from '~/common/test/request-helpers'
 import { getDb } from '~/db/get-db'
-import app from '~/server'
+import { createApp } from '~/server'
 
-interface UserResponse {
-  id: number
-  nickname: string
-  email: string
-  name: string
-  preferences: {
-    subscribeEventCreationEmail: boolean
-    subscribeWeeklyEmail: boolean
-  }
-  roles: string[]
-}
+const mockUserService = createMockUserService()
+const app = createApp({ userService: mockUserService })
 
 describe('GET /users/me', () => {
   const db = getDb(testEnv.D1_DB)
 
   beforeEach(async () => {
     await clearDatabase(db)
-    resetAuth0Mock()
+    resetMockUserService()
   })
 
   it('returns the authenticated user with local user existing', async () => {
-    // Create local user matching the JWT mock sub (auth0|user-123)
     await createTestUser(db, {
-      auth0Sub: 'auth0|user-123',
       nickname: 'test-user',
+      sub: 'auth0|user-123',
     })
 
     const res = await authenticatedRequest(app, testEnv, '/users/me', 'GET')
 
     expect(res.status).toBe(200)
-    const user = await res.json<UserResponse>()
+    const user = await res.json()
     expect(user).toMatchObject({
       email: 'test@example.com',
+      id: expect.any(Number),
       name: 'Test User',
       nickname: 'test-user',
-      preferences: {
-        subscribeEventCreationEmail: true,
-        subscribeWeeklyEmail: true,
+      subscriptions: {
+        eventCreationEmail: true,
+        weeklyEmail: true,
       },
-      roles: ['USER'],
     })
-    expect(user.id).toEqual(expect.any(Number))
   })
 
-  it('creates local user if only exists in Auth0', async () => {
-    // Auth0 mock has default user (auth0|user-123), but no local user
+  it('returns 500 when user not found in service', async () => {
+    // JWT mock uses sub 'auth0|user-123' — remove it from mock service
+    mockState.reset()
+
+    await createTestUser(db, {
+      nickname: 'test-user',
+      sub: 'auth0|user-123',
+    })
 
     const res = await authenticatedRequest(app, testEnv, '/users/me', 'GET')
 
-    expect(res.status).toBe(200)
-    const user = await res.json<UserResponse>()
-    expect(user.id).toEqual(expect.any(Number))
-    expect(user.nickname).toBe('test-user')
-
-    // Verify user was created in local database
-    const localUsers = await db.query.users.findMany()
-    expect(localUsers).toHaveLength(1)
-    expect(localUsers[0].auth0Sub).toBe('auth0|user-123')
+    expect(res.status).toBe(500)
   })
 
-  it('returns 500 when Auth0 API fails', async () => {
-    setAuth0Error('get', {
-      message: 'Auth0 service unavailable',
+  it('returns 500 when user not found in local database', async () => {
+    // Mock service has default user (auth0|user-123) but no local DB user
+    const res = await authenticatedRequest(app, testEnv, '/users/me', 'GET')
+
+    expect(res.status).toBe(500)
+  })
+
+  it('returns 500 when user service fails', async () => {
+    // Create local user so the parallel DB query resolves quickly
+    // and doesn't leak past the test boundary
+    await createTestUser(db, {
+      nickname: 'test-user',
+      sub: 'auth0|user-123',
+    })
+
+    setUserServiceError('getBySub', {
+      message: 'Service unavailable',
       statusCode: 503,
     })
 
     const res = await authenticatedRequest(app, testEnv, '/users/me', 'GET')
+    // Consume body to ensure all in-flight operations settle
+    await res.text()
 
     expect(res.status).toBe(500)
   })

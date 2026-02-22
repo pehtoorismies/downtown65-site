@@ -1,11 +1,14 @@
-import { PaginationQuerySchema } from '@downtown65/schema'
 import { createRoute } from '@hono/zod-openapi'
 import z from 'zod'
 import type { AppAPI } from '~/app-api'
 import { apiKeyAuth } from '~/common/middleware/apiKeyAuth'
 import { jwtToken } from '~/common/middleware/jwt'
-import { listUsers } from '../db/list-users'
-import { UserAPIResponseSchema } from './api-schema'
+import { UserAPIResponseSchema } from './user-api-response-schema'
+
+export const PaginationQuerySchema = z.object({
+  limit: z.string().optional().default('10'),
+  page: z.string().optional().default('1'),
+})
 
 const route = createRoute({
   description: 'Get all users',
@@ -24,15 +27,14 @@ const route = createRoute({
             limit: z.number(),
             start: z.number(),
             total: z.number(),
-            users: z.array(UserAPIResponseSchema.omit({ id: true })),
+            users: z.array(
+              UserAPIResponseSchema.omit({ id: true, subscriptions: true }),
+            ),
           }),
         },
       },
       description: 'List of all users',
     },
-    // 401: {
-    //   $ref: '#/components/responses/UnauthorizedError',
-    // },
   },
   security: [{ ApiKeyAuth: [], BearerToken: [] }],
 })
@@ -58,13 +60,20 @@ export const register = (app: AppAPI) => {
     const { page, limit } = c.req.valid('query')
 
     ctx.logger
-      .withMetadata({ data: { limit, page } })
+      .withMetadata({
+        data: {
+          limit,
+          page,
+          toValidPage: toValidPage(page),
+          validLimit: toValidLimit(limit),
+        },
+      })
       .debug('Handling request to get users')
 
-    const paginatedUsers = await listUsers(ctx, {
-      limit: toValidLimit(limit),
-      page: toValidPage(page),
-    })
+    const paginatedUsers = await ctx.userService.paginatedList(
+      toValidPage(page),
+      toValidLimit(limit),
+    )
 
     return c.json(paginatedUsers, 200)
   })

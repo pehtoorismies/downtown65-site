@@ -1,17 +1,22 @@
-import type { ID } from '@downtown65/schema'
 import type { RequestContext } from '~/app-api'
 import { getDb } from '~/db/get-db'
 
-export const getUserId = async (
+export const getUserIdByNickname = async (
   ctx: RequestContext,
-  sub: string,
-): Promise<ID | undefined> => {
+  nickname: string,
+) => {
   const db = getDb(ctx.db)
+
   const localUser = await db.query.users.findFirst({
-    columns: { id: true },
+    columns: { id: true, sub: true },
     where: {
-      sub,
+      nickname,
     },
   })
-  return !localUser ? undefined : localUser.id
+
+  if (localUser == null) {
+    return null
+  }
+
+  return localUser
 }

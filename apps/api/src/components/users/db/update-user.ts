@@ -1,32 +1,9 @@
+import type { ID } from '@downtown65/schema'
 import { eq } from 'drizzle-orm'
 import type { RequestContext } from '~/app-api'
-import { getManagementClient } from '~/common/auth0/client'
 import { getDb } from '~/db/get-db'
 import { users as usersTable } from '~/db/schema'
-import { type UserUpdateParams, UserUpdateParamsSchema } from '../shared-schema'
-
-const UpdateSchema = UserUpdateParamsSchema.transform((obj) => {
-  if (
-    obj.subscribeEventCreationEmail === undefined &&
-    obj.subscribeWeeklyEmail === undefined
-  ) {
-    return {
-      name: obj.name,
-      nickname: obj.nickname,
-      picture: obj.picture,
-    }
-  }
-
-  return {
-    name: obj.name,
-    nickname: obj.nickname,
-    picture: obj.picture,
-    user_metadata: {
-      subscribeEventCreationEmail: obj.subscribeEventCreationEmail,
-      subscribeWeeklyEmail: obj.subscribeWeeklyEmail,
-    },
-  }
-})
+import type { UserUpdateParams } from '../shared-schema'
 
 const getUpdateValuesForLocal = (params: UserUpdateParams) => {
   const values: Partial<Pick<UserUpdateParams, 'nickname' | 'picture'>> = {}
@@ -44,33 +21,27 @@ const getUpdateValuesForLocal = (params: UserUpdateParams) => {
 
 export const updateUser = async (
   ctx: RequestContext,
-  auth0Sub: string,
+  id: ID,
   params: UserUpdateParams,
 ) => {
-  const management = await getManagementClient(ctx.authConfig)
-  const parsedParams = UpdateSchema.parse(params)
-  ctx.logger.info(
-    `Updating user ${auth0Sub} with params: ${JSON.stringify(parsedParams)}`,
-  )
-  // TODO: handle errors
-  const response = await management.users.update(auth0Sub, parsedParams)
-  ctx.logger.info(
-    `Updated user ${auth0Sub} with params: ${JSON.stringify(response)}`,
-  )
-
+  const db = getDb(ctx.db)
   const localUpdateValues = getUpdateValuesForLocal(params)
   if (!localUpdateValues) {
-    return true
+    const user = await db.query.users.findFirst({
+      columns: { sub: true },
+      where: { id },
+    })
+    return user?.sub ?? null
   }
 
-  const db = getDb(ctx.db)
-
-  // just in case, update local user
-  await db
+  const user = await db
     .update(usersTable)
     .set(localUpdateValues)
-    .where(eq(usersTable.auth0Sub, auth0Sub))
+    .where(eq(usersTable.id, id))
     .returning()
 
-  return true
+  if (user.length === 1) {
+    return user[0].sub
+  }
+  return null
 }
