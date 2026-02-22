@@ -144,12 +144,12 @@ export function createApp(services: AppServices = {}) {
           ApiKeyAuth: {
             in: 'header',
             name: 'x-api-key', // header name in your security scheme
-            value: 'dev-api-key-change-in-production', // provide a default value for easy testing
+            value: 'api', // provide a default value for easy testing
           },
         },
       },
       pageTitle: 'Dt65 Events API Reference',
-      theme: 'kepler',
+      theme: 'kepler' as const,
       url: '/doc',
     })),
   )
